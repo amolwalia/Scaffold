@@ -1,50 +1,45 @@
-# Welcome to your Expo app 👋
+# Scaffold
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Scaffold is a networking app for tradespeople and apprentices to connect and find community.  
+The app provides a safe, supportive space where users can join groups, share experiences, and access opportunities within the trades industry.
 
-## Get started
+## Project Status
 
-1. Install dependencies
+🚧 **Early Development**  
+This project is in its initial stages. We are currently setting up the foundation and haven’t built out core features yet.
 
-   ```bash
+## Tech Stack
+
+- [Expo](https://expo.dev/) — for building and testing our React Native app
+- React Native — mobile app framework
+- Planned: Backend and database (to be decided in future phases)
+
+## Goals (Initial Phase)
+
+- Set up the project environment using Expo
+- Define the app’s core flows and navigation structure
+- Build a simple prototype for testing basic interactions
+
+## How to Run (once setup is ready)
+
+1. Clone the repository:
+
+   git clone https://github.com/<your-org-or-user>/scaffold.git
+
+2. Navigate into the project folder:
+
+   cd scaffold
+
+3. Install dependencies:
+
    npm install
-   ```
 
-2. Start the app
+4. Start the Expo development server:
 
-   ```bash
    npx expo start
-   ```
 
-In the output, you'll find options to open the app in a
+This will launch Expo Dev Tools in your browser, where you can run the app in an iOS/Android simulator or on your own device with the Expo Go app.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Contributing
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Since this is an early-stage project, contributions right now focus on planning, documentation, and setting up the development environment. As the app structure grows, we’ll add contribution guidelines.
