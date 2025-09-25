@@ -24,7 +24,7 @@ This project is in its initial stages. We are currently setting up the foundatio
 
 1. Clone the repository:
 
-   git clone https://github.com/<your-org-or-user>/scaffold.git
+   git clone https://github.com/amolwalia/Scaffold.git
 
 2. Navigate into the project folder:
 
