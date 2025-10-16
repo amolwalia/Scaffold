@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
@@ -9,7 +10,9 @@ interface GrantProps {
   deadline: string;
   category: string;
   description: string;
+  eligible?: boolean;
   onPress?: () => void;
+  onApply?: () => void;
 }
 
 export default function Grant({ 
@@ -20,48 +23,118 @@ export default function Grant({
   deadline, 
   category, 
   description, 
-  onPress 
+  eligible = false,
+  onPress,
+  onApply 
 }: GrantProps) {
   return (
-    <TouchableOpacity 
-      onPress={onPress}
-      className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4 mx-4"
-      activeOpacity={0.7}
-    >
-      <View className="flex-row justify-between items-start mb-2">
-        <Text className="text-lg font-bold text-gray-900 flex-1 mr-2" numberOfLines={2}>
-          {title}
-        </Text>
-        <View className="bg-blue-100 px-2 py-1 rounded-full">
-          <Text className="text-xs font-medium text-blue-800">
-            {category}
+    <View className={`rounded-2xl shadow-sm border p-5 mb-4 mx-4 ${
+      eligible 
+        ? 'bg-white border-gray-200' 
+        : 'bg-gray-100 border-gray-300 opacity-75'
+    }`}>
+      {/* Top Section with Bookmark and Logo */}
+      <View className="flex-row justify-between items-start mb-4">
+        <TouchableOpacity onPress={onPress} className="p-1">
+          <Ionicons 
+            name="bookmark-outline" 
+            size={20} 
+            color={eligible ? "#9CA3AF" : "#D1D5DB"} 
+          />
+        </TouchableOpacity>
+        
+        {/* Organization Logo Placeholder */}
+        <View className="items-center">
+          <View className={`w-12 h-12 rounded-lg items-center justify-center mb-1 ${
+            eligible 
+              ? 'bg-gradient-to-br from-yellow-400 to-orange-500' 
+              : 'bg-gray-300'
+          }`}>
+            <View className={`w-6 h-6 rounded-full ${
+              eligible ? 'bg-white' : 'bg-gray-400'
+            }`} />
+          </View>
+          <Text className={`text-xs font-medium ${
+            eligible ? 'text-gray-800' : 'text-gray-500'
+          }`}>
+            {organization}
           </Text>
         </View>
       </View>
-      
-      <Text className="text-sm text-gray-600 mb-2">
-        {organization}
+
+      {/* Grant Title */}
+      <Text className={`text-lg font-bold mb-3 leading-tight ${
+        eligible ? 'text-gray-900' : 'text-gray-500'
+      }`} numberOfLines={2}>
+        {title}
       </Text>
-      
-      <Text className="text-gray-700 mb-3" numberOfLines={2}>
-        {description}
-      </Text>
-      
-      <View className="flex-row justify-between items-center">
-        <View>
-          <Text className="text-xs text-gray-500">Amount</Text>
-          <Text className="text-lg font-bold text-green-600">
+
+      {/* Amount Tag */}
+      <View className="flex-row justify-between items-center mb-4">
+        <View className={`px-3 py-1 rounded-full ${
+          eligible ? 'bg-gray-800' : 'bg-gray-400'
+        }`}>
+          <Text className="text-white text-sm font-medium">
             {amount}
           </Text>
         </View>
         
-        <View className="items-end">
-          <Text className="text-xs text-gray-500">Deadline</Text>
-          <Text className="text-sm font-medium text-red-600">
+        {/* Deadline with Calendar Icon */}
+        <View className="flex-row items-center">
+          <Ionicons 
+            name="calendar-outline" 
+            size={14} 
+            color={eligible ? "#374151" : "#9CA3AF"} 
+          />
+          <Text className={`text-sm ml-1 ${
+            eligible ? 'text-gray-700' : 'text-gray-500'
+          }`}>
             {deadline}
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+
+      {/* Bottom Section with Eligibility and Apply Button */}
+      <View className="flex-row justify-between items-center">
+        {/* Eligibility Message */}
+        <View className="flex-row items-center flex-1">
+          {eligible ? (
+            <>
+              <View className="w-5 h-5 bg-green-500 rounded-full items-center justify-center mr-2">
+                <Ionicons name="checkmark" size={12} color="white" />
+              </View>
+              <Text className="text-gray-700 text-sm">
+                You're eligible for this grant!
+              </Text>
+            </>
+          ) : (
+            <>
+              <View className="w-5 h-5 bg-red-400 rounded-full items-center justify-center mr-2">
+                <Ionicons name="close" size={12} color="white" />
+              </View>
+              <Text className="text-red-500 text-sm">
+                You're not eligible for this grant
+              </Text>
+            </>
+          )}
+        </View>
+
+        {/* Apply Button */}
+        <TouchableOpacity 
+          onPress={eligible ? onApply : undefined}
+          className={`px-6 py-3 rounded-lg ${
+            eligible 
+              ? 'bg-orange-500' 
+              : 'bg-gray-400'
+          }`}
+          activeOpacity={eligible ? 0.8 : 1}
+          disabled={!eligible}
+        >
+          <Text className="text-white font-bold text-sm">
+            Apply
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }

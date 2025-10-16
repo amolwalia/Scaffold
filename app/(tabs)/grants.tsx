@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Grant from '../../components/grant';
@@ -10,67 +11,80 @@ interface GrantData {
   deadline: string;
   category: string;
   description: string;
+  eligible?: boolean;
 }
 
 const sampleGrants: GrantData[] = [
   {
     id: '1',
-    title: 'Small Business Innovation Research Grant',
-    organization: 'National Science Foundation',
-    amount: '$150,000',
-    deadline: 'March 15, 2024',
-    category: 'Research',
-    description: 'Funding for innovative research projects that have commercial potential and address important societal needs.'
+    title: 'StrongerBC Future Skills Grant',
+    organization: 'WorkBC',
+    amount: 'Up to $3,500',
+    deadline: '7/14 - 8/20',
+    category: 'Education',
+    description: 'Funding for skills training and professional development programs.',
+    eligible: true
   },
   {
     id: '2',
-    title: 'Community Development Grant',
-    organization: 'Department of Housing and Urban Development',
-    amount: '$500,000',
-    deadline: 'April 30, 2024',
-    category: 'Community',
-    description: 'Support for community development projects that improve housing, economic opportunities, and quality of life.'
+    title: 'Youth Work in Trades (WRK) Scholarship',
+    organization: 'WorkBC',
+    amount: 'Up to $1,000',
+    deadline: '9/2 - 11/14',
+    category: 'Education',
+    description: 'Scholarship for youth pursuing trades education and apprenticeship programs.',
+    eligible: true
   },
   {
     id: '3',
-    title: 'Environmental Protection Grant',
-    organization: 'Environmental Protection Agency',
-    amount: '$75,000',
-    deadline: 'May 1, 2024',
-    category: 'Environment',
-    description: 'Funding for projects that protect and improve environmental quality and public health.'
+    title: 'LNG Canada Trades Training Fund',
+    organization: 'BC Ca',
+    amount: 'Up to $1,300',
+    deadline: '2/28',
+    category: 'Training',
+    description: 'Training fund for LNG-related trades and skills development.',
+    eligible: true
   },
   {
     id: '4',
-    title: 'Education Technology Grant',
-    organization: 'Department of Education',
-    amount: '$200,000',
-    deadline: 'June 15, 2024',
-    category: 'Education',
-    description: 'Support for innovative educational technology projects that enhance learning outcomes.'
+    title: 'Masonry Institute of BC Training Fund',
+    organization: 'Masonry Institute',
+    amount: 'Up to $1,950',
+    deadline: '3m before training starts',
+    category: 'Training',
+    description: 'Training fund for masonry and construction skills development.',
+    eligible: true
   },
   {
     id: '5',
-    title: 'Healthcare Innovation Grant',
-    organization: 'National Institutes of Health',
-    amount: '$300,000',
-    deadline: 'July 1, 2024',
-    category: 'Healthcare',
-    description: 'Funding for healthcare research and innovation projects that improve patient outcomes.'
+    title: 'Soroptimist - Live your dream awards',
+    organization: 'Soroptimist',
+    amount: 'Up to $10,000',
+    deadline: '8/1 - 11/14',
+    category: 'Awards',
+    description: 'Awards for women pursuing education and career goals.',
+    eligible: false
   }
 ];
 
 export default function GrantsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedTab, setSelectedTab] = useState('All');
   
-  const categories = ['All', 'Research', 'Community', 'Environment', 'Education', 'Healthcare'];
+  const tabs = ['All', 'Suggested', 'My Grants'];
   
   const filteredGrants = sampleGrants.filter(grant => {
     const matchesSearch = grant.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          grant.organization.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || grant.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    
+    if (selectedTab === 'Suggested') {
+      return matchesSearch && grant.eligible;
+    } else if (selectedTab === 'My Grants') {
+      // For demo purposes, show all grants as "My Grants"
+      return matchesSearch;
+    } else {
+      return matchesSearch;
+    }
   });
 
   const handleGrantPress = (grant: GrantData) => {
@@ -78,74 +92,87 @@ export default function GrantsScreen() {
     // Add navigation to grant details here
   };
 
+  const handleApplyPress = (grant: GrantData) => {
+    console.log('Apply pressed for:', grant.title);
+    // Add navigation to application form here
+  };
+
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-white">
       {/* Header */}
-      <View className="bg-white px-4 py-6 pt-12 border-b border-gray-200">
-        <Text className="text-2xl font-bold text-gray-900 mb-2">
-          Available Grants
-        </Text>
-        <Text className="text-gray-600">
-          Find funding opportunities for your projects
+      <View className="px-4 py-6 pt-12">
+        <Text className="text-2xl font-bold text-gray-900">
+          Explore Grants
         </Text>
       </View>
 
-      {/* Search Bar */}
-      <View className="bg-white px-4 py-3 border-b border-gray-200">
-        <TextInput
-          className="bg-gray-100 rounded-lg px-4 py-3 text-gray-900"
-          placeholder="Search grants..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholderTextColor="#9CA3AF"
-        />
-      </View>
-
-      {/* Category Filter */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        className="bg-white border-b border-gray-200"
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
-      >
-        {categories.map((category) => (
+      {/* Main Navigation Tabs */}
+      <View className="flex-row px-4 mb-4">
+        {tabs.map((tab) => (
           <TouchableOpacity
-            key={category}
-            onPress={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-full mr-3 ${
-              selectedCategory === category 
-                ? 'bg-blue-600' 
+            key={tab}
+            onPress={() => setSelectedTab(tab)}
+            className={`px-4 py-2 rounded-lg mr-3 ${
+              selectedTab === tab 
+                ? 'bg-purple-600' 
                 : 'bg-gray-100'
             }`}
           >
             <Text className={`text-sm font-medium ${
-              selectedCategory === category 
+              selectedTab === tab 
                 ? 'text-white' 
                 : 'text-gray-700'
             }`}>
-              {category}
+              {tab}
             </Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </View>
+
+      {/* Search Bar */}
+      <View className="px-4 mb-4">
+        <View className="relative">
+          <TextInput
+            className="border border-purple-200 rounded-lg px-4 py-3 pr-10 text-gray-900"
+            placeholder="Find Grants"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholderTextColor="#9CA3AF"
+          />
+          <View className="absolute right-3 top-3">
+            <Ionicons name="search" size={20} color="#9CA3AF" />
+          </View>
+        </View>
+      </View>
+
+      {/* Suggested grants for you Section */}
+      <View className="flex-row justify-between items-center px-4 mb-4">
+        <Text className="text-lg font-bold text-gray-900">
+          Suggested grants for you
+        </Text>
+        <TouchableOpacity>
+          <Ionicons name="swap-vertical" size={20} color="#6B7280" />
+        </TouchableOpacity>
+      </View>
 
       {/* Grants List */}
-      <ScrollView className="flex-1 pt-4">
+      <ScrollView className="flex-1 px-4">
         {filteredGrants.length > 0 ? (
           filteredGrants.map((grant) => (
             <Grant
               key={grant.id}
               {...grant}
               onPress={() => handleGrantPress(grant)}
+              onApply={() => handleApplyPress(grant)}
             />
           ))
         ) : (
-          <View className="flex-1 items-center justify-center px-4">
+          <View className="flex-1 items-center justify-center py-8">
             <Text className="text-gray-500 text-center text-lg">
               No grants found matching your criteria
             </Text>
             <Text className="text-gray-400 text-center mt-2">
-              Try adjusting your search or category filter
+              Try adjusting your search or tab filter
             </Text>
           </View>
         )}
