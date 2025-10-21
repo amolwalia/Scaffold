@@ -11,8 +11,10 @@ interface GrantProps {
   category: string;
   description: string;
   eligible?: boolean;
+  saved?: boolean;
   onPress?: () => void;
   onApply?: () => void;
+  onSave?: () => void;
 }
 
 export default function Grant({ 
@@ -24,25 +26,24 @@ export default function Grant({
   category, 
   description, 
   eligible = false,
+  saved = false,
   onPress,
-  onApply 
+  onApply,
+  onSave 
 }: GrantProps) {
   return (
-    <View className={`rounded-2xl shadow-sm border p-5 mb-4 mx-4 ${
-      eligible 
-        ? 'bg-white border-gray-200' 
-        : 'bg-gray-100 border-gray-300 opacity-75'
-    }`}>
+    <TouchableOpacity 
+      onPress={onPress}
+      activeOpacity={0.7}
+      className={`rounded-2xl shadow-sm border p-5 mb-4 mx-4 ${
+        eligible 
+          ? 'bg-white border-gray-200' 
+          : 'bg-gray-100 border-gray-300 opacity-75'
+      }`}
+    >
       {/* Top Section with Bookmark and Logo */}
       <View className="flex-row justify-between items-start mb-4">
-        <TouchableOpacity onPress={onPress} className="p-1">
-          <Ionicons 
-            name="bookmark-outline" 
-            size={20} 
-            color={eligible ? "#9CA3AF" : "#D1D5DB"} 
-          />
-        </TouchableOpacity>
-        
+
         {/* Organization Logo Placeholder */}
         <View className="items-center">
           <View className={`w-12 h-12 rounded-lg items-center justify-center mb-1 ${
@@ -60,6 +61,20 @@ export default function Grant({
             {organization}
           </Text>
         </View>
+
+        <TouchableOpacity 
+          onPress={(e) => {
+            e?.stopPropagation?.();
+            onSave?.();
+          }} 
+          className="p-1"
+        >
+          <Ionicons 
+            name={saved ? "bookmark" : "bookmark-outline"} 
+            size={25} 
+            color={saved ? "#3B82F6" : (eligible ? "#9CA3AF" : "#D1D5DB")} 
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Grant Title */}
@@ -121,7 +136,10 @@ export default function Grant({
 
         {/* Apply Button */}
         <TouchableOpacity 
-          onPress={eligible ? onApply : undefined}
+          onPress={(e) => {
+            e?.stopPropagation?.();
+            if (eligible) onApply?.();
+          }}
           className={`px-6 py-3 rounded-lg ${
             eligible 
               ? 'bg-orange-500' 
@@ -135,6 +153,6 @@ export default function Grant({
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }

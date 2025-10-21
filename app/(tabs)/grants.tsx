@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Grant from '../../components/grant';
@@ -12,6 +13,8 @@ interface GrantData {
   category: string;
   description: string;
   eligible?: boolean;
+  saved?: boolean;
+  applied?: boolean;
 }
 
 const sampleGrants: GrantData[] = [
@@ -23,7 +26,9 @@ const sampleGrants: GrantData[] = [
     deadline: '7/14 - 8/20',
     category: 'Education',
     description: 'Funding for skills training and professional development programs.',
-    eligible: true
+    eligible: true,
+    saved: false,
+    applied: false
   },
   {
     id: '2',
@@ -33,7 +38,9 @@ const sampleGrants: GrantData[] = [
     deadline: '9/2 - 11/14',
     category: 'Education',
     description: 'Scholarship for youth pursuing trades education and apprenticeship programs.',
-    eligible: true
+    eligible: true,
+    saved: false,
+    applied: false
   },
   {
     id: '3',
@@ -43,7 +50,9 @@ const sampleGrants: GrantData[] = [
     deadline: '2/28',
     category: 'Training',
     description: 'Training fund for LNG-related trades and skills development.',
-    eligible: true
+    eligible: true,
+    saved: true,
+    applied: false
   },
   {
     id: '4',
@@ -53,7 +62,9 @@ const sampleGrants: GrantData[] = [
     deadline: '3m before training starts',
     category: 'Training',
     description: 'Training fund for masonry and construction skills development.',
-    eligible: true
+    eligible: true,
+    saved: false,
+    applied: true
   },
   {
     id: '5',
@@ -63,25 +74,34 @@ const sampleGrants: GrantData[] = [
     deadline: '8/1 - 11/14',
     category: 'Awards',
     description: 'Awards for women pursuing education and career goals.',
-    eligible: false
+    eligible: false,
+    saved: false,
+    applied: false
   }
 ];
 
 export default function GrantsScreen() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTab, setSelectedTab] = useState('All');
+  const [selectedSubFilter, setSelectedSubFilter] = useState('Saved');
+  const [grants, setGrants] = useState(sampleGrants);
   
-  const tabs = ['All', 'Suggested', 'My Grants'];
+  const tabs = ['All', 'Eligible', 'My Grants'];
   
-  const filteredGrants = sampleGrants.filter(grant => {
+  const filteredGrants = grants.filter(grant => {
     const matchesSearch = grant.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          grant.organization.toLowerCase().includes(searchQuery.toLowerCase());
     
-    if (selectedTab === 'Suggested') {
+    if (selectedTab === 'Eligible') {
       return matchesSearch && grant.eligible;
     } else if (selectedTab === 'My Grants') {
-      // For demo purposes, show all grants as "My Grants"
-      return matchesSearch;
+      if (selectedSubFilter === 'Saved') {
+        return matchesSearch && grant.saved;
+      } else if (selectedSubFilter === 'Applied') {
+        return matchesSearch && grant.applied;
+      }
+      return matchesSearch && (grant.saved || grant.applied);
     } else {
       return matchesSearch;
     }
@@ -89,12 +109,39 @@ export default function GrantsScreen() {
 
   const handleGrantPress = (grant: GrantData) => {
     console.log('Grant pressed:', grant.title);
-    // Add navigation to grant details here
+    // Navigate to grant details page
+    router.push({
+      pathname: '/grant-details',
+      params: { 
+        id: grant.id,
+        title: grant.title,
+        organization: grant.organization,
+        amount: grant.amount,
+        deadline: grant.deadline,
+        eligible: grant.eligible ? 'true' : 'false'
+      }
+    });
   };
 
   const handleApplyPress = (grant: GrantData) => {
     console.log('Apply pressed for:', grant.title);
+    // Mark as applied
+    setGrants(prevGrants => 
+      prevGrants.map(g => 
+        g.id === grant.id ? { ...g, applied: true } : g
+      )
+    );
     // Add navigation to application form here
+  };
+
+  const handleSavePress = (grant: GrantData) => {
+    console.log('Save pressed for:', grant.title);
+    // Toggle saved state
+    setGrants(prevGrants => 
+      prevGrants.map(g => 
+        g.id === grant.id ? { ...g, saved: !g.saved } : g
+      )
+    );
   };
 
   return (
@@ -129,6 +176,36 @@ export default function GrantsScreen() {
         ))}
       </View>
 
+      {/* Sub-filters for My Grants */}
+      {selectedTab === 'My Grants' && (
+        <View className="flex-row px-4 mb-4">
+          <TouchableOpacity
+            onPress={() => setSelectedSubFilter('Applied')}
+            className="mr-6"
+          >
+            <Text className={`text-sm ${
+              selectedSubFilter === 'Applied' 
+                ? 'text-purple-600' 
+                : 'text-gray-500'
+            }`}>
+              Applied
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setSelectedSubFilter('Saved')}
+          >
+            <Text className={`text-sm ${
+              selectedSubFilter === 'Saved' 
+                ? 'text-purple-600' 
+                : 'text-gray-500'
+            }`}>
+              Saved
+            </Text>
+            
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Search Bar */}
       <View className="px-4 mb-4">
         <View className="relative">
@@ -145,10 +222,15 @@ export default function GrantsScreen() {
         </View>
       </View>
 
-      {/* Suggested grants for you Section */}
+      {/* Section Title */}
       <View className="flex-row justify-between items-center px-4 mb-4">
         <Text className="text-lg font-bold text-gray-900">
-          Suggested grants for you
+          {selectedTab === 'My Grants' 
+            ? (selectedSubFilter === 'Saved' ? 'Your Saved Grants' : 'Your Applied Grants')
+            : selectedTab === 'Eligible' 
+            ? 'Eligible grants for you'
+            : 'Suggested grants for you'
+          }
         </Text>
         <TouchableOpacity>
           <Ionicons name="swap-vertical" size={20} color="#6B7280" />
@@ -164,6 +246,7 @@ export default function GrantsScreen() {
               {...grant}
               onPress={() => handleGrantPress(grant)}
               onApply={() => handleApplyPress(grant)}
+              onSave={() => handleSavePress(grant)}
             />
           ))
         ) : (
