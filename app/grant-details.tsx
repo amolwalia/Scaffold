@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
@@ -31,7 +31,10 @@ export default function GrantDetailsScreen() {
 
   return (
     <View className="flex-1 bg-white">
-      {/* Header */}
+      {/* Hides the default header */}
+      <Stack.Screen options={{ headerShown: false }} />
+
+      {/* Custom Header */}
       <View className="flex-row items-center justify-between px-4 py-6 pt-12">
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#000" />
