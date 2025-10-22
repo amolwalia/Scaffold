@@ -120,7 +120,7 @@ export default function GrantDetailsScreen() {
               Apply
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity className="bg-green-400 rounded-3xl py-4">
+          <TouchableOpacity className="bg-[#7CD23E] rounded-3xl py-4">
             <Text className="text-black text-center font-medium text-base">
               Generate my application
             </Text>
@@ -136,10 +136,10 @@ export default function GrantDetailsScreen() {
           {/* Step 1: Check Eligibility */}
           <View className="mb-6">
             <View className="flex-row items-center mb-3">
-              <View className="bg-green-500 rounded-full w-6 h-6 items-center justify-center mr-3">
+              <View className="bg-[#7CD23E] rounded-full w-6 h-6 items-center justify-center mr-3">
                 <Ionicons name="checkmark" size={16} color="white" />
               </View>
-              <Text className="text-green-500 font-bold text-base">
+              <Text className="text-[#7CD23E] font-bold text-base">
                 Step 1 : Check Eligibility
               </Text>
             </View>
@@ -201,10 +201,10 @@ export default function GrantDetailsScreen() {
           {/* Step 2: Gather Required Documents */}
           <View className="mb-6">
             <View className="flex-row items-center mb-3">
-              <View className="bg-green-500 rounded-full w-6 h-6 items-center justify-center mr-3">
+              <View className="bg-[#7CD23E] rounded-full w-6 h-6 items-center justify-center mr-3">
                 <Ionicons name="checkmark" size={16} color="white" />
               </View>
-              <Text className="text-green-600 font-bold text-base">
+              <Text className="text-[#7CD23E] font-bold text-base">
                 Step 2 : Gather Required Documents
               </Text>
             </View>
@@ -255,7 +255,7 @@ export default function GrantDetailsScreen() {
           {/* Step 4: Record the Result */}
           <View>
             <View className="flex-row items-center mb-3">
-              <View className="bg-gray-300 rounded-full w-6 h-6 items-center justify-center mr-3">
+              <View className="bg-[#6FCEFD] rounded-full w-6 h-6 items-center justify-center mr-3">
                 <Ionicons name="checkmark" size={16} color="white" />
               </View>
               <Text className="text-gray-400 font-bold text-base">
@@ -264,12 +264,12 @@ export default function GrantDetailsScreen() {
             </View>
 
             <View className="px-7">
-              <TouchableOpacity className="bg-blue-400 rounded-3xl py-4 mb-3">
+              <TouchableOpacity className="bg-[#6FCEFD] rounded-3xl py-4 mb-3">
                 <Text className="text-black text-center font-medium text-base">
                   Accepted
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity className="bg-red-500 rounded-3xl py-4">
+              <TouchableOpacity className="bg-[#E83B4D] rounded-3xl py-4">
                 <Text className="text-black text-center font-medium text-base">
                   Declined
                 </Text>
