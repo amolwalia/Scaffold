@@ -13,8 +13,9 @@ interface GrantProps {
   eligible?: boolean;
   saved?: boolean;
   onPress?: () => void;
-  onApply?: () => void;
+  onView?: () => void;
   onSave?: () => void;
+  onNavigateToApply?: () => void;
 }
 
 export default function Grant({ 
@@ -28,8 +29,9 @@ export default function Grant({
   eligible = false,
   saved = false,
   onPress,
-  onApply,
-  onSave 
+  onView,
+  onSave,
+  onNavigateToApply
 }: GrantProps) {
   return (
     <TouchableOpacity 
@@ -134,11 +136,13 @@ export default function Grant({
           )}
         </View>
 
-        {/* Apply Button */}
+        {/* View Button */}
         <TouchableOpacity 
           onPress={(e) => {
             e?.stopPropagation?.();
-            if (eligible) onApply?.();
+            if (eligible) {
+              onNavigateToApply?.();
+            }
           }}
           className={`px-6 py-3 rounded-lg ${
             eligible 
@@ -148,8 +152,8 @@ export default function Grant({
           activeOpacity={eligible ? 0.8 : 1}
           disabled={!eligible}
         >
-          <Text className="text-white font-bold text-sm">
-            Apply
+          <Text className="text-black font-medium text-sm">
+            View
           </Text>
         </TouchableOpacity>
       </View>
