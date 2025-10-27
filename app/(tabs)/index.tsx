@@ -1,9 +1,9 @@
-import { SafeAreaView, ScrollView, View, Text } from "react-native";
-import HeaderGreeting from "../../components/HeaderGreeting";
-import EligibilityBanner from "../../components/EligibilityBanner";
+import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import ApplicationProgressCard from "../../components/ApplicationProgressCard";
-import SavedGrantRow from "../../components/SavedGrantRow";
+import EligibilityBanner from "../../components/EligibilityBanner";
 import FinishProfileCard from "../../components/FinishProfileCard";
+import HeaderGreeting from "../../components/HeaderGreeting";
+import SavedGrantRow from "../../components/SavedGrantRow";
 
 export default function HomeTab() {
   const user = { name: "Mateo Alvarez", role: "Apprentice Electrician" };

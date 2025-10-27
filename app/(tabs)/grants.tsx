@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Grant from '../../components/grant';
+import GrantSubFilters from '../../components/GrantSubFilters';
 
 interface GrantData {
   id: string;
@@ -151,15 +152,7 @@ export default function GrantsScreen() {
         <Text className="text-2xl font-bold text-gray-900">
           Explore Grants
         </Text>
-        {/* Test button for grant saved apply page */}
-        <TouchableOpacity 
-          className="bg-blue-500 rounded-lg py-2 px-4 mt-2"
-          onPress={() => router.push('/grant-saved-apply')}
-        >
-          <Text className="text-white text-center font-medium">
-            Test: Go to Grant Saved Apply Page
-          </Text>
-        </TouchableOpacity>
+      
       </View>
 
       {/* Main Navigation Tabs */}
@@ -187,32 +180,10 @@ export default function GrantsScreen() {
 
       {/* Sub-filters for My Grants */}
       {selectedTab === 'My Grants' && (
-        <View className="flex-row px-4 mb-4">
-          <TouchableOpacity
-            onPress={() => setSelectedSubFilter('Applied')}
-            className="mr-6"
-          >
-            <Text className={`text-sm ${
-              selectedSubFilter === 'Applied' 
-                ? 'text-purple-600' 
-                : 'text-gray-500'
-            }`}>
-              Applied
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setSelectedSubFilter('Saved')}
-          >
-            <Text className={`text-sm ${
-              selectedSubFilter === 'Saved' 
-                ? 'text-purple-600' 
-                : 'text-gray-500'
-            }`}>
-              Saved
-            </Text>
-            
-          </TouchableOpacity>
-        </View>
+        <GrantSubFilters
+          selectedFilter={selectedSubFilter}
+          onFilterChange={setSelectedSubFilter}
+        />
       )}
 
       {/* Search Bar */}
@@ -254,8 +225,10 @@ export default function GrantsScreen() {
               key={grant.id}
               {...grant}
               onPress={() => handleGrantPress(grant)}
-              onApply={() => handleApplyPress(grant)}
+              onView={() => handleApplyPress(grant)}
               onSave={() => handleSavePress(grant)}
+              onNavigateToApply={() => router.push('/grant-details')}
+              
             />
           ))
         ) : (

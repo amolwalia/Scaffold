@@ -1,3 +1,4 @@
+import BottomNavigation from "@/components/BottomNavigation";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -27,7 +28,7 @@ export default function GrantSavedApplyScreen() {
     amount: "Up to $1,950",
     deadline: "3m before training starts",
     description: "The Masonry Institute of BC has evolved from masonry organizations, which have been promoting the local masonry industry for over 50 years.",
-    fullDescription: "The Masonry Institute of BC has evolved from masonry organizations, which have been promoting the local masonry industry for over 50 years. We are committed to advancing the masonry trade through education, training, and professional development. Our training fund provides financial support to apprentices and tradespeople pursuing masonry-related education and certification programs. This includes support for various levels of apprenticeship training, specialized masonry techniques, and continuing education opportunities that enhance skills and career advancement in the masonry industry.",
+    fullDescription: "The Masonry Institute of BC has evolved from masonry organizations, which have been promoting the local masonry industry for over 50 years." + "\n" + " We are committed to advancing the masonry trade through education, training, and professional development. Our training fund provides financial support to apprentices and tradespeople pursuing masonry-related education and certification programs." + "\n" + "This includes support for various levels of apprenticeship training, specialized masonry techniques, and continuing education opportunities that enhance skills and career advancement in the masonry industry.",
   };
 
   const toggleStepExpansion = (stepKey: string) => {
@@ -92,8 +93,11 @@ export default function GrantSavedApplyScreen() {
 
         {/* Generate Application Button */}
         <View className="px-4 mb-6">
-          <TouchableOpacity className="bg-orange-400 rounded-3xl py-4">
-            <Text className="text-black text-center font-bold text-base">
+          <TouchableOpacity 
+            className="bg-orange-400 rounded-3xl py-4"
+            onPress={() => router.push('/generated-application')}
+          >
+            <Text className="text-black text-center font-medium text-base">
               Generate my application
             </Text>
           </TouchableOpacity>
@@ -316,7 +320,7 @@ export default function GrantSavedApplyScreen() {
                     <Text className="text-gray-900 text-sm mb-4">
                       Submit your application in the <Text className="font-bold">Masonry Institute of British Columbia</Text> portal
                     </Text>
-                    <TouchableOpacity className="bg-green-500 rounded-xl py-5 flex-row items-center justify-center">
+                    <TouchableOpacity className="bg-[#7CD23E] rounded-xl py-5 flex-row items-center justify-center">
                       <Text className="text-black font-medium text-base mr-2">Apply here</Text>
                       <Ionicons name="open-outline" size={20} color="black" />
                     </TouchableOpacity>
@@ -357,7 +361,7 @@ export default function GrantSavedApplyScreen() {
                     </Text>
                     <View className="flex-row space-x-2">
                       <TouchableOpacity
-                        className="bg-green-500 rounded-2xl py-3 flex-1"
+                        className="bg-[#7CD23E] rounded-2xl py-3 flex-1"
                         onPress={() => handleApplicationResult('approved')}
                       >
                         <Text className="text-black text-center font-medium text-sm">Approved</Text>
@@ -383,7 +387,7 @@ export default function GrantSavedApplyScreen() {
         </View>
       </ScrollView>
 
-      {/* Bottom Navigation Bar */}
+      {/* {/* Bottom Navigation Bar 
       <View className="bg-white border-t border-gray-200 px-4 py-2">
         <View className="flex-row justify-around items-center">
           <TouchableOpacity 
@@ -404,8 +408,9 @@ export default function GrantSavedApplyScreen() {
             <Ionicons name="person-outline" size={24} color="#9CA3AF" />
             <Text className="text-gray-500 text-xs mt-1">Profile</Text>
           </TouchableOpacity>
-        </View>
-      </View>
+        </View>} 
+        </View>*/}
+      <BottomNavigation activeTab="grants" />
     </View>
   );
 }

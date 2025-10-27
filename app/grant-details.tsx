@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { SafeAreaView, ScrollView, View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
 import InfoChip from "../components/InfoChip";
 import ModalPopover from "../components/ModalPopover";
 
@@ -111,11 +111,13 @@ export default function GrantDetails() {
           <Pressable
             className="h-[56px] rounded-full items-center justify-center"
             style={{ backgroundColor: "#E1882C" }}
+            onPress={() => router.push('/grant-saved-apply')}
           >
             <Text className="text-[18px] font-montSemi text-black">
               Get started
             </Text>
           </Pressable>
+
         </View>
       </ScrollView>
 
