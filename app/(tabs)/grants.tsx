@@ -151,6 +151,15 @@ export default function GrantsScreen() {
         <Text className="text-2xl font-bold text-gray-900">
           Explore Grants
         </Text>
+        {/* Test button for grant saved apply page */}
+        <TouchableOpacity 
+          className="bg-blue-500 rounded-lg py-2 px-4 mt-2"
+          onPress={() => router.push('/grant-saved-apply')}
+        >
+          <Text className="text-white text-center font-medium">
+            Test: Go to Grant Saved Apply Page
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Main Navigation Tabs */}
