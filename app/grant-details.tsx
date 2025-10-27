@@ -1,55 +1,12 @@
-// app/grants/grant-details.tsx
 import { useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import InfoChip from "../components/InfoChip";
 import ModalPopover from "../components/ModalPopover";
-
-/** Small rounded chip with icon, label and chevron */
-function InfoChip({
-  bg = "#F3F4F6",
-  iconBg = "#E5F0FF",
-  iconName,
-  iconColor,
-  label,
-  onPress,
-}: {
-  bg?: string;
-  iconBg?: string;
-  iconName: keyof typeof Ionicons.glyphMap;
-  iconColor: string;
-  label: string;
-  onPress?: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      className="rounded-[10px] px-3 py-3 flex-row items-center justify-between"
-      style={{ backgroundColor: bg }}
-    >
-      <View className="flex-row items-center">
-        <View
-          className="h-8 w-8 rounded-full items-center justify-center mr-3"
-          style={{ backgroundColor: iconBg }}
-        >
-          <Ionicons name={iconName} size={18} color={iconColor} />
-        </View>
-        <Text
-          className="text-[16px] font-montSemi text-[#0B0B0F]"
-          numberOfLines={1}
-        >
-          {label}
-        </Text>
-      </View>
-      <Ionicons name="chevron-forward" size={18} color="#6B7280" />
-    </Pressable>
-  );
-}
 
 export default function GrantDetails() {
   const router = useRouter();
-
-  // which modal is open
   const [open, setOpen] = useState<
     null | "eligible" | "funding" | "date" | "age" | "location" | "notes"
   >(null);
@@ -67,11 +24,11 @@ export default function GrantDetails() {
           <View className="flex-row items-center justify-between mb-4">
             <Pressable
               onPress={() => router.back()}
-              className="h-9 w-9 rounded-full items-center justify-center"
+              className="h-9 w-9 items-center justify-center"
             >
               <Ionicons name="chevron-back" size={22} color="#111827" />
             </Pressable>
-            <Pressable className="h-9 w-9 rounded-full items-center justify-center">
+            <Pressable className="h-9 w-9 items-center justify-center">
               <Ionicons name="bookmark-outline" size={22} color="#6B7280" />
             </Pressable>
           </View>
@@ -84,45 +41,45 @@ export default function GrantDetails() {
           {/* Chips grid (2 columns) */}
           <View className="grid grid-cols-2 gap-3">
             <InfoChip
+              label="You’re eligible"
               iconName="checkmark-circle"
               iconColor="#3B82F6"
               iconBg="#E5F0FF"
-              label="You’re eligible"
               onPress={() => setOpen("eligible")}
             />
             <InfoChip
+              label="Up to $1950"
               iconName="cash-outline"
               iconColor="#22C55E"
               iconBg="#E6F9EC"
-              label="Up to $1950"
               onPress={() => setOpen("funding")}
             />
             <InfoChip
+              label="3 Months Before"
               iconName="calendar-outline"
               iconColor="#F59E0B"
               iconBg="#FEF3E7"
-              label="3 Months Before"
               onPress={() => setOpen("date")}
             />
             <InfoChip
+              label="Gr 10+"
               iconName="person-circle-outline"
               iconColor="#F59E0B"
               iconBg="#FEF3E7"
-              label="Gr 10+"
               onPress={() => setOpen("age")}
             />
             <InfoChip
+              label="Legal Work Permit"
               iconName="home-outline"
               iconColor="#F59E0B"
               iconBg="#FEF3E7"
-              label="Legal Work Permit"
               onPress={() => setOpen("location")}
             />
             <InfoChip
+              label="Notes"
               iconName="information-circle-outline"
               iconColor="#7B6CF6"
               iconBg="#ECEBFF"
-              label="Notes"
               onPress={() => setOpen("notes")}
             />
           </View>
@@ -162,7 +119,7 @@ export default function GrantDetails() {
         </View>
       </ScrollView>
 
-      {/* MODALS — content exactly from your overlays */}
+      {/* MODALS */}
       <ModalPopover
         visible={open === "eligible"}
         onClose={close}
@@ -225,14 +182,13 @@ export default function GrantDetails() {
         titleIconBg="#7B6CF6"
         titleIconColor="#FFFFFF"
       >
-        {/* Bullet list for the Notes overlay */}
         <View className="mt-1">
           <Text className="text-[15px] leading-[20px] text-[#0B0B0F] font-montSemi mb-2">
             Successful applicants must be:
           </Text>
           {[
             "Enrolled at the Trowel Trades Training Association",
-            "In Level, 1, 2, 3 of their apprenticeship",
+            "In Level 1, 2, or 3 of their apprenticeship",
             "Priority will be given to applicants who are members of the Masonry Institute of BC",
           ].map((t, i) => (
             <View key={i} className="flex-row mb-2">
