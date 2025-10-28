@@ -1,18 +1,18 @@
 import BottomNavigation from "@/components/BottomNavigation";
+import SparkleIcon from "@/components/SparkleIcon";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
-import SparkleIcon from "@/components/SparkleIcon";
 import {
-  View,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
+  View,
 } from "react-native";
 
 const PRESET_GOAL =
-  "My future goal as a mason is to become a certified journeyman and eventually run my own small contracting business. I want to focus on custom stone and brickwork for residential homes, where craftsmanship and detail really stand out.";
+  "My future goal as a mason is to become a certified journeyman and eventually run my own small contracting business. I want to focus on custom stone and brickwork for residential homes.";
 
 export default function GeneratedApplicationScreen() {
   const router = useRouter();
@@ -207,12 +207,12 @@ export default function GeneratedApplicationScreen() {
               <View>
                 {/* Label + sparkle icon */}
                 <View className="relative mb-2 pr-8">
-                  <Text className="text-gray-600 text-sm">
+                  <Text className="text-gray-600 text-sm mb-2">
                     What is your future goal as a mason?
                   </Text>
 
                   <TouchableOpacity
-                    className="absolute right-0 top-0"
+                    className="absolute right-0 top-0 "
                     onPress={insertPresetGoal}
                     hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
                     accessibilityRole="button"
@@ -223,7 +223,7 @@ export default function GeneratedApplicationScreen() {
                 </View>
 
                 <TextInput
-                  className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 min-h-[80px]"
+                  className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 min-h-[80px] mb-2"
                   placeholder="Enter your response here..."
                   value={writtenAnswers.goal}
                   onChangeText={(text) =>
@@ -235,7 +235,7 @@ export default function GeneratedApplicationScreen() {
               </View>
 
               <View>
-                <Text className="text-gray-600 text-sm mb-2">
+                <Text className="text-gray-600 text-sm mb-4">
                   Why have you chosen a career in masonry?
                 </Text>
                 <TouchableOpacity

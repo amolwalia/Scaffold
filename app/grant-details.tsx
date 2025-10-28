@@ -32,19 +32,22 @@ function Chip({ label, iconName, iconBg, onPress }: ChipProps) {
         pressed && chipStyles.pressed,
       ]}
     >
-      <View style={[chipStyles.iconCircle, { backgroundColor: iconBg }]}>
-        <Ionicons name={iconName} size={18} color="#fff" />
-      </View>
+      <View className="flex-row justify-between items-center bg-gray-100 p-2 mx-1 rounded-2xl"> 
+        <View style={[chipStyles.iconCircle, { backgroundColor: iconBg }]}>
+           <Ionicons name={iconName} size={18} color="#fff" />
+        </View>
 
-      <View style={chipStyles.labelWrap}>
+        <View style={chipStyles.labelWrap}>
         <Text numberOfLines={1} ellipsizeMode="tail" style={chipStyles.label}>
           {label}
         </Text>
       </View>
-
-      <View style={chipStyles.chevWrap}>
-        <Ionicons name="chevron-forward" size={16} color="#111" />
-      </View>
+         <View style={chipStyles.chevWrap}>
+        <   Ionicons name="chevron-forward" size={16} color="#111" className="pr-8"/>
+         </View>
+      
+      
+</View>
     </Pressable>
   );
 }

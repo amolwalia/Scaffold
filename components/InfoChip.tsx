@@ -1,7 +1,7 @@
 // components/InfoChip.tsx
-import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type InfoChipProps = {
   iconName: keyof typeof Ionicons.glyphMap;
@@ -26,24 +26,7 @@ export default function InfoChip({
         <Ionicons name={iconName} size={18} color="#fff" />
       </View>
 
-      {/* Label (never lets chevron wrap below) */}
-      <View style={styles.labelWrap}>
-        <Text
-          style={styles.label}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-          allowFontScaling={false}
-          includeFontPadding={false}
-        >
-          {label}
-        </Text>
-      </View>
-
-      {/* Chevron (fixed box so it can’t wrap) */}
-      <View style={styles.chevWrap}>
-        <Ionicons name="chevron-forward" size={16} color="#111" />
-      </View>
-    </Pressable>
+      
   );
 }
 
@@ -92,7 +75,7 @@ const styles = StyleSheet.create({
   // Reserve space for chevron so it never drops
   chevWrap: {
     width: 18,
-    alignItems: "flex-end",
+    alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
