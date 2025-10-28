@@ -2,16 +2,25 @@ import BottomNavigation from "@/components/BottomNavigation";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import SparkleIcon from "@/components/SparkleIcon";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+
+const PRESET_GOAL =
+  "My future goal as a mason is to become a certified journeyman and eventually run my own small contracting business. I want to focus on custom stone and brickwork for residential homes, where craftsmanship and detail really stand out.";
 
 export default function GeneratedApplicationScreen() {
   const router = useRouter();
   const [writtenAnswers, setWrittenAnswers] = useState({
     goal: "",
-    career: ""
+    career: "",
   });
 
-  // Mock profile data - in production this would come from user profile
   const profileData = {
     fullName: "Mateo Alvarez",
     streetAddress: "123 Main Street",
@@ -20,22 +29,23 @@ export default function GeneratedApplicationScreen() {
     phone: "(604) 555-0123",
     currentEmployer: "ABC Construction Ltd.",
     tuitionCost: "$2,500",
-    apprenticeshipLevel: "Level 2"
+    apprenticeshipLevel: "Level 2",
   };
 
   const handleApplyPress = () => {
-    console.log('Apply button pressed - navigate to external portal');
-    // In production, this would open the external application portal
+    console.log("Apply button pressed - navigate to external portal");
   };
 
   const handleUploadDocuments = () => {
-    console.log('Upload documents pressed');
-    // In production, this would open document upload interface
+    console.log("Upload documents pressed");
+  };
+
+  const insertPresetGoal = () => {
+    setWrittenAnswers((prev) => ({ ...prev, goal: PRESET_GOAL }));
   };
 
   return (
     <View className="flex-1 bg-white">
-      {/* Hides the default header */}
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Custom Header */}
@@ -58,16 +68,20 @@ export default function GeneratedApplicationScreen() {
             Masonry Institute of BC Training Fund
           </Text>
           <Text className="text-gray-700 text-base leading-relaxed mb-4">
-            We've auto-filled your application using your profile. {" "}
-            <Text className="text-purple-600">Finish applying through the portal</Text>.
+            We've auto-filled your application using your profile{" "}
+            <Text className="text-purple-600">
+              Finish applying through the portal
+            </Text>
+            .
           </Text>
-          
-          {/* Apply Button */}
-          <TouchableOpacity 
+
+          <TouchableOpacity
             className="bg-[#7CD23E] rounded-xl py-5 flex-row items-center justify-center mb-6"
             onPress={handleApplyPress}
           >
-            <Text className="text-black font-medium text-base mr-2">Apply here</Text>
+            <Text className="text-black font-medium text-base mr-2">
+              Apply here
+            </Text>
             <Ionicons name="open-outline" size={20} color="black" />
           </TouchableOpacity>
         </View>
@@ -77,110 +91,169 @@ export default function GeneratedApplicationScreen() {
           <Text className="text-xl font-bold text-gray-900 mb-4">
             Your application template
           </Text>
-          
-          {/* Missing Profile Warning 
-          <View className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <Text className="text-red-600 font-medium text-base">
-              Missing from your profile...
-            </Text>
-          </View>
-          
 
-          {/* Basic Profile Section */}
+          {/* Basic Profile */}
           <View className="bg-gray-50 border border-green-500 rounded-2xl p-4 mb-4">
-            <Text className="text-lg font-bold text-gray-900 mb-4">Basic Profile</Text>
-            
+            <Text className="text-lg font-bold text-gray-900 mb-4">
+              Basic Profile
+            </Text>
+
             <View className="space-y-3">
               <View className="flex-row items-center justify-between">
                 <Text className="text-gray-600 text-sm mb-1">Full Name</Text>
-                <Text className="text-gray-900 text-base">{profileData.fullName}</Text>
+                <Text className="text-gray-900 text-base">
+                  {profileData.fullName}
+                </Text>
               </View>
-              
+
               <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">Street Address</Text>
-                <Text className="text-gray-900 text-base">{profileData.streetAddress}</Text>
+                <Text className="text-gray-600 text-sm mb-1">
+                  Street Address
+                </Text>
+                <Text className="text-gray-900 text-base">
+                  {profileData.streetAddress}
+                </Text>
               </View>
-              
+
               <View className="flex-row items-center justify-between">
                 <Text className="text-gray-600 text-sm mb-1">City</Text>
-                <Text className="text-gray-900 text-base">{profileData.city}</Text>
+                <Text className="text-gray-900 text-base">
+                  {profileData.city}
+                </Text>
               </View>
-              
+
               <View className="flex-row items-center justify-between">
                 <Text className="text-gray-600 text-sm mb-1">Email</Text>
-                <Text className="text-gray-900 text-base">{profileData.email}</Text>
+                <Text className="text-gray-900 text-base">
+                  {profileData.email}
+                </Text>
               </View>
-              
+
               <View className="flex-row items-center justify-between">
                 <Text className="text-gray-600 text-sm mb-1">Phone</Text>
-                <Text className="text-gray-900 text-base">{profileData.phone}</Text>
+                <Text className="text-gray-900 text-base">
+                  {profileData.phone}
+                </Text>
               </View>
-              
+
               <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">Current Employer</Text>
-                <Text className="text-gray-900 text-base">{profileData.currentEmployer}</Text>
+                <Text className="text-gray-600 text-sm mb-1">
+                  Current Employer
+                </Text>
+                <Text className="text-gray-900 text-base">
+                  {profileData.currentEmployer}
+                </Text>
               </View>
             </View>
           </View>
 
-          {/* Education and Training Section */}
+          {/* Education and training */}
           <View className="bg-gray-50 border border-green-500 rounded-2xl p-4 mb-4">
-            <Text className="text-lg font-bold text-gray-900 mb-4">Education and training</Text>
-            
+            <Text className="text-lg font-bold text-gray-900 mb-4">
+              Education and training
+            </Text>
+
             <View className="space-y-3">
               <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">Cost of Tuition</Text>
-                <Text className="text-gray-900 text-base">{profileData.tuitionCost}</Text>
+                <Text className="text-gray-600 text-sm mb-1">
+                  Cost of Tuition
+                </Text>
+                <Text className="text-gray-900 text-base">
+                  {profileData.tuitionCost}
+                </Text>
               </View>
-              
+
               <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">Apprenticeship Level</Text>
-                <Text className="text-gray-900 text-base">{profileData.apprenticeshipLevel}</Text>
+                <Text className="text-gray-600 text-sm mb-1">
+                  Apprenticeship Level
+                </Text>
+                <Text className="text-gray-900 text-base">
+                  {profileData.apprenticeshipLevel}
+                </Text>
               </View>
             </View>
           </View>
 
-          {/* References Section */}
+          {/* References */}
           <View className="bg-gray-50 border border-green-500 rounded-2xl p-4 mb-4">
-            <Text className="text-lg font-bold text-gray-900 mb-4">References</Text>
-            
+            <Text className="text-lg font-bold text-gray-900 mb-4">
+              References
+            </Text>
+
             <View className="space-y-3">
               <View className="flex-row items-center justify-between">
                 <Text className="text-gray-600 text-sm mb-1">Full Name</Text>
-                <Text className="text-gray-400 text-base italic">Not provided</Text>
+                <Text className="text-gray-400 text-base italic">
+                  Not provided
+                </Text>
               </View>
-              
+
               <View className="flex-row items-center justify-between">
                 <Text className="text-gray-600 text-sm mb-1">Phone</Text>
-                <Text className="text-gray-400 text-base italic">Not provided</Text>
+                <Text className="text-gray-400 text-base italic">
+                  Not provided
+                </Text>
               </View>
             </View>
           </View>
 
-          {/* Written Answers Section */}
+          {/* Written Answers */}
           <View className="bg-gray-50 border border-green-500 rounded-2xl p-4 mb-4">
-            <Text className="text-lg font-bold text-gray-900 mb-4">Written Answers</Text>
-            
+            <Text className="text-lg font-bold text-gray-900 mb-4">
+              Written Answers
+            </Text>
+
             <View className="space-y-4">
               <View>
-                <Text className="text-gray-600 text-sm mb-2">What is your future goal as a mason?</Text>
+                {/* Label + sparkle icon */}
+                <View className="relative mb-2 pr-8">
+                  <Text className="text-gray-600 text-sm">
+                    What is your future goal as a mason?
+                  </Text>
+
+                  <TouchableOpacity
+                    className="absolute right-0 top-0"
+                    onPress={insertPresetGoal}
+                    hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
+                    accessibilityRole="button"
+                    accessibilityLabel="Insert suggested answer"
+                  >
+                    <SparkleIcon />
+                  </TouchableOpacity>
+                </View>
+
                 <TextInput
                   className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 min-h-[80px]"
                   placeholder="Enter your response here..."
                   value={writtenAnswers.goal}
-                  onChangeText={(text) => setWrittenAnswers(prev => ({ ...prev, goal: text }))}
+                  onChangeText={(text) =>
+                    setWrittenAnswers((prev) => ({ ...prev, goal: text }))
+                  }
                   multiline
                   textAlignVertical="top"
                 />
               </View>
-              
+
               <View>
-                <Text className="text-gray-600 text-sm mb-2">Why have you chosen a career in masonry?</Text>
+                <Text className="text-gray-600 text-sm mb-2">
+                  Why have you chosen a career in masonry?
+                </Text>
+                <TouchableOpacity
+                  className="absolute right-0 top-0"
+                  onPress={insertPresetGoal}
+                  hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Insert suggested answer"
+                >
+                  <SparkleIcon />
+                </TouchableOpacity>
                 <TextInput
                   className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 min-h-[80px]"
                   placeholder="Enter your response here..."
                   value={writtenAnswers.career}
-                  onChangeText={(text) => setWrittenAnswers(prev => ({ ...prev, career: text }))}
+                  onChangeText={(text) =>
+                    setWrittenAnswers((prev) => ({ ...prev, career: text }))
+                  }
                   multiline
                   textAlignVertical="top"
                 />
@@ -188,44 +261,60 @@ export default function GeneratedApplicationScreen() {
             </View>
           </View>
 
-          {/* Documents Section */}
+          {/* Documents */}
           <View className="bg-gray-50 border border-green-500 rounded-2xl p-4 mb-6">
-            <Text className="text-lg font-bold text-gray-900 mb-4">Documents</Text>
-            
+            <Text className="text-lg font-bold text-gray-900 mb-4">
+              Documents
+            </Text>
+
             <View className="space-y-3">
               <View className="flex-row items-center">
                 <Ionicons name="folder" size={20} color="#F97316" />
-                <Text className="text-gray-900 text-base ml-3">Unofficial transcript (high school or post-secondary)</Text>
+                <Text className="text-gray-900 text-base ml-3">
+                  Unofficial transcript (high school or post-secondary)
+                </Text>
               </View>
-              
+
               <View className="flex-row items-center">
                 <Ionicons name="folder" size={20} color="#F97316" />
-                <Text className="text-gray-900 text-base ml-3">Proof of registration and acceptance in your program</Text>
+                <Text className="text-gray-900 text-base ml-3">
+                  Proof of registration and acceptance in your program
+                </Text>
               </View>
-              
+
               <View className="flex-row items-center">
                 <Ionicons name="folder" size={20} color="#F97316" />
-                <Text className="text-gray-900 text-base ml-3">Letter of support from your current employer</Text>
+                <Text className="text-gray-900 text-base ml-3">
+                  Letter of support from your current employer
+                </Text>
               </View>
-              
+
               <View className="flex-row items-center">
                 <Ionicons name="folder" size={20} color="#F97316" />
-                <Text className="text-gray-900 text-base ml-3">Confirmation of membership status with the Masonry Institute of BC</Text>
+                <Text className="text-gray-900 text-base ml-3">
+                  Confirmation of membership status with the Masonry Institute
+                  of BC
+                </Text>
               </View>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 className="flex-row items-center mt-4"
                 onPress={handleUploadDocuments}
               >
-                <Ionicons name="cloud-upload-outline" size={20} color="#3B82F6" />
-                <Text className="text-blue-600 text-base ml-3 font-medium">Upload documents</Text>
+                <Ionicons
+                  name="cloud-upload-outline"
+                  size={20}
+                  color="#3B82F6"
+                />
+                <Text className="text-blue-600 text-base ml-3 font-medium">
+                  Upload documents
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </ScrollView>
 
-      {/* Bottom Navigation Bar */}
       <BottomNavigation activeTab="grants" />
     </View>
   );
