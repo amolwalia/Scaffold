@@ -26,7 +26,7 @@ export default function HomeTab() {
         contentContainerStyle={{ paddingTop: 12, paddingBottom: 120 }}
       >
         {/* phone-width canvas for web parity */}
-        <View className="w-full max-w-[390px] px-5 mx-auto">
+        <View className="w-full px-5 mx-auto">
           <HeaderGreeting name={user.name} role={user.role} />
 
           <EligibilityBanner

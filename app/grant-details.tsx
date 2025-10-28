@@ -1,107 +1,224 @@
+import BottomNavigation from "@/components/BottomNavigation";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
-import InfoChip from "../components/InfoChip";
+import { Stack, useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  FlatList,
+  ListRenderItemInfo,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import ModalPopover from "../components/ModalPopover";
+
+/* -----------------------------------------------------
+   Local chip component — bullet-proof on iPhone
+----------------------------------------------------- */
+type ChipProps = {
+  label: string;
+  iconName: keyof typeof Ionicons.glyphMap;
+  iconBg: string;
+  onPress?: () => void;
+};
+function Chip({ label, iconName, iconBg, onPress }: ChipProps) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        chipStyles.container,
+        pressed && chipStyles.pressed,
+      ]}
+    >
+      <View style={[chipStyles.iconCircle, { backgroundColor: iconBg }]}>
+        <Ionicons name={iconName} size={18} color="#fff" />
+      </View>
+
+      <View style={chipStyles.labelWrap}>
+        <Text numberOfLines={1} ellipsizeMode="tail" style={chipStyles.label}>
+          {label}
+        </Text>
+      </View>
+
+      <View style={chipStyles.chevWrap}>
+        <Ionicons name="chevron-forward" size={16} color="#111" />
+      </View>
+    </Pressable>
+  );
+}
+
+const chipStyles = StyleSheet.create({
+  container: {
+    backgroundColor: "#F6F6F6",
+    borderRadius: 18,
+    minHeight: 56,
+    paddingHorizontal: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "nowrap",
+    width: "100%",
+    overflow: "hidden",
+  },
+  pressed: { opacity: 0.95 },
+  iconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+    flexShrink: 0,
+  },
+  labelWrap: {
+    flexGrow: 1,
+    flexShrink: 1,
+    minWidth: 0,
+    marginRight: 6,
+  },
+  label: {
+    fontSize: 16,
+    lineHeight: 19,
+    fontWeight: "700",
+    color: "#111",
+  },
+  chevWrap: {
+    width: 18,
+    alignItems: "flex-end",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+});
+
+/* -----------------------------------------------------
+   Screen
+----------------------------------------------------- */
+type Key = "eligible" | "funding" | "date" | "age" | "location" | "notes";
+
+type ChipItem = {
+  key: Key;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  bg: string;
+};
 
 export default function GrantDetails() {
   const router = useRouter();
-  const [open, setOpen] = useState<
-    null | "eligible" | "funding" | "date" | "age" | "location" | "notes"
-  >(null);
+  const [open, setOpen] = useState<null | Key>(null);
   const close = () => setOpen(null);
 
+  const data: ChipItem[] = [
+    {
+      key: "eligible",
+      label: "You’re eligible",
+      icon: "checkmark-circle",
+      bg: "#3B82F6",
+    },
+    {
+      key: "funding",
+      label: "Up to $1950",
+      icon: "cash-outline",
+      bg: "#22C55E",
+    },
+    {
+      key: "date",
+      label: "3 Months Before",
+      icon: "calendar-outline",
+      bg: "#F59E0B",
+    },
+    {
+      key: "age",
+      label: "Gr 10+",
+      icon: "person-circle-outline",
+      bg: "#F59E0B",
+    },
+    {
+      key: "location",
+      label: "Legal Work Permit",
+      icon: "home-outline",
+      bg: "#F59E0B",
+    },
+    {
+      key: "notes",
+      label: "Notes",
+      icon: "information-circle-outline",
+      bg: "#7B6CF6",
+    },
+  ];
+
+  const renderItem = ({ item }: ListRenderItemInfo<ChipItem>) => (
+    <View style={styles.gridItem}>
+      <Chip
+        label={item.label}
+        iconName={item.icon}
+        iconBg={item.bg}
+        onPress={() => setOpen(item.key)}
+      />
+    </View>
+  );
+
   return (
-    <SafeAreaView className="flex-1 bg-white font-mont">
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView
-        className="bg-white"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
       >
-        <View className="w-full max-w-[390px] mx-auto px-5 pt-3">
+        <Stack.Screen options={{ headerShown: false }} />
+
+        <View style={{ width: "100%", paddingTop: 12 }}>
           {/* Top bar */}
-          <View className="flex-row items-center justify-between mb-4">
-            <Pressable
-              onPress={() => router.back()}
-              className="h-9 w-9 items-center justify-center"
-            >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 16,
+            }}
+          >
+            <Pressable onPress={() => router.back()} style={styles.iconBtn}>
               <Ionicons name="chevron-back" size={22} color="#111827" />
             </Pressable>
-            <Pressable className="h-9 w-9 items-center justify-center">
+            <Pressable style={styles.iconBtn}>
               <Ionicons name="bookmark-outline" size={22} color="#6B7280" />
             </Pressable>
           </View>
 
           {/* Title */}
-          <Text className="text-[26px] leading-[30px] font-montExtra text-[#0B0B0F] mb-4">
+          <Text style={styles.title}>
             Masonry Institute of BC Training Fund
           </Text>
 
-          {/* Chips grid (2 columns) */}
-          <View className="grid grid-cols-2 gap-3">
-            <InfoChip
-              label="You’re eligible"
-              iconName="checkmark-circle"
-              iconColor="#3B82F6"
-              iconBg="#E5F0FF"
-              onPress={() => setOpen("eligible")}
-            />
-            <InfoChip
-              label="Up to $1950"
-              iconName="cash-outline"
-              iconColor="#22C55E"
-              iconBg="#E6F9EC"
-              onPress={() => setOpen("funding")}
-            />
-            <InfoChip
-              label="3 Months Before"
-              iconName="calendar-outline"
-              iconColor="#F59E0B"
-              iconBg="#FEF3E7"
-              onPress={() => setOpen("date")}
-            />
-            <InfoChip
-              label="Gr 10+"
-              iconName="person-circle-outline"
-              iconColor="#F59E0B"
-              iconBg="#FEF3E7"
-              onPress={() => setOpen("age")}
-            />
-            <InfoChip
-              label="Legal Work Permit"
-              iconName="home-outline"
-              iconColor="#F59E0B"
-              iconBg="#FEF3E7"
-              onPress={() => setOpen("location")}
-            />
-            <InfoChip
-              label="Notes"
-              iconName="information-circle-outline"
-              iconColor="#7B6CF6"
-              iconBg="#ECEBFF"
-              onPress={() => setOpen("notes")}
-            />
-          </View>
+          {/* Chips grid — robust on iOS/Android/Web */}
+          <FlatList
+            data={data}
+            keyExtractor={(it) => it.key}
+            renderItem={renderItem}
+            numColumns={2}
+            columnWrapperStyle={{
+              justifyContent: "space-between",
+              marginBottom: 12,
+            }}
+            scrollEnabled={false}
+            contentContainerStyle={{ paddingTop: 4 }}
+          />
 
           {/* About card */}
-          <View className="mt-5 rounded-[10px] bg-[#ECEBFF] px-4 py-4">
-            <Text className="text-[15px] leading-[20px] text-[#0B0B0F]">
+          <View style={styles.infoCard}>
+            <Text style={styles.infoText}>
               The Masonry Institute of BC has evolved from masonry
               organizations, which have been promoting the local masonry
               industry for over 50 years.
             </Text>
-            <View className="items-end mt-2">
+            <View style={{ alignItems: "flex-end", marginTop: 8 }}>
               <Ionicons name="chevron-down" size={18} color="#6B6B6B" />
             </View>
           </View>
 
           {/* Candidate messages */}
-          <View className="mt-8 mb-5">
-            <Text className="text-center text-[18px] font-montExtra text-[#7B6CF6] mb-1">
-              You are a strong candidate.
-            </Text>
-            <Text className="text-center text-[16px] text-[#F59E0B]">
+          <View style={{ marginTop: 24, marginBottom: 20 }}>
+            <Text style={styles.strong}>You are a strong candidate.</Text>
+            <Text style={styles.sub}>
               Your profile is missing some information for this grant
               application.
             </Text>
@@ -109,19 +226,15 @@ export default function GrantDetails() {
 
           {/* CTA */}
           <Pressable
-            className="h-[56px] rounded-full items-center justify-center"
-            style={{ backgroundColor: "#E1882C" }}
-            onPress={() => router.push('/grant-saved-apply')}
+            style={styles.cta}
+            onPress={() => router.push("/grant-saved-apply")}
           >
-            <Text className="text-[18px] font-montSemi text-black">
-              Get started
-            </Text>
+            <Text style={styles.ctaText}>Get started</Text>
           </Pressable>
-
         </View>
       </ScrollView>
 
-      {/* MODALS */}
+      {/* MODALS (unchanged) */}
       <ModalPopover
         visible={open === "eligible"}
         onClose={close}
@@ -184,8 +297,16 @@ export default function GrantDetails() {
         titleIconBg="#7B6CF6"
         titleIconColor="#FFFFFF"
       >
-        <View className="mt-1">
-          <Text className="text-[15px] leading-[20px] text-[#0B0B0F] font-montSemi mb-2">
+        <View style={{ marginTop: 4 }}>
+          <Text
+            style={{
+              fontSize: 15,
+              lineHeight: 20,
+              color: "#0B0B0F",
+              fontWeight: "600",
+              marginBottom: 8,
+            }}
+          >
             Successful applicants must be:
           </Text>
           {[
@@ -193,17 +314,89 @@ export default function GrantDetails() {
             "In Level 1, 2, or 3 of their apprenticeship",
             "Priority will be given to applicants who are members of the Masonry Institute of BC",
           ].map((t, i) => (
-            <View key={i} className="flex-row mb-2">
-              <Text className="text-[15px] leading-[20px] text-[#4B5563] mr-2">
+            <View key={i} style={{ flexDirection: "row", marginBottom: 8 }}>
+              <Text
+                style={{
+                  fontSize: 15,
+                  lineHeight: 20,
+                  color: "#4B5563",
+                  marginRight: 8,
+                }}
+              >
                 {"\u2022"}
               </Text>
-              <Text className="flex-1 text-[15px] leading-[20px] text-[#4B5563]">
+              <Text
+                style={{
+                  flex: 1,
+                  fontSize: 15,
+                  lineHeight: 20,
+                  color: "#4B5563",
+                }}
+              >
                 {t}
               </Text>
             </View>
           ))}
         </View>
       </ModalPopover>
+
+      <BottomNavigation activeTab="grants" />
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  iconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 26,
+    lineHeight: 30,
+    fontWeight: "800",
+    color: "#0B0B0F",
+    marginBottom: 16,
+  },
+  gridItem: {
+    flex: 1,
+  },
+  infoCard: {
+    marginTop: 20,
+    backgroundColor: "#ECEBFF",
+    borderRadius: 12,
+    padding: 16,
+  },
+  infoText: {
+    fontSize: 15,
+    lineHeight: 20,
+    color: "#0B0B0F",
+  },
+  strong: {
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#7B6CF6",
+    marginBottom: 4,
+  },
+  sub: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#F59E0B",
+  },
+  cta: {
+    marginTop: 8,
+    backgroundColor: "#E1882C",
+    borderRadius: 28,
+    height: 56,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#000",
+  },
+});
