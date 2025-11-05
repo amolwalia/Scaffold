@@ -1,5 +1,5 @@
-import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
 import { Platform } from "react-native";
 
 const ACTIVE = "#7B6CF6";
@@ -9,7 +9,6 @@ const BAR_BG = "#F8F8F8";
 export default function TabsLayout() {
   return (
     <Tabs
-      sceneContainerStyle={{ backgroundColor: "#FFFFFF" }}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarShowLabel: true,
