@@ -39,8 +39,15 @@
           }
         }
       ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
       "expo-font",
-      "expo-speech-recognition"
+      "expo-speech-recognition",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,

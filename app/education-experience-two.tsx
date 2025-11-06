@@ -1,14 +1,22 @@
-import React, { useState } from "react";
+import VoiceInputOverlay from "@/components/VoiceInputOverlay";
+import { Ionicons } from "@expo/vector-icons";
 import {
-  View,
+  AudioModule,
+  RecordingPresets,
+  setAudioModeAsync,
+  useAudioRecorder,
+  useAudioRecorderState,
+} from "expo-audio";
+import { Stack, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
-import VoiceInputOverlay from "@/components/VoiceInputOverlay";
 
 export default function EducationExperience2() {
   const router = useRouter();
@@ -21,6 +29,33 @@ export default function EducationExperience2() {
     setHighSchoolName(transcribedText);
     setShowVoiceOverlay(false);
   };
+
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recorderState = useAudioRecorderState(audioRecorder);
+
+  const record = async () => {
+    await audioRecorder.prepareToRecordAsync();
+    audioRecorder.record();
+  };
+
+  const stopRecording = async () => {
+    // The recording will be available on `audioRecorder.uri`.
+    await audioRecorder.stop();
+  };
+
+  useEffect(() => {
+    (async () => {
+      const status = await AudioModule.requestRecordingPermissionsAsync();
+      if (!status.granted) {
+        Alert.alert("Permission to access microphone was denied");
+      }
+
+      setAudioModeAsync({
+        playsInSilentMode: true,
+        allowsRecording: true,
+      });
+    })();
+  }, []);
 
   return (
     <View className="flex-1 bg-white">
