@@ -4,7 +4,13 @@ import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface ProfileFieldProps {
   label: string;
@@ -33,7 +39,7 @@ export default function Profile() {
   const { profileData } = useProfile();
 
   // Helper function to display value or "Empty..."
-  const displayValue = (value: string) => (value || "Empty...");
+  const displayValue = (value: string) => value || "Empty...";
 
   // Calculate completion counts
   const basicProfileComplete = useMemo(() => {
@@ -96,7 +102,12 @@ export default function Profile() {
       householdComplete.filled +
       educationComplete.filled;
     return Math.round((filledFields / totalFields) * 100);
-  }, [basicProfileComplete, residenceComplete, householdComplete, educationComplete]);
+  }, [
+    basicProfileComplete,
+    residenceComplete,
+    householdComplete,
+    educationComplete,
+  ]);
 
   const handleEditBasicProfile = () => {
     // TODO: Navigate to edit basic profile
@@ -124,7 +135,10 @@ export default function Profile() {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Profile Header */}
         <View style={styles.header}>
           <View style={styles.profilePictureContainer}>
@@ -142,16 +156,34 @@ export default function Profile() {
             {profileData.name || "Bob Ross"}
           </Text>
 
-          {/* Documents Button */}
-          <TouchableOpacity
-            style={styles.documentsButton}
-            onPress={handleDocuments}
-            activeOpacity={0.7}
+          {/* Buttons */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 10,
+            }}
           >
-            <Ionicons name="folder" size={20} color="#8B5CF6" />
-            <Text style={styles.documentsButtonText}>Documents</Text>
-            <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.documentsButton}
+              onPress={handleDocuments}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="folder" size={20} color="#8B5CF6" />
+              <Text style={styles.documentsButtonText}>Documents</Text>
+              <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.documentsButton}
+              onPress={() => router.push("../education-experience-two")}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="create" size={20} color="#8B5CF6" />
+              <Text style={styles.documentsButtonText}>Edit Profile</Text>
+              <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Profile Progress */}
@@ -164,18 +196,32 @@ export default function Profile() {
           {/* Basic Profile */}
           <ProfileSectionCard
             title="Basic Profile"
-            completed={basicProfileComplete.filled === basicProfileComplete.total}
+            completed={
+              basicProfileComplete.filled === basicProfileComplete.total
+            }
             completionCount={basicProfileComplete.count}
             showEditButton={false}
           >
-            <ProfileField label="Name:" value={displayValue(profileData.name)} />
+            <ProfileField
+              label="Name:"
+              value={displayValue(profileData.name)}
+            />
             <ProfileField
               label="Date of birth:"
               value={displayValue(profileData.dateOfBirth)}
             />
-            <ProfileField label="Gender:" value={displayValue(profileData.gender)} />
-            <ProfileField label="Phone:" value={displayValue(profileData.phone)} />
-            <ProfileField label="Email:" value={displayValue(profileData.email)} />
+            <ProfileField
+              label="Gender:"
+              value={displayValue(profileData.gender)}
+            />
+            <ProfileField
+              label="Phone:"
+              value={displayValue(profileData.phone)}
+            />
+            <ProfileField
+              label="Email:"
+              value={displayValue(profileData.email)}
+            />
           </ProfileSectionCard>
 
           {/* Residence Information */}
@@ -185,12 +231,18 @@ export default function Profile() {
             completionCount={residenceComplete.count}
             showEditButton={false}
           >
-            <ProfileField label="Address:" value={displayValue(profileData.address)} />
+            <ProfileField
+              label="Address:"
+              value={displayValue(profileData.address)}
+            />
             <ProfileField
               label="Postal Code:"
               value={displayValue(profileData.postalCode)}
             />
-            <ProfileField label="Province:" value={displayValue(profileData.province)} />
+            <ProfileField
+              label="Province:"
+              value={displayValue(profileData.province)}
+            />
             <ProfileField
               label="Citizenship status:"
               value={displayValue(profileData.citizenshipStatus)}
@@ -266,7 +318,10 @@ export default function Profile() {
               label="Graduation Date:"
               value={displayValue(profileData.tradeGraduationDate)}
             />
-            <ProfileField label="Trade:" value={displayValue(profileData.trade)} />
+            <ProfileField
+              label="Trade:"
+              value={displayValue(profileData.trade)}
+            />
             <ProfileField
               label="Apprenticeship Level/Year:"
               value={displayValue(profileData.apprenticeshipLevel)}

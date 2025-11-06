@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Modal,
   View,
@@ -8,9 +8,9 @@ import {
   ScrollView,
   Animated,
   Easing,
-  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import Voice from "@react-native-voice/voice";
 
 interface VoiceInputOverlayProps {
   visible: boolean;
@@ -19,7 +19,7 @@ interface VoiceInputOverlayProps {
 }
 
 const BAR_COUNT = 6;
-const BAR_BASE_HEIGHT = 24;
+const BAR_BASE_HEIGHT = 24; // visual baseline for bars
 
 export default function VoiceInputOverlay({
   visible,
@@ -29,14 +29,23 @@ export default function VoiceInputOverlay({
   const [phase, setPhase] = useState<"idle" | "listening" | "review">("idle");
   const [recognizedText, setRecognizedText] = useState("");
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
 
-  // waveform animation setup
   const bars = Array.from(
     { length: BAR_COUNT },
     () => useRef(new Animated.Value(1)).current
   );
 
+  useEffect(() => {
+    Voice.onSpeechResults = (e) => {
+      if (e.value && e.value[0]) setRecognizedText(e.value[0]);
+    };
+    Voice.onSpeechEnd = () => setIsListening(false);
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  // Safe waveform animation — scaleY only
   useEffect(() => {
     if (isListening) {
       const loops = bars.map((bar) =>
@@ -64,49 +73,23 @@ export default function VoiceInputOverlay({
 
   const startListening = async () => {
     try {
-      if (Platform.OS === "web" || typeof window !== "undefined") {
-        const SpeechRecognition =
-          (window as any).SpeechRecognition ||
-          (window as any).webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-          alert("Speech recognition not supported on this device.");
-          return;
-        }
-
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = "en-US";
-
-        recognition.onresult = (event: any) => {
-          let text = "";
-          for (let i = 0; i < event.results.length; i++) {
-            text += event.results[i][0].transcript + " ";
-          }
-          setRecognizedText(text.trim());
-        };
-
-        recognition.onerror = (err: any) => console.error("Speech error:", err);
-        recognition.onend = () => setIsListening(false);
-
-        recognition.start();
-        recognitionRef.current = recognition;
-        setPhase("listening");
-        setIsListening(true);
-      } else {
-        alert("Speech recognition requires Expo Web or device browser mode.");
-      }
-    } catch (e) {
-      console.error("Speech start failed:", e);
+      await Voice.start("en-US");
+      setIsListening(true);
+      setPhase("listening");
+      setRecognizedText("");
+    } catch (err) {
+      console.error("Voice start error:", err);
     }
   };
 
-  const stopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
+  const stopListening = async () => {
+    try {
+      await Voice.stop();
+      setIsListening(false);
+      setPhase("review");
+    } catch (err) {
+      console.error("Voice stop error:", err);
     }
-    setIsListening(false);
-    setPhase("review");
   };
 
   const handleRetry = () => {
@@ -125,7 +108,12 @@ export default function VoiceInputOverlay({
       {bars.map((bar, i) => (
         <Animated.View
           key={i}
-          style={[styles.waveBar, { transform: [{ scaleY: bar }] }]}
+          style={[
+            styles.waveBar,
+            {
+              transform: [{ scaleY: bar }],
+            },
+          ]}
         />
       ))}
     </View>
@@ -281,11 +269,11 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     justifyContent: "center",
     marginBottom: 16,
-    height: BAR_BASE_HEIGHT * 2,
+    height: BAR_BASE_HEIGHT * 2, // fixed container height
   },
   waveBar: {
     width: 6,
-    height: BAR_BASE_HEIGHT,
+    height: BAR_BASE_HEIGHT, // static height
     marginHorizontal: 3,
     borderRadius: 3,
     backgroundColor: "#8B5CF6",
