@@ -4,6 +4,7 @@ import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
+import * as DocumentPicker from "expo-document-picker";
 import {
   ScrollView,
   StyleSheet,
@@ -37,6 +38,26 @@ function ProfileField({ label, value }: ProfileFieldProps) {
 export default function Profile() {
   const router = useRouter();
   const { profileData } = useProfile();
+
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "*/*", // any file type
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled) {
+        console.log("User canceled document picker");
+        return;
+      }
+
+      const file = result.assets[0];
+      console.log("Selected file:", file);
+      // You can now handle the file (upload, display name, etc.)
+    } catch (error) {
+      console.error("Error picking document:", error);
+    }
+  };
 
   // Helper function to display value or "Empty..."
   const displayValue = (value: string) => value || "Empty...";
@@ -166,7 +187,7 @@ export default function Profile() {
           >
             <TouchableOpacity
               style={styles.documentsButton}
-              onPress={handleDocuments}
+              onPress={pickDocument}
               activeOpacity={0.7}
             >
               <Ionicons name="folder" size={20} color="#8B5CF6" />
