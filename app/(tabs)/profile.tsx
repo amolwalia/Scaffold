@@ -13,6 +13,8 @@ import {
   View,
 } from "react-native";
 
+import { RetrieveResponse } from "roughlyai"
+
 interface ProfileFieldProps {
   label: string;
   value: string;
@@ -48,11 +50,102 @@ export default function Profile() {
 
       if (result.canceled) {
         console.log("User canceled document picker");
+
         return;
       }
 
       const file = result.assets[0];
+      
+      //upload documents
       console.log("Selected file:", file);
+      const _resp = await fetch("https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/", {
+        method: "POST",
+        body: JSON.stringify({
+          type: "upload",
+          project_name: "Scaffold",
+          filename: file.name.toLocaleLowerCase()
+        })
+      })
+      if (!_resp.ok) {
+        throw new Error(`Failed to fetch presigned URL.`);
+      }
+
+      const uploadUrl:any = JSON.parse(await _resp.json());
+      console.log("what is url", uploadUrl); 
+      if (!uploadUrl?.url[0]) {
+        throw new Error(`Invalid presigned URL.`);
+      }
+      
+      // upload file to S3 using the presigned PUT URL
+      const fileUri = file.uri ?? file.uri;
+      
+      const resp = await fetch(fileUri);
+      const fileBlob = await resp.blob();
+      
+      console.log("what is happening", uploadUrl.url[0]);
+      const uploadResponse = await fetch(uploadUrl.url[0], {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.mimeType || (file.mimeType as string) || "application/octet-stream",
+        },
+        body: fileBlob,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Failed to upload the file to S3.`);
+      }
+
+      //training documents
+      const _resp_train = await fetch("https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/", {
+        method: "POST",
+        body: JSON.stringify({
+          type: "train",
+          project_name: "Scaffold"
+        })
+      })
+
+      if (!_resp_train.ok) {
+        throw new Error(`Failed to fetch presigned URL.`);
+      }
+
+      const trainUrl:any = JSON.parse(await _resp_train.json());
+      console.log("what is train url", trainUrl.url); 
+      if (!trainUrl?.url) {
+        throw new Error(`Invalid presigned URL.`);
+      }
+      
+      const _trained = await RetrieveResponse(trainUrl.url);
+      
+      if(!_trained){
+        throw new Error(`Training failed.`);
+      }
+
+      //prompting documents
+      const _prompt = await fetch("https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/", {
+        method: "POST",
+        body: JSON.stringify({
+          project_name: "Scaffold",
+          prompt:`Find first name and last name in the document "${file.name}". Return in this json {"first_name":string, "last_name":string}. Do not include \`\`\`json`
+        })
+      })
+
+      if (!_prompt.ok) {
+        throw new Error(`Failed to fetch presigned URL.`);
+      }
+
+      const _promptUrl:any = JSON.parse(await _prompt.json());
+       console.log("what is prompt url", _promptUrl.url);
+
+      if (!_promptUrl?.url) {
+        throw new Error(`Invalid presigned URL.`);
+      }
+
+      const _prompt_response:any = await RetrieveResponse(_promptUrl.url);
+
+      //answer for the prompts
+      const _answer = _prompt_response.answer
+      alert(JSON.stringify(_answer));
+
       // You can now handle the file (upload, display name, etc.)
     } catch (error) {
       console.error("Error picking document:", error);
