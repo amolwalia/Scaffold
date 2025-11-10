@@ -1,20 +1,19 @@
-import { SafeAreaView, ScrollView, Text, View } from "react-native";
-import ApplicationProgressCard from "../../components/ApplicationProgressCard";
-import EligibilityBanner from "../../components/EligibilityBanner";
-import FinishProfileCard from "../../components/FinishProfileCard";
-import HeaderGreeting from "../../components/HeaderGreeting";
-import SavedGrantRow from "../../components/SavedGrantRow";
+import { SafeAreaView, ScrollView, Text, View } from 'react-native';
+import EligibilityBanner from '../../components/EligibilityBanner';
+import FinishProfileCard from '../../components/FinishProfileCard';
+import HeaderGreeting from '../../components/HeaderGreeting';
+import SavedGrantRow from '../../components/SavedGrantRow';
 
 export default function HomeTab() {
-  const user = { name: "Mateo Alvarez", role: "Apprentice Electrician" };
+  const user = { name: 'Mateo Alvarez', role: 'Apprentice Electrician' };
   const eligible = {
     count: 4,
     total: 7750,
     items: [
-      "StrongerBC Future Skills Grant",
-      "Youth Work in Trades (WRK) Scholarship",
-      "LNG Canada Trades Training Fund",
-      "Masonry Institute of BC Training Fund",
+      'StrongerBC Future Skills Grant',
+      'Youth Work in Trades (WRK) Scholarship',
+      'LNG Canada Trades Training Fund',
+      'Masonry Institute of BC Training Fund',
     ],
   };
 
@@ -35,22 +34,11 @@ export default function HomeTab() {
             total={eligible.total}
           />
 
-          <Text className="mb-3 text-xl font-extrabold text-gray-900">
-            Application Tracker
-          </Text>
-
-          <ApplicationProgressCard
-            title="StrongerBC Future Skills Grants"
-            logoUri="https://upload.wikimedia.org/wikipedia/en/7/7a/WorkBC_logo.png"
-            totalSteps={5}
-            currentStep={3}
-          />
-
           <View className="mt-3">
-            <SavedGrantRow label="Apply to your saved grant" />
+            <SavedGrantRow label="Explore your eligible grants now" />
           </View>
 
-          <Text className="mb-3 text-xl font-extrabold text-[#0B0B0F]">
+          <Text className="mb-3 mt-6 text-[22px] font-montserrat-bold text-[#000000]">
             Finish your profile!
           </Text>
           <FinishProfileCard

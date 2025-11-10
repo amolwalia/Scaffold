@@ -1,5 +1,5 @@
-import { Pressable, View, Text } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Pressable, View, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 type Props = {
   label: string; // e.g., "Apply to your saved grant"
@@ -11,24 +11,24 @@ export default function SavedGrantRow({ label, onPress }: Props) {
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      className="rounded-[10px] bg-[#F3F2FF] active:opacity-80"
+      className="rounded-[10px] bg-[#7260CC]"
       style={{
-        minHeight: 84,
-        paddingHorizontal: 16,
-        paddingVertical: 18,
+        height: 60,
+        paddingHorizontal: 20,
+        paddingVertical: 15,
       }}
     >
       <View className="flex-row items-center justify-between">
         <Text
-          className="text-[18px] leading-[22px] text-[#0B0B0F]"
+          className="text-[16px] font-montserrat-bold leading-[22px] text-[#FFFFFF]"
           numberOfLines={1}
         >
           {label}
         </Text>
 
         {/* Right chevron, centered and consistent size */}
-        <View className="h-8 w-8 items-center justify-center">
-          <Ionicons name="chevron-forward" size={20} color="#111111" />
+        <View className="h-8 w-8 items-center justify-center rounded-full bg-[#EFEFFF]">
+          <Ionicons name="arrow-forward" size={25} color="#7260CC" />
         </View>
       </View>
     </Pressable>

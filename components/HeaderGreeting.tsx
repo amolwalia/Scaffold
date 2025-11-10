@@ -1,5 +1,5 @@
-import { View, Text, Pressable } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 type Props = {
   name: string;
@@ -9,19 +9,25 @@ type Props = {
 
 export default function HeaderGreeting({ name, role, onBellPress }: Props) {
   return (
-    <View className="mb-6 flex-row items-center justify-between">
+    <View className=" pb-3 flex-row items-center justify-between border-b border-solid border-[#B2B1B8]">
       <View>
-        <Text className="text-base text-gray-600">Hello,</Text>
-        <Text className="text-2xl font-extrabold text-gray-900">{name}</Text>
-        <Text className="mt-1 text-sm text-gray-600">{role}</Text>
+        <Text className="text-[18px] font-montserrat-medium text-[#000000]">
+          Hello,
+        </Text>
+        <Text className="text-[26px] font-montserrat-bold text-[#000000] mt-1">
+          {name}
+        </Text>
+        <Text className="text-sm font-montserrat-medium  text-[#000000] ">
+          {role}
+        </Text>
       </View>
 
       <Pressable
         accessibilityLabel="Notifications"
         onPress={onBellPress}
-        className="h-10 w-10 items-center justify-center rounded-full bg-[#ECEBFF] active:opacity-80"
+        className="h-12 w-12 items-center justify-center rounded-full bg-[#7260CC]"
       >
-        <Ionicons name="notifications-outline" size={22} color="#7B6CF6" />
+        <Ionicons name="notifications-outline" size={27} color="#FFFFFF" />
       </Pressable>
     </View>
   );

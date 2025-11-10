@@ -1,10 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
-import { Platform } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
+import { Platform } from 'react-native';
 
-const ACTIVE = "#7B6CF6";
-const INACTIVE = "#B6B6BC";
-const BAR_BG = "#F8F8F8";
+const ACTIVE = '#7B6CF6';
+const INACTIVE = '#B6B6BC';
+const BAR_BG = '#F8F8F8';
 
 export default function TabsLayout() {
   return (
@@ -16,9 +16,9 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: INACTIVE,
         tabBarLabelStyle: {
           fontSize: 12,
-          textTransform: "lowercase",
-          marginTop: 6,
-          fontWeight: "600",
+          textTransform: 'lowercase',
+          marginTop: 0,
+          fontWeight: '600',
         },
         tabBarStyle: {
           backgroundColor: BAR_BG,
@@ -32,26 +32,26 @@ export default function TabsLayout() {
         tabBarIcon: ({ focused, color }) => {
           const s = 28;
           const name =
-            route.name === "index"
+            route.name === 'index'
               ? focused
-                ? "home"
-                : "home-outline"
-              : route.name === "grants"
+                ? 'home'
+                : 'home-outline'
+              : route.name === 'grants'
                 ? focused
-                  ? "compass"
-                  : "compass-outline"
-                : route.name === "profile"
+                  ? 'compass'
+                  : 'compass-outline'
+                : route.name === 'profile'
                   ? focused
-                    ? "person"
-                    : "person-outline"
-                  : "ellipse-outline";
+                    ? 'person'
+                    : 'person-outline'
+                  : 'ellipse-outline';
           return <Ionicons name={name as any} size={s} color={color} />;
         },
       })}
     >
-      <Tabs.Screen name="index" options={{ title: "home" }} />
-      <Tabs.Screen name="grants" options={{ title: "Grants" }} />
-      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+      <Tabs.Screen name="index" options={{ title: 'home' }} />
+      <Tabs.Screen name="grants" options={{ title: 'Grants' }} />
+      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
     </Tabs>
   );
 }
