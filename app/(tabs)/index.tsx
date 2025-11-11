@@ -1,10 +1,12 @@
 import { SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import EligibilityBanner from '../../components/EligibilityBanner';
 import FinishProfileCard from '../../components/FinishProfileCard';
 import HeaderGreeting from '../../components/HeaderGreeting';
 import SavedGrantRow from '../../components/SavedGrantRow';
 
 export default function HomeTab() {
+  const router = useRouter();
   const user = { name: 'Mateo Alvarez', role: 'Apprentice Electrician' };
   const eligible = {
     count: 4,
@@ -22,11 +24,15 @@ export default function HomeTab() {
       <ScrollView
         className="bg-white"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: 12, paddingBottom: 120 }}
+        contentContainerStyle={{ paddingTop: 25, paddingBottom: 120 }}
       >
         {/* phone-width canvas for web parity */}
         <View className="w-full px-5 mx-auto">
-          <HeaderGreeting name={user.name} role={user.role} />
+          <HeaderGreeting
+            name={user.name}
+            role={user.role}
+            onBellPress={() => router.push('/notifications')}
+          />
 
           <EligibilityBanner
             count={eligible.count}
@@ -34,7 +40,7 @@ export default function HomeTab() {
             total={eligible.total}
           />
 
-          <View className="mt-3">
+          <View className="mt-[12px]">
             <SavedGrantRow label="Explore your eligible grants now" />
           </View>
 

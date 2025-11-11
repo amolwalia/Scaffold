@@ -1,4 +1,5 @@
 import { View, Text } from 'react-native';
+import MoneyIcon from './icons/MoneyIcon';
 
 export default function EligibilityBanner({
   count,
@@ -33,12 +34,15 @@ export default function EligibilityBanner({
       </View>
 
       <View className=" bg-none pt-5 pb-0 border-t border-solid border-[#F6F6F6]">
-        <Text className="text-[15px] font-montserrat-semibold text-[#27252F] flex justify-end items-center">
-          Total up to{' '}
-          <Text className="font-montserrat-bold text-[26px] text-[#FF890C] ml-1">
-            ${total.toLocaleString()}
+        <View className="flex-row items-center justify-end">
+          <MoneyIcon size={24} />
+          <Text className="ml-2 text-[15px] font-montserrat-semibold text-[#27252F] flex justify-end items-center">
+            Total up to{' '}
+            <Text className="font-montserrat-bold text-[26px] text-[#FF890C] ml-1">
+              ${total.toLocaleString()}
+            </Text>
           </Text>
-        </Text>
+        </View>
       </View>
     </View>
   );

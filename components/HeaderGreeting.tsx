@@ -27,7 +27,14 @@ export default function HeaderGreeting({ name, role, onBellPress }: Props) {
         onPress={onBellPress}
         className="h-12 w-12 items-center justify-center rounded-full bg-[#7260CC]"
       >
-        <Ionicons name="notifications-outline" size={27} color="#FFFFFF" />
+        <View className="relative">
+          <Ionicons name="notifications-outline" size={27} color="#FFFFFF" />
+          <View className="absolute -right-4 -top-3 h-5 w-5 items-center justify-center rounded-full bg-[#FF5168]">
+            <Text className="text-[10px] font-montserrat-bold text-white">
+              1
+            </Text>
+          </View>
+        </View>
       </Pressable>
     </View>
   );

@@ -28,7 +28,7 @@ export default function SavedGrantRow({ label, onPress }: Props) {
 
         {/* Right chevron, centered and consistent size */}
         <View className="h-8 w-8 items-center justify-center rounded-full bg-[#EFEFFF]">
-          <Ionicons name="arrow-forward" size={25} color="#7260CC" />
+          <Ionicons name="arrow-forward-outline" size={22} color="#7260CC" />
         </View>
       </View>
     </Pressable>

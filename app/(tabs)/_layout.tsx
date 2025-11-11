@@ -15,10 +15,9 @@ export default function TabsLayout() {
         tabBarActiveTintColor: ACTIVE,
         tabBarInactiveTintColor: INACTIVE,
         tabBarLabelStyle: {
-          fontSize: 12,
-          textTransform: 'lowercase',
+          fontSize: 8,
           marginTop: 0,
-          fontWeight: '600',
+          fontFamily: 'montserrat-medium',
         },
         tabBarStyle: {
           backgroundColor: BAR_BG,
@@ -49,7 +48,7 @@ export default function TabsLayout() {
         },
       })}
     >
-      <Tabs.Screen name="index" options={{ title: 'home' }} />
+      <Tabs.Screen name="index" options={{ title: 'Home' }} />
       <Tabs.Screen name="grants" options={{ title: 'Grants' }} />
       <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
     </Tabs>

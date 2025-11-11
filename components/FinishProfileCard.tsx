@@ -71,7 +71,7 @@ export default function FinishProfileCard({
           accessibilityRole="button"
           className="h-8 w-8 items-center justify-center rounded-full bg-[#7260CC] active:opacity-80"
         >
-          <Ionicons name="arrow-forward" size={24} color="#F6F6F6" />
+          <Ionicons name="arrow-forward-outline" size={22} color="#F6F6F6" />
         </Pressable>
       </View>
     </View>
