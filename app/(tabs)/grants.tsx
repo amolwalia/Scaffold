@@ -1,9 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Grant from '../../components/grant';
-import GrantSubFilters from '../../components/GrantSubFilters';
+import { Theme } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React, { useMemo, useState } from "react";
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View, } from "react-native";
+import Grant from "../../components/grant";
+import GrantSubFilters from "../../components/GrantSubFilters";
 
 interface GrantData {
   id: string;
@@ -20,228 +21,315 @@ interface GrantData {
 
 const sampleGrants: GrantData[] = [
   {
-    id: '1',
-    title: 'StrongerBC Future Skills Grant',
-    organization: 'WorkBC',
-    amount: 'Up to $3,500',
-    deadline: '7/14 - 8/20',
-    category: 'Education',
-    description: 'Funding for skills training and professional development programs.',
+    id: "1",
+    title: "StrongerBC Future Skills Grant",
+    organization: "WorkBC",
+    amount: "Up to $3,500",
+    deadline: "7/14 - 8/20",
+    category: "Education",
+    description: "",
     eligible: true,
     saved: false,
-    applied: false
+    applied: false,
   },
   {
-    id: '2',
-    title: 'Youth Work in Trades (WRK) Scholarship',
-    organization: 'WorkBC',
-    amount: 'Up to $1,000',
-    deadline: '9/2 - 11/14',
-    category: 'Education',
-    description: 'Scholarship for youth pursuing trades education and apprenticeship programs.',
+    id: "2",
+    title: "Youth Work in Trades (WRK) Scholarship",
+    organization: "WorkBC",
+    amount: "Up to $1,000",
+    deadline: "9/2 - 11/14",
+    category: "Education",
+    description: "",
     eligible: true,
     saved: false,
-    applied: false
+    applied: false,
   },
   {
-    id: '3',
-    title: 'LNG Canada Trades Training Fund',
-    organization: 'BC Ca',
-    amount: 'Up to $1,300',
-    deadline: '2/28',
-    category: 'Training',
-    description: 'Training fund for LNG-related trades and skills development.',
+    id: "3",
+    title: "LNG Canada Trades Training Fund",
+    organization: "BC Ca",
+    amount: "Up to $1,300",
+    deadline: "2/28",
+    category: "Training",
+    description: "",
     eligible: true,
     saved: true,
-    applied: false
+    applied: false,
   },
   {
-    id: '4',
-    title: 'Masonry Institute of BC Training Fund',
-    organization: 'Masonry Institute',
-    amount: 'Up to $1,950',
-    deadline: '3m before training starts',
-    category: 'Training',
-    description: 'Training fund for masonry and construction skills development.',
+    id: "4",
+    title: "Masonry Institute of BC Training Fund",
+    organization: "Masonry Institute",
+    amount: "Up to $1,950",
+    deadline: "3m before training starts",
+    category: "Training",
+    description: "",
     eligible: true,
     saved: false,
-    applied: true
+    applied: true,
   },
   {
-    id: '5',
-    title: 'Soroptimist - Live your dream awards',
-    organization: 'Soroptimist',
-    amount: 'Up to $10,000',
-    deadline: '8/1 - 11/14',
-    category: 'Awards',
-    description: 'Awards for women pursuing education and career goals.',
+    id: "5",
+    title: "Soroptimist - Live your dream awards",
+    organization: "Soroptimist",
+    amount: "Up to $10,000",
+    deadline: "8/1 - 11/14",
+    category: "Awards",
+    description: "",
     eligible: false,
     saved: false,
-    applied: false
-  }
+    applied: false,
+  },
 ];
 
 export default function GrantsScreen() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTab, setSelectedTab] = useState('All');
-  const [selectedSubFilter, setSelectedSubFilter] = useState('Saved');
-  const [grants, setGrants] = useState(sampleGrants);
-  
-  const tabs = ['All', 'Eligible', 'My Grants'];
-  
-  const filteredGrants = grants.filter(grant => {
-    const matchesSearch = grant.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         grant.organization.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    if (selectedTab === 'Eligible') {
-      return matchesSearch && grant.eligible;
-    } else if (selectedTab === 'My Grants') {
-      if (selectedSubFilter === 'Saved') {
-        return matchesSearch && grant.saved;
-      } else if (selectedSubFilter === 'Applied') {
-        return matchesSearch && grant.applied;
-      }
-      return matchesSearch && (grant.saved || grant.applied);
-    } else {
-      return matchesSearch;
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTab, setSelectedTab] =
+    useState<"All" | "Eligible" | "My Grants">("All");
+  const [selectedSubFilter, setSelectedSubFilter] =
+    useState<"Saved" | "Applied">("Saved");
+  const [grants, setGrants] = useState<GrantData[]>(sampleGrants);
+
+  const tabs: Array<"All" | "Eligible" | "My Grants"> = [
+    "All",
+    "Eligible",
+    "My Grants",
+  ];
+
+  const filteredGrants = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    const bySearch = (g: GrantData) =>
+      !q ||
+      g.title.toLowerCase().includes(q) ||
+      g.organization.toLowerCase().includes(q);
+
+    if (selectedTab === "Eligible")
+      return grants.filter((g) => bySearch(g) && g.eligible);
+    if (selectedTab === "My Grants") {
+      if (selectedSubFilter === "Saved")
+        return grants.filter((g) => bySearch(g) && g.saved);
+      if (selectedSubFilter === "Applied")
+        return grants.filter((g) => bySearch(g) && g.applied);
+      return grants.filter((g) => bySearch(g) && (g.saved || g.applied));
     }
-  });
+    return grants.filter(bySearch);
+  }, [grants, searchQuery, selectedTab, selectedSubFilter]);
 
   const handleGrantPress = (grant: GrantData) => {
-    console.log('Grant pressed:', grant.title);
-    // Navigate to grant details page
     router.push({
-      pathname: '/grant-details',
-      params: { 
+      pathname: "/grant-details",
+      params: {
         id: grant.id,
         title: grant.title,
         organization: grant.organization,
         amount: grant.amount,
         deadline: grant.deadline,
-        eligible: grant.eligible ? 'true' : 'false'
-      }
+        eligible: grant.eligible ? "true" : "false",
+      },
     });
   };
 
   const handleApplyPress = (grant: GrantData) => {
-    console.log('Apply pressed for:', grant.title);
-    // Mark as applied
-    setGrants(prevGrants => 
-      prevGrants.map(g => 
-        g.id === grant.id ? { ...g, applied: true } : g
-      )
+    setGrants((prev) =>
+      prev.map((g) => (g.id === grant.id ? { ...g, applied: true } : g))
     );
-    // Add navigation to application form here
   };
 
   const handleSavePress = (grant: GrantData) => {
-    console.log('Save pressed for:', grant.title);
-    // Toggle saved state
-    setGrants(prevGrants => 
-      prevGrants.map(g => 
-        g.id === grant.id ? { ...g, saved: !g.saved } : g
-      )
+    setGrants((prev) =>
+      prev.map((g) => (g.id === grant.id ? { ...g, saved: !g.saved } : g))
     );
   };
 
+  const sectionTitle =
+    selectedTab === "My Grants"
+      ? selectedSubFilter === "Saved"
+        ? "Saved grants"
+        : "Applied grants"
+      : selectedTab === "Eligible"
+      ? "Eligible grants for you"
+      : "Suggested grants for you";
+
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="px-4 py-6 pt-12">
-        <Text className="text-2xl font-bold text-gray-900">
-          Explore Grants
+      <View style={styles.header}>
+        <Text style={[Theme.typography.h2, { color: Theme.colors.black }]}>
+          All Grants
         </Text>
-      
       </View>
 
-      {/* Main Navigation Tabs */}
-      <View className="flex-row px-4 mb-4">
-        {tabs.map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            onPress={() => setSelectedTab(tab)}
-            className={`px-4 py-2 rounded-lg mr-3 ${
-              selectedTab === tab 
-                ? 'bg-purple-600' 
-                : 'bg-gray-100'
-            }`}
-          >
-            <Text className={`text-sm font-medium ${
-              selectedTab === tab 
-                ? 'text-white' 
-                : 'text-gray-700'
-            }`}>
-              {tab}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      {/* Tabs */}
+      <View style={styles.tabsRow}>
+        {tabs.map((tab, idx) => {
+          const active = selectedTab === tab;
+          const isLast = idx === tabs.length - 1;
+          return (
+            <TouchableOpacity
+              key={tab}
+              onPress={() => setSelectedTab(tab)}
+              style={[
+                styles.tabBtn,
+                !isLast && { marginRight: 8 },
+                {
+                  backgroundColor: active
+                    ? Theme.colors.brightPurple
+                    : Theme.colors.lightGrey,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  Theme.typography.label,
+                  { color: active ? Theme.colors.white : Theme.colors.darkGrey },
+                ]}
+              >
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
-      {/* Sub-filters for My Grants */}
-      {selectedTab === 'My Grants' && (
-        <GrantSubFilters
-          selectedFilter={selectedSubFilter}
-          onFilterChange={setSelectedSubFilter}
-        />
+      {/* Subfilters for My Grants */}
+      {selectedTab === "My Grants" && (
+        <View
+          style={{
+            paddingHorizontal: Theme.spacing.lg,
+            marginBottom: Theme.spacing.sm,
+          }}
+        >
+          <GrantSubFilters
+            selectedFilter={selectedSubFilter}
+            onFilterChange={setSelectedSubFilter}
+          />
+        </View>
       )}
 
-      {/* Search Bar */}
-      <View className="px-4 mb-4">
-        <View className="relative">
+      {/* Search */}
+      <View style={styles.searchWrap}>
+        <View style={styles.searchInner}>
           <TextInput
-            className="border border-purple-200 rounded-lg px-4 py-3 pr-10 text-gray-900"
+            style={styles.searchInput}
             placeholder="Find Grants"
+            placeholderTextColor={Theme.colors.purple}
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholderTextColor="#9CA3AF"
           />
-          <View className="absolute right-3 top-3">
-            <Ionicons name="search" size={20} color="#9CA3AF" />
-          </View>
+          <Ionicons
+            name="search"
+            size={18}
+            color={Theme.colors.grey}
+            style={styles.searchIcon}
+          />
         </View>
       </View>
 
-      {/* Section Title */}
-      <View className="flex-row justify-between items-center px-4 mb-4">
-        <Text className="text-lg font-bold text-gray-900">
-          {selectedTab === 'My Grants' 
-            ? (selectedSubFilter === 'Saved' ? 'Your Saved Grants' : 'Your Applied Grants')
-            : selectedTab === 'Eligible' 
-            ? 'Eligible grants for you'
-            : 'Suggested grants for you'
-          }
+      {/* Section title + sort */}
+      <View style={styles.sectionHeader}>
+        <Text style={[Theme.typography.subhead1, { color: Theme.colors.black }]}>
+          {sectionTitle}
         </Text>
-        <TouchableOpacity>
-          <Ionicons name="swap-vertical" size={20} color="#6B7280" />
+        <TouchableOpacity hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Ionicons name="swap-vertical" size={20} color={Theme.colors.darkGrey} />
         </TouchableOpacity>
       </View>
 
-      {/* Grants List */}
-      <ScrollView className="flex-1 px-4">
-        {filteredGrants.length > 0 ? (
-          filteredGrants.map((grant) => (
-            <Grant
-              key={grant.id}
-              {...grant}
-              onPress={() => handleGrantPress(grant)}
-              onView={() => handleApplyPress(grant)}
-              onSave={() => handleSavePress(grant)}
-              onNavigateToApply={() => router.push('/grant-details')}
-              
-            />
-          ))
-        ) : (
-          <View className="flex-1 items-center justify-center py-8">
-            <Text className="text-gray-500 text-center text-lg">
-              No grants found matching your criteria
+      {/* List */}
+      <FlatList
+        data={filteredGrants}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => (
+          <Grant
+            {...item}
+            onPress={() => handleGrantPress(item)}
+            onView={() => handleApplyPress(item)}
+            onSave={() => handleSavePress(item)}
+            onNavigateToApply={() => router.push("/grant-details")}
+          />
+        )}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={[Theme.typography.subhead1, { marginTop: Theme.spacing.lg, color: Theme.colors.grey }]}>
+              No grants found
             </Text>
-            <Text className="text-gray-400 text-center mt-2">
+            <Text style={[Theme.typography.body, { marginTop: 6, color: Theme.colors.grey}]}>
               Try adjusting your search or tab filter
             </Text>
           </View>
-        )}
-      </ScrollView>
+        }
+      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Theme.colors.white,
+  },
+  header: {
+    alignSelf: "center",
+    width: Theme.layout.width,
+    paddingTop: 48,
+    paddingBottom: Theme.spacing.lg,
+    marginTop: Theme.spacing.xl,
+  },
+  tabsRow: {
+    flexDirection: "row",
+    alignSelf: "center",
+    width: Theme.layout.width,
+    justifyContent: "space-between",
+    marginBottom: Theme.spacing.md,
+  },
+  tabBtn: {
+    flex: 1,
+    alignItems: "center",
+    ...Theme.padding.buttonMd,
+    borderRadius: Theme.radius.button,
+  },
+  searchWrap: {
+    alignSelf: "center",
+    width: Theme.layout.width,
+    marginBottom: Theme.spacing.lg,
+  },
+  searchInner: {
+    position: "relative",
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: Theme.colors.purpleStroke,
+    borderRadius: Theme.radius.search,
+    ...Theme.padding.buttonLg,
+    paddingHorizontal: Theme.spacing.lg,
+    paddingRight: 36,
+    fontFamily: Theme.fonts.medium,
+    fontSize: 14,
+    color: Theme.colors.darkGrey,
+    backgroundColor: Theme.colors.white,
+  },
+  searchIcon: {
+    position: "absolute",
+    right: 12,
+    top: 12,
+  },
+  sectionHeader: {
+    alignSelf: "center",
+    width: Theme.layout.width,
+    marginBottom: Theme.spacing.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  listContent: {
+    paddingBottom: Theme.spacing.md,
+  },
+  empty: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 24,
+  },
+});

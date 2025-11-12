@@ -69,7 +69,7 @@ export default function Grant({
       {/* Title */}
       <Text
         style={[
-          Theme.typography.h3,
+          Theme.typography.subhead1,
           { color: eligible ? Theme.colors.black : Theme.colors.grey },
           styles.title,
         ]}

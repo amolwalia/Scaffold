@@ -46,6 +46,7 @@ export const Spacing = {
   sm: 8,
   md: 12, // related
   lg: 28, // unrelated
+  xl: 40, // header top padding
 }
 
 // Shadows 
@@ -67,7 +68,13 @@ export const Radius = {
 };
 
 export const Layout = {
-  width: "98%",
+  width: "90%",
+};
+
+export const Padding = {
+  buttonSm: { paddingVertical: 8, paddingHorizontal: 16 },
+  buttonMd: { paddingVertical: 10, paddingHorizontal: 20 },
+  buttonLg: { paddingVertical: 14, paddingHorizontal: 28 },
 };
 
 export const Theme = {
@@ -78,6 +85,9 @@ export const Theme = {
   shadow: Shadow,
   radius: Radius,
   layout: Layout,
-}
+  padding: Padding,
+};
+
+
 
 export default Theme;
