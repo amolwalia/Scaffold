@@ -1,53 +1,83 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
-import { Platform } from 'react-native';
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
+// Colour 
 export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+  // Purples
+  purple: "#8E7BFF",
+  lightPurple: "#EFEFFF",
+  brightPurple: "#8E78FF",
+  purpleStroke: "#C3B7FF",
+  // Oranges
+  orange: "#FF890C",
+  lightOrange: "#FFA341",
+  // Neutrals
+  black: "#000000",
+  white: "#FFFFFF",
+  grey: "#B2B1B8",
+  lightGrey: "#F6F6F6",
+  darkGrey: "#646466",
+  // Signals
+  blue: "#6FCEFD",
+  green: "#7CD23E",
+  yellow: "#FFE554",
+  red: "#E83B4D",
+};
+
+// Font
+export const Fonts = {
+  medium: "Montserrat-Medium",
+  semibold: "Montserrat-SemiBold",
+  bold: "Montserrat-Bold",
+};
+
+// Typography styles
+export const Typography = {
+  h1: { fontFamily: Fonts.bold, fontSize: 24, lineHeight: 28 },
+  h2: { fontFamily: Fonts.bold, fontSize: 20, lineHeight: 24 },
+  h3: { fontFamily: Fonts.semibold, fontSize: 18, lineHeight: 22 },
+  subhead1: { fontFamily: Fonts.bold, fontSize: 16, lineHeight: 20 },
+  subhead2: { fontFamily: Fonts.medium, fontSize: 16, lineHeight: 20 },
+  body: { fontFamily: Fonts.medium, fontSize: 14, lineHeight: 18 },
+  label: { fontFamily: Fonts.medium, fontSize: 12, lineHeight: 16 },
+  button: { fontFamily: Fonts.semibold, fontSize: 15, lineHeight: 19 }, 
+};
+
+// Spacing 
+export const Spacing = {
+  xs: 4, 
+  sm: 8,
+  md: 12, // related
+  lg: 28, // unrelated
+}
+
+// Shadows 
+export const Shadow = {
+  cardShadow: {
+    shadowColor: "#C3B7FF",
+    shadowOffset: { width: 1, height: 2},
+    shadowOpacity: 0.25, 
+    shadowRadius: 4.8,
+    elevation: 3, // for Android
   },
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+// Border Radius
+export const Radius = {
+  card: 10,
+  search: 35,
+  button: 40,
+};
+
+export const Layout = {
+  width: "98%",
+};
+
+export const Theme = {
+  colors: Colors,
+  typography: Typography,
+  fonts: Fonts,
+  spacing: Spacing,
+  shadow: Shadow,
+  radius: Radius,
+  layout: Layout,
+}
+
+export default Theme;

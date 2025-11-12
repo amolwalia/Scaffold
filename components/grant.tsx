@@ -1,6 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Theme } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
 
 interface GrantProps {
   id: string;
@@ -18,145 +20,246 @@ interface GrantProps {
   onNavigateToApply?: () => void;
 }
 
-export default function Grant({ 
-  id, 
-  title, 
-  organization, 
-  amount, 
-  deadline, 
-  category, 
-  description, 
+export default function Grant({
+  title,
+  amount,
+  deadline,
   eligible = false,
   saved = false,
   onPress,
-  onView,
   onSave,
-  onNavigateToApply
+  onNavigateToApply,
 }: GrantProps) {
+  const amountValue = amount.replace(/^Up to\s*/i, "");
+  const hasUpTo = /^up to/i.test(amount);
+
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       onPress={onPress}
-      activeOpacity={0.7}
-      className={`rounded-2xl shadow-sm border p-5 mb-4 mx-4 ${
-        eligible 
-          ? 'bg-white border-gray-200' 
-          : 'bg-gray-100 border-gray-300 opacity-75'
-      }`}
+      activeOpacity={0.8}
+      style={[
+        styles.card,
+        Theme.shadow.cardShadow,
+        !eligible && { opacity: 0.75 },
+      ]}
     >
-      {/* Top Section with Bookmark and Logo */}
-      <View className="flex-row justify-between items-start mb-4">
+      {/* Top: logo + bookmark */}
+      <View style={styles.topRow}>
+          <View
+            style={[
+              styles.logo,
+              { backgroundColor: eligible ? Theme.colors.orange : Theme.colors.lightGrey },
+            ]}
+          />
 
-        {/* Organization Logo Placeholder */}
-        <View className="items-center">
-          <View className={`w-12 h-12 rounded-lg items-center justify-center mb-1 ${
-            eligible 
-              ? 'bg-gradient-to-br from-yellow-400 to-orange-500' 
-              : 'bg-gray-300'
-          }`}>
-            <View className={`w-6 h-6 rounded-full ${
-              eligible ? 'bg-white' : 'bg-gray-400'
-            }`} />
-          </View>
-          <Text className={`text-xs font-medium ${
-            eligible ? 'text-gray-800' : 'text-gray-500'
-          }`}>
-            {organization}
-          </Text>
-        </View>
-
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={(e) => {
-            e?.stopPropagation?.();
+            e.stopPropagation?.();
             onSave?.();
-          }} 
-          className="p-1"
+          }}
         >
-          <Ionicons 
-            name={saved ? "bookmark" : "bookmark-outline"} 
-            size={25} 
-            color={saved ? "#3B82F6" : (eligible ? "#9CA3AF" : "#D1D5DB")} 
+          <Ionicons
+            name={saved ? "bookmark" : "bookmark-outline"}
+            size={22}
+            color={saved ? Theme.colors.brightPurple : Theme.colors.grey}
           />
         </TouchableOpacity>
       </View>
 
-      {/* Grant Title */}
-      <Text className={`text-lg font-bold mb-3 leading-tight ${
-        eligible ? 'text-gray-900' : 'text-gray-500'
-      }`} numberOfLines={2}>
+      {/* Title */}
+      <Text
+        style={[
+          Theme.typography.h3,
+          { color: eligible ? Theme.colors.black : Theme.colors.grey },
+          styles.title,
+        ]}
+        numberOfLines={2}
+      >
         {title}
       </Text>
 
-      {/* Amount Tag */}
-      <View className="flex-row justify-between items-center mb-4">
-        <View className={`px-3 py-1 rounded-full ${
-          eligible ? 'bg-gray-800' : 'bg-gray-400'
-        }`}>
-          <Text className="text-white text-sm font-medium">
-            {amount}
-          </Text>
-        </View>
-        
-        {/* Deadline with Calendar Icon */}
-        <View className="flex-row items-center">
-          <Ionicons 
-            name="calendar-outline" 
-            size={14} 
-            color={eligible ? "#374151" : "#9CA3AF"} 
-          />
-          <Text className={`text-sm ml-1 ${
-            eligible ? 'text-gray-700' : 'text-gray-500'
-          }`}>
-            {deadline}
-          </Text>
-        </View>
-      </View>
+      {/* Amount + Deadline */}
+        <View style={styles.metaRow}>
+          <View style={styles.metaLeft}>
+            <Ionicons name="calendar-outline" size={16} color={Theme.colors.darkGrey} />
+            <Text style={[Theme.typography.label, styles.metaText]}>{deadline}</Text>
 
-      {/* Bottom Section with Eligibility and Apply Button */}
-      <View className="flex-row justify-between items-center">
-        {/* Eligibility Message */}
-        <View className="flex-row items-center flex-1">
-          {eligible ? (
-            <>
-              <View className="w-5 h-5 bg-green-500 rounded-full items-center justify-center mr-2">
-                <Ionicons name="checkmark" size={12} color="white" />
-              </View>
-              <Text className="text-gray-700 text-sm">
-                You're eligible for this grant!
+            <View style={styles.metaSep} />
+
+            <Text style={Theme.typography.label}>
+              {hasUpTo && (
+                <Text style={{ color: Theme.colors.black }}>Up to </Text>
+              )}
+              <Text
+                style={{
+                  color: Theme.colors.brightPurple,
+                  fontFamily: Theme.fonts.bold,
+                  fontSize: 15,
+                }}
+              >
+                {amountValue}
               </Text>
-            </>
-          ) : (
-            <>
-              <View className="w-5 h-5 bg-red-400 rounded-full items-center justify-center mr-2">
-                <Ionicons name="close" size={12} color="white" />
-              </View>
-              <Text className="text-red-500 text-sm">
-                You're not eligible for this grant
-              </Text>
-            </>
-          )}
+            </Text>
+          </View>
         </View>
 
-        {/* View Button */}
-        <TouchableOpacity 
+      {/* thin divider under meta row */}
+        <View style={styles.metaDivider} />
+
+      {/* Bottom: eligibility + view */}
+      <View style={styles.bottomRow}>
+        <View style={styles.eligibility}>
+          <View
+            style={[
+              styles.statusDot,
+              { backgroundColor: eligible ? Theme.colors.green : Theme.colors.red },
+            ]}
+          >
+            <Ionicons
+              name={eligible ? "checkmark" : "close"}
+              size={12}
+              color={Theme.colors.white}
+            />
+          </View>
+          <Text
+            style={[
+              Theme.typography.label,
+              { color: eligible ? Theme.colors.black: Theme.colors.red },
+            ]}
+          >
+            {eligible
+              ? "You're eligible for this grant!"
+              : "You're not eligible for this grant"}
+          </Text>
+        </View>
+
+        <TouchableOpacity
           onPress={(e) => {
-            e?.stopPropagation?.();
-            if (eligible) {
-              onNavigateToApply?.();
-            }
+            e.stopPropagation?.();
+            if (eligible) onNavigateToApply?.();
           }}
-          className={`px-6 py-3 rounded-lg ${
-            eligible 
-              ? 'bg-orange-500' 
-              : 'bg-gray-400'
-          }`}
-          activeOpacity={eligible ? 0.8 : 1}
+          activeOpacity={eligible ? 0.85 : 1}
           disabled={!eligible}
+          style={[
+            styles.viewBtn,
+            {
+              backgroundColor: eligible
+                ? Theme.colors.orange
+                : Theme.colors.lightGrey,
+            },
+          ]}
         >
-          <Text className="text-black font-medium text-sm">
-            View
-          </Text>
+          <Text style={Theme.typography.button}>View</Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: Theme.colors.white,
+    borderWidth: 0.5,
+    borderColor: Theme.colors.purpleStroke,
+    borderRadius: Theme.radius.card,
+    padding: Theme.spacing.md,
+    marginBottom: Theme.spacing.md,
+    alignSelf: "center",
+
+    // use layout from theme
+    width: Theme.layout.width,
+    ...Theme.shadow.cardShadow,
+  },
+
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: Theme.spacing.md,
+  },
+
+  logo: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  title: {
+    marginBottom: Theme.spacing.sm,
+  },
+
+  metaRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Theme.spacing.md,
+  },
+
+  metaLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  metaText: {
+    marginLeft: 4,
+  },
+
+  metaSep: {
+    width: 1,
+    height: 14,
+    backgroundColor: Theme.colors.grey,
+    marginHorizontal: 8,
+  },
+
+  metaDivider: {
+    height: 0.7,
+    backgroundColor: Theme.colors.grey,
+    marginTop: Theme.spacing.lg,
+    marginBottom: 10,
+  },
+
+  amountPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: Theme.radius.button,
+  },
+
+  deadline: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  deadlineText: {
+    marginLeft: 6,
+  },
+
+  bottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  eligibility: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    marginRight: Theme.spacing.md,
+  },
+
+  statusDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
+  },
+
+  viewBtn: {
+    paddingHorizontal: Theme.spacing.lg,
+    paddingVertical: Theme.spacing.sm,
+    borderRadius: Theme.radius.card,
+  },
+} as const);
