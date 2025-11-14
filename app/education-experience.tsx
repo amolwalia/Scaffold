@@ -1,49 +1,66 @@
-import { InputFieldWithVoice } from "@/components/InputField";
-import VoiceInputOverlay from "@/components/VoiceInputOverlay";
+import VoiceInputOverlay from "@/utilities/useVoiceToText";
+import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function EducationExperience() {
   const router = useRouter();
+  const { profileData, updateProfileData } = useProfile();
+  const [tradeSchoolName, setTradeSchoolName] = useState(profileData.tradeSchoolName || "");
+  const [tradeProgramName, setTradeProgramName] = useState(profileData.tradeProgramName || "");
+  const [graduationDate, setGraduationDate] = useState(profileData.tradeGraduationDate || "");
+  const [trade, setTrade] = useState(profileData.trade || "");
+  const [apprenticeshipLevel, setApprenticeshipLevel] = useState(profileData.apprenticeshipLevel || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
   const [activeField, setActiveField] = useState<string | null>(null);
+  const [showApprenticeshipPicker, setShowApprenticeshipPicker] = useState(false);
 
-  const [formData, setFormData] = useState({
-    tradeSchoolName: "",
-    tradeProgramName: "",
-    graduationDate: "",
-    trade: "",
-    apprenticeshipLevel: "",
-  });
+  const APPRENTICESHIP_LEVELS = ["Level 1", "Level 2", "Level 3", "Level 4", "Year 1", "Year 2", "Year 3", "Year 4"];
 
-  const handleVoiceInput = (fieldName: string) => {
-    setActiveField(fieldName);
-    setShowVoiceOverlay(true);
-  };
-
-  const handleTranscribe = (text: string) => {
-    if (activeField) {
-      setFormData((prev) => ({
-        ...prev,
-        [activeField]: text,
-      }));
+  const handleVoiceResult = (text: string) => {
+    if (activeField === "tradeSchoolName") {
+      setTradeSchoolName(text);
+      updateProfileData({ tradeSchoolName: text });
+    } else if (activeField === "tradeProgramName") {
+      setTradeProgramName(text);
+      updateProfileData({ tradeProgramName: text });
+    } else if (activeField === "graduationDate") {
+      setGraduationDate(text);
+      updateProfileData({ tradeGraduationDate: text });
+    } else if (activeField === "trade") {
+      setTrade(text);
+      updateProfileData({ trade: text });
+    } else if (activeField === "apprenticeshipLevel") {
+      const match = APPRENTICESHIP_LEVELS.find((l) =>
+        text.toLowerCase().includes(l.toLowerCase())
+      );
+      if (match) {
+        setApprenticeshipLevel(match);
+        updateProfileData({ apprenticeshipLevel: match });
+      }
     }
     setShowVoiceOverlay(false);
     setActiveField(null);
   };
 
   const handleNext = () => {
-    // TODO: Navigate to next step or save data
-    console.log("Form data:", formData);
-    router.back();
+    updateProfileData({
+      tradeSchoolName,
+      tradeProgramName,
+      tradeGraduationDate: graduationDate,
+      trade,
+      apprenticeshipLevel,
+    });
+    router.push("/(tabs)/profile");
   };
 
   return (
@@ -73,85 +90,106 @@ export default function EducationExperience() {
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        
         <Text style={styles.sectionTitle}>Trade-Specific Education</Text>
 
         <View style={styles.formContainer}>
-          <InputFieldWithVoice
+          <TextInput
+            style={styles.input}
             placeholder="Trade School / Vocational School Name..."
-            value={formData.tradeSchoolName}
-            onChangeText={(text) =>
-              setFormData((prev) => ({ ...prev, tradeSchoolName: text }))
-            }
-            onVoiceInput={() => handleVoiceInput("tradeSchoolName")}
+            placeholderTextColor="#9CA3AF"
+            value={tradeSchoolName}
+            onChangeText={(text) => {
+              setTradeSchoolName(text);
+              updateProfileData({ tradeSchoolName: text });
+            }}
           />
 
-          <InputFieldWithVoice
+          <TextInput
+            style={styles.input}
             placeholder="Trade / Vocational Program Name..."
-            value={formData.tradeProgramName}
-            onChangeText={(text) =>
-              setFormData((prev) => ({ ...prev, tradeProgramName: text }))
-            }
-            onVoiceInput={() => handleVoiceInput("tradeProgramName")}
+            placeholderTextColor="#9CA3AF"
+            value={tradeProgramName}
+            onChangeText={(text) => {
+              setTradeProgramName(text);
+              updateProfileData({ tradeProgramName: text });
+            }}
           />
 
-          <InputFieldWithVoice
+          <TextInput
+            style={styles.input}
             placeholder="Graduation / Completion Date..."
-            value={formData.graduationDate}
-            onChangeText={(text) =>
-              setFormData((prev) => ({ ...prev, graduationDate: text }))
-            }
-            onVoiceInput={() => handleVoiceInput("graduationDate")}
+            placeholderTextColor="#9CA3AF"
+            value={graduationDate}
+            onChangeText={(text) => {
+              setGraduationDate(text);
+              updateProfileData({ tradeGraduationDate: text });
+            }}
           />
 
-          <InputFieldWithVoice
+          <TextInput
+            style={styles.input}
             placeholder="Trade..."
-            value={formData.trade}
-            onChangeText={(text) =>
-              setFormData((prev) => ({ ...prev, trade: text }))
-            }
-            onVoiceInput={() => handleVoiceInput("trade")}
+            placeholderTextColor="#9CA3AF"
+            value={trade}
+            onChangeText={(text) => {
+              setTrade(text);
+              updateProfileData({ trade: text });
+            }}
           />
 
-          <InputFieldWithVoice
-            placeholder="Apprenticeship Level / Year..."
-            value={formData.apprenticeshipLevel}
-            onChangeText={(text) =>
-              setFormData((prev) => ({ ...prev, apprenticeshipLevel: text }))
-            }
-            onVoiceInput={() => handleVoiceInput("apprenticeshipLevel")}
-            isDropdown={true}
-          />
-        </View>
-
-        {/* Action Buttons */}
-        <View style={styles.actionContainer}>
           <TouchableOpacity
-            style={styles.voiceButton}
-            onPress={() => handleVoiceInput("general")}
-            activeOpacity={0.7}
+            style={styles.input}
+            onPress={() => setShowApprenticeshipPicker(!showApprenticeshipPicker)}
           >
-            <Ionicons name="mic" size={24} color="#8B5CF6" />
+            <Text style={apprenticeshipLevel ? styles.inputText : styles.placeholderText}>
+              {apprenticeshipLevel || "Apprenticeship Level / Year..."}
+            </Text>
+            <Ionicons name="chevron-down" size={20} color="#9CA3AF" />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.nextButton}
-            onPress={handleNext}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
+          {showApprenticeshipPicker && (
+            <View style={styles.picker}>
+              {APPRENTICESHIP_LEVELS.map((level) => (
+                <TouchableOpacity
+                  key={level}
+                  style={styles.pickerOption}
+                  onPress={() => {
+                    setApprenticeshipLevel(level);
+                    setShowApprenticeshipPicker(false);
+                    updateProfileData({ apprenticeshipLevel: level });
+                  }}
+                >
+                  <Text style={styles.pickerOptionText}>{level}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
 
-      {/* Voice Input Overlay */}
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.voiceButton}
+          onPress={() => {
+            setActiveField("tradeSchoolName");
+            setShowVoiceOverlay(true);
+          }}
+        >
+          <Ionicons name="mic" size={24} color="#8B5CF6" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+          <Text style={styles.nextButtonText}>Next</Text>
+        </TouchableOpacity>
+      </View>
+
       <VoiceInputOverlay
         visible={showVoiceOverlay}
         onClose={() => {
           setShowVoiceOverlay(false);
           setActiveField(null);
         }}
-        onTranscribe={handleTranscribe}
+        onResult={handleVoiceResult}
       />
     </View>
   );
@@ -201,15 +239,55 @@ const styles = StyleSheet.create({
     color: "#0B0B0F",
     paddingHorizontal: 20,
     marginBottom: 20,
+    textAlign: "center",
   },
   formContainer: {
     paddingHorizontal: 20,
   },
-  actionContainer: {
+  input: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#0B0B0F",
+    marginBottom: 16,
+  },
+  inputText: {
+    fontSize: 16,
+    color: "#0B0B0F",
+  },
+  placeholderText: {
+    fontSize: 16,
+    color: "#9CA3AF",
+  },
+  picker: {
+    marginTop: -16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 8,
+    maxHeight: 200,
+    backgroundColor: "#FFFFFF",
+  },
+  pickerOption: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+  },
+  pickerOptionText: {
+    fontSize: 16,
+    color: "#0B0B0F",
+  },
+  footer: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 20,
     paddingBottom: 40,
     gap: 16,
   },
@@ -217,9 +295,11 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#F3F2FF",
+    borderWidth: 2,
+    borderColor: "#8B5CF6",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#FFFFFF",
   },
   nextButton: {
     flex: 1,

@@ -244,7 +244,7 @@ export default function Profile() {
   };
 
   const handleContinue = () => {
-    router.push("/education-experience");
+    router.push("/basic-profile-name");
   };
 
   return (

@@ -1,16 +1,16 @@
-import React, { useEffect, useState, useRef } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
   Animated,
   Easing,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import Voice from "@react-native-voice/voice";
 
 interface VoiceInputOverlayProps {
   visible: boolean;
@@ -29,23 +29,14 @@ export default function VoiceInputOverlay({
   const [phase, setPhase] = useState<"idle" | "listening" | "review">("idle");
   const [recognizedText, setRecognizedText] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
+  // waveform animation setup
   const bars = Array.from(
     { length: BAR_COUNT },
     () => useRef(new Animated.Value(1)).current
   );
 
-  useEffect(() => {
-    Voice.onSpeechResults = (e) => {
-      if (e.value && e.value[0]) setRecognizedText(e.value[0]);
-    };
-    Voice.onSpeechEnd = () => setIsListening(false);
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  // Safe waveform animation — scaleY only
   useEffect(() => {
     if (isListening) {
       const loops = bars.map((bar) =>
@@ -73,23 +64,49 @@ export default function VoiceInputOverlay({
 
   const startListening = async () => {
     try {
-      await Voice.start("en-US");
-      setIsListening(true);
-      setPhase("listening");
-      setRecognizedText("");
-    } catch (err) {
-      console.error("Voice start error:", err);
+      if (Platform.OS === "web" || typeof window !== "undefined") {
+        const SpeechRecognition =
+          (window as any).SpeechRecognition ||
+          (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+          alert("Speech recognition not supported on this device.");
+          return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+
+        recognition.onresult = (event: any) => {
+          let text = "";
+          for (let i = 0; i < event.results.length; i++) {
+            text += event.results[i][0].transcript + " ";
+          }
+          setRecognizedText(text.trim());
+        };
+
+        recognition.onerror = (err: any) => console.error("Speech error:", err);
+        recognition.onend = () => setIsListening(false);
+
+        recognition.start();
+        recognitionRef.current = recognition;
+        setPhase("listening");
+        setIsListening(true);
+      } else {
+        alert("Speech recognition requires Expo Web or device browser mode.");
+      }
+    } catch (e) {
+      console.error("Speech start failed:", e);
     }
   };
 
-  const stopListening = async () => {
-    try {
-      await Voice.stop();
-      setIsListening(false);
-      setPhase("review");
-    } catch (err) {
-      console.error("Voice stop error:", err);
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
     }
+    setIsListening(false);
+    setPhase("review");
   };
 
   const handleRetry = () => {
@@ -108,12 +125,7 @@ export default function VoiceInputOverlay({
       {bars.map((bar, i) => (
         <Animated.View
           key={i}
-          style={[
-            styles.waveBar,
-            {
-              transform: [{ scaleY: bar }],
-            },
-          ]}
+          style={[styles.waveBar, { transform: [{ scaleY: bar }] }]}
         />
       ))}
     </View>
