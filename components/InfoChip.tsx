@@ -2,6 +2,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Theme from "../theme";
 
 type InfoChipProps = {
   iconName: keyof typeof Ionicons.glyphMap;

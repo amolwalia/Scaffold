@@ -1,7 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
+import { Theme } from '@/constants/theme';
 type Props = {
   eyebrow: string;
   title: string;
@@ -22,25 +23,58 @@ export default function NotificationListItem({
       accessibilityRole="button"
       accessibilityState={{ disabled: !onPress }}
       onPress={onPress}
-      className="flex-row items-center justify-between bg-white pl-[36px] pr-[20px] pt-[25px] pb-[24px] border-b border-solid border-[#B2B1B8] active:opacity-80"
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 25,
+        borderBottomWidth: 1,
+        borderBottomColor: Theme.colors.grey,
+      }}
     >
       <View className="flex-1 pr-4">
-        <Text className="text-[13px] font-montserrat-medium text-[#7260CC]">
+        <Text
+          style={[
+            Theme.typography.body,
+            { color: Theme.colors.purple, fontSize: 13 },
+          ]}
+        >
           {eyebrow}
         </Text>
-        <Text className="mt-[5px] text-[16px] font-montserrat-bold text-[#000000]">
+        <Text
+          style={[
+            Theme.typography.subhead1,
+            { color: Theme.colors.black, marginTop: 5 },
+          ]}
+        >
           {title}
         </Text>
         {subtitle ? (
-          <Text className="mt-[5px] text-[12px] font-montserrat-medium text-[#000000]">
+          <Text
+            style={[
+              Theme.typography.label,
+              { color: Theme.colors.black, marginTop: 5 },
+            ]}
+          >
             {subtitle}
           </Text>
         ) : null}
       </View>
 
-      <View className="items-center justify-center pl-3">
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingLeft: 12,
+        }}
+      >
         {rightAccessory ?? (
-          <Ionicons name="chevron-forward-outline" size={18} color="#000000" />
+          <Ionicons
+            name="chevron-forward-outline"
+            size={18}
+            color={Theme.colors.black}
+          />
         )}
       </View>
     </Pressable>

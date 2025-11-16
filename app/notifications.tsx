@@ -1,7 +1,8 @@
-import { SafeAreaView, View, Text, Pressable, FlatList } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { FlatList, Pressable, SafeAreaView, Text, View } from 'react-native';
 
+import { Theme } from '@/constants/theme';
 import NotificationListItem from '../components/NotificationListItem';
 import EyeIcon from '../components/icons/EyeIcon';
 
@@ -25,15 +26,31 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-row items-center pt-[30px] pr-[20px] pl-[20px] pb-[30px]">
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 30,
+          paddingHorizontal: 20,
+        }}
+      >
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
           onPress={() => router.back()}
         >
-          <Ionicons name="chevron-back-outline" size={20} color="#1F2937" />
+          <Ionicons
+            name="chevron-back-outline"
+            size={20}
+            color={Theme.colors.black}
+          />
         </Pressable>
-        <Text className="ml-[22px] text-[24px] font-montserrat-bold text-[#111827]">
+        <Text
+          style={[
+            Theme.typography.h1,
+            { color: Theme.colors.black, marginLeft: 22 },
+          ]}
+        >
           Notifications
         </Text>
       </View>

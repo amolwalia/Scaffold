@@ -1,11 +1,12 @@
-import { Modal, View, Text, Pressable, Platform } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import { Theme, Typography } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { Modal, Pressable, Text, View } from 'react-native';
 
 type Action = {
   label: string;
   onPress: () => void;
-  variant?: "primary" | "secondary"; // optional CTA row (if you ever need it)
+  variant?: 'primary' | 'secondary'; // optional CTA row (if you ever need it)
 };
 
 type Props = {
@@ -30,15 +31,15 @@ export default function ModalPopover({
   visible,
   onClose,
   title,
-  titleIconName = "calendar-outline",
-  titleIconBg = "#F59E0B",
-  titleIconColor = "#FFFFFF",
+  titleIconName = 'calendar-outline',
+  titleIconBg = '#F59E0B',
+  titleIconColor = '#FFFFFF',
   lines,
   children,
   actions = [],
 }: Props) {
   const cardShadow = {
-    shadowColor: "#000",
+    shadowColor: Theme.colors.black,
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
@@ -56,28 +57,60 @@ export default function ModalPopover({
       {/* Backdrop */}
       <Pressable
         onPress={onClose}
-        className="flex-1 bg-black/40 items-center justify-center px-5"
+        style={{
+          flex: 1,
+          // Semi-transparent black backdrop (only the background is faded)
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingHorizontal: 20,
+        }}
       >
         {/* Stop touches from bubbling to the backdrop */}
         <Pressable
           onPress={() => {}}
-          className="w-full max-w-[360px] rounded-[10px] bg-white px-5 py-4"
-          style={cardShadow}
+          style={{
+            ...cardShadow,
+            width: '100%',
+            maxWidth: 295,
+            borderRadius: Theme.radius.card,
+            backgroundColor: Theme.colors.white,
+            paddingVertical: 29,
+            paddingHorizontal: 29,
+          }}
         >
           {/* Title row */}
           {!!title && (
-            <View className="flex-row items-center mb-2">
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: 8,
+              }}
+            >
               <View
-                className="h-8 w-8 rounded-full items-center justify-center mr-3"
-                style={{ backgroundColor: titleIconBg }}
+                style={{
+                  width: 25,
+                  height: 25,
+                  borderRadius: 50,
+                  backgroundColor: titleIconBg,
+                  marginRight: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 <Ionicons
                   name={titleIconName as any}
-                  size={18}
+                  size={14}
                   color={titleIconColor}
                 />
               </View>
-              <Text className="text-[18px] leading-[22px] text-[#0B0B0F] font-montExtra">
+              <Text
+                style={{
+                  ...Typography.subhead1,
+                  color: Theme.colors.black,
+                }}
+              >
                 {title}
               </Text>
             </View>
@@ -87,11 +120,15 @@ export default function ModalPopover({
           {children ? (
             children
           ) : (
-            <View className="mt-1">
+            <View style={{ marginTop: 10 }}>
               {(lines ?? []).map((line, i) => (
                 <Text
                   key={i}
-                  className="text-[15px] leading-[20px] text-[#4B5563] mb-2 font-mont"
+                  style={{
+                    ...Typography.body,
+                    color: Theme.colors.black,
+                    marginBottom: 8,
+                  }}
                 >
                   {line}
                 </Text>
@@ -101,23 +138,37 @@ export default function ModalPopover({
 
           {/* Optional actions row */}
           {actions.length > 0 && (
-            <View className="mt-3 flex-row justify-end gap-3">
-              {actions.map(({ label, onPress, variant = "secondary" }) => (
+            <View
+              style={{
+                marginTop: 12,
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                gap: 5,
+              }}
+            >
+              {actions.map(({ label, onPress, variant = 'secondary' }) => (
                 <Pressable
                   key={label}
                   onPress={onPress}
-                  className={
-                    variant === "primary"
-                      ? "px-4 py-2 rounded-[10px] bg-[#7B6CF6]"
-                      : "px-4 py-2 rounded-[10px] bg-[#F3F4F6]"
-                  }
+                  style={{
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    borderRadius: 10,
+                    backgroundColor:
+                      variant === 'primary'
+                        ? Theme.colors.purple
+                        : Theme.colors.grey,
+                  }}
                 >
                   <Text
-                    className={
-                      variant === "primary"
-                        ? "text-white font-montSemi"
-                        : "text-[#111827] font-montSemi"
-                    }
+                    style={{
+                      ...Typography.subhead2,
+                      color:
+                        variant === 'primary'
+                          ? Theme.colors.white
+                          : Theme.colors.black,
+                      fontFamily: Theme.fonts.semibold,
+                    }}
                   >
                     {label}
                   </Text>

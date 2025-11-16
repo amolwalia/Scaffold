@@ -1,30 +1,78 @@
-import { View, Text } from 'react-native';
+import { Theme } from '@/constants/theme';
+import { Image, ImageSourcePropType, Text, View } from 'react-native';
 import MoneyIcon from './icons/MoneyIcon';
 
 export default function EligibilityBanner({
   count,
   grants,
   total,
+  icons,
 }: {
   count: number;
   grants: string[];
   total: number;
+  icons?: ImageSourcePropType[];
 }) {
   return (
-    <View className="rounded-[10px] bg-[#ECEBFF] px-4 py-5 mt-7">
-      <Text className="text-[18px] font-montserrat-semibold  text-[#0B0B0F] mb-5">
+    <View
+      style={{
+        borderRadius: Theme.radius.card,
+        backgroundColor: Theme.colors.lightPurple,
+        paddingHorizontal: 14,
+        paddingVertical: 20,
+        marginTop: Theme.spacing.lg,
+      }}
+    >
+      <Text
+        style={[
+          Theme.typography.h3,
+          { color: Theme.colors.black, marginBottom: 22 },
+        ]}
+      >
         You’re eligible for{' '}
-        <Text className="text-[#FF890C] font-montserrat-extrabold">
+        <Text
+          style={[
+            Theme.typography.h3,
+            { color: Theme.colors.orange, fontFamily: Theme.fonts.extrabold },
+          ]}
+        >
           {count} Grants
         </Text>
       </Text>
 
-      <View className="mb-5">
-        {grants.map((g) => (
-          <View key={g} className="flex-row items-center mb-2">
-            <View className="h-2 w-2 rounded-full bg-[#7B6CF6] mr-3" />
+      <View style={{ marginBottom: 22, gap: 10 }}>
+        {grants.map((g, index) => (
+          <View
+            key={g}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+          >
+            <Image
+              source={
+                icons && icons[index]
+                  ? icons[index]
+                  : require('../assets/images/workBC.png')
+              }
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: 10,
+                marginRight: 15,
+              }}
+              resizeMode="cover"
+            />
             <Text
-              className="flex-1 text-[15px] font-montserrat-medium leading-[18px] text-[#0B0B0F]"
+              style={[
+                {
+                  color: Theme.colors.black,
+                  flex: 1,
+                  fontFamily: Theme.fonts.medium,
+                  fontSize: 15,
+                  lineHeight: 20,
+                },
+              ]}
               numberOfLines={1}
             >
               {g}
@@ -33,7 +81,15 @@ export default function EligibilityBanner({
         ))}
       </View>
 
-      <View className=" bg-none pt-5 pb-0 border-t border-solid border-[#F6F6F6]">
+      <View
+        style={{
+          paddingTop: 20,
+          paddingBottom: 0,
+          borderTopWidth: 1,
+          borderTopColor: Theme.colors.lightGrey,
+          borderStyle: 'solid',
+        }}
+      >
         <View className="flex-row items-center justify-end">
           <MoneyIcon size={24} />
           <Text className="ml-2 text-[15px] font-montserrat-semibold text-[#27252F] flex justify-end items-center">

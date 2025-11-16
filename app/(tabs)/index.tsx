@@ -1,5 +1,6 @@
-import { SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { Theme } from '@/constants/theme';
 import { useRouter } from 'expo-router';
+import { SafeAreaView, ScrollView, Text, View } from 'react-native';
 import EligibilityBanner from '../../components/EligibilityBanner';
 import FinishProfileCard from '../../components/FinishProfileCard';
 import HeaderGreeting from '../../components/HeaderGreeting';
@@ -17,12 +18,18 @@ export default function HomeTab() {
       'LNG Canada Trades Training Fund',
       'Masonry Institute of BC Training Fund',
     ],
+    icons: [
+      require('../../assets/images/workBC.png'),
+      require('../../assets/images/workBC.png'),
+      require('../../assets/images/LNG.png'),
+      require('../../assets/images/Masonry.png'),
+    ],
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
-        className="bg-white"
+        style={{ backgroundColor: Theme.colors.white }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: 25, paddingBottom: 120 }}
       >
@@ -38,13 +45,19 @@ export default function HomeTab() {
             count={eligible.count}
             grants={eligible.items}
             total={eligible.total}
+            icons={eligible.icons}
           />
 
-          <View className="mt-[12px]">
+          <View style={{ marginTop: 12 }}>
             <SavedGrantRow label="Explore your eligible grants now" />
           </View>
 
-          <Text className="mb-3 mt-6 text-[22px] font-montserrat-bold text-[#000000]">
+          <Text
+            style={[
+              Theme.typography.h2,
+              { color: Theme.colors.black, marginTop: 27, marginBottom: 14 },
+            ]}
+          >
             Finish your profile!
           </Text>
           <FinishProfileCard

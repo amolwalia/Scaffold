@@ -1,7 +1,9 @@
-import BottomNavigation from "@/components/BottomNavigation";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
-import React, { useState } from "react";
+import BottomNavigation from '@/components/BottomNavigation';
+
+import { Theme } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Stack, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
   FlatList,
   ListRenderItemInfo,
@@ -10,9 +12,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
-} from "react-native";
-import ModalPopover from "../components/ModalPopover";
+} from 'react-native';
+import ModalPopover from '../components/ModalPopover';
 
 /* -----------------------------------------------------
    Local chip component — bullet-proof on iPhone
@@ -32,45 +35,45 @@ function Chip({ label, iconName, iconBg, onPress }: ChipProps) {
         pressed && chipStyles.pressed,
       ]}
     >
-      <View className="flex-row justify-between items-center bg-gray-100 p-2 mx-1 rounded-2xl"> 
-        <View style={[chipStyles.iconCircle, { backgroundColor: iconBg }]}>
-           <Ionicons name={iconName} size={18} color="#fff" />
-        </View>
+      <View style={[chipStyles.iconCircle, { backgroundColor: iconBg }]}>
+        <Ionicons name={iconName} size={16} color="#fff" />
+      </View>
 
-        <View style={chipStyles.labelWrap}>
+      <View style={chipStyles.labelWrap}>
         <Text numberOfLines={1} ellipsizeMode="tail" style={chipStyles.label}>
           {label}
         </Text>
       </View>
-         <View style={chipStyles.chevWrap}>
-        <   Ionicons name="chevron-forward" size={16} color="#111" className="pr-8"/>
-         </View>
-      
-      
-</View>
+      <View style={chipStyles.chevWrap}>
+        <Ionicons
+          name="chevron-forward-outline"
+          size={12}
+          color={Theme.colors.black}
+        />
+      </View>
     </Pressable>
   );
 }
 
 const chipStyles = StyleSheet.create({
   container: {
-    backgroundColor: "#F6F6F6",
-    borderRadius: 18,
-    minHeight: 56,
+    backgroundColor: Theme.colors.lightGrey,
+    borderRadius: Theme.radius.card,
+    minHeight: 46,
     paddingHorizontal: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    flexWrap: "nowrap",
-    width: "100%",
-    overflow: "hidden",
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'nowrap',
+    width: '100%',
+    overflow: 'hidden',
   },
   pressed: { opacity: 0.95 },
   iconCircle: {
-    width: 32,
-    height: 32,
+    width: 25,
+    height: 25,
     borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 10,
     flexShrink: 0,
   },
@@ -81,15 +84,13 @@ const chipStyles = StyleSheet.create({
     marginRight: 6,
   },
   label: {
-    fontSize: 16,
-    lineHeight: 19,
-    fontWeight: "700",
-    color: "#111",
+    ...Theme.typography.body,
+    color: Theme.colors.black,
   },
   chevWrap: {
     width: 18,
-    alignItems: "flex-end",
-    justifyContent: "center",
+    alignItems: 'flex-end',
+    justifyContent: 'center',
     flexShrink: 0,
   },
 });
@@ -97,7 +98,7 @@ const chipStyles = StyleSheet.create({
 /* -----------------------------------------------------
    Screen
 ----------------------------------------------------- */
-type Key = "eligible" | "funding" | "date" | "age" | "location" | "notes";
+type Key = 'eligible' | 'funding' | 'date' | 'age' | 'location' | 'notes';
 
 type ChipItem = {
   key: Key;
@@ -110,43 +111,59 @@ export default function GrantDetails() {
   const router = useRouter();
   const [open, setOpen] = useState<null | Key>(null);
   const close = () => setOpen(null);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  const grantData = {
+    title: 'Masonry Institute of BC Training Fund',
+    organization: 'Masonry Institute',
+    amount: 'Up to $1,950',
+    deadline: '3m before training starts',
+    description:
+      'The Masonry Institute of BC has evolved from masonry organizations, which have been promoting the local masonry industry for over 50 years.',
+    fullDescription:
+      'The Masonry Institute of BC has evolved from masonry organizations, which have been promoting the local masonry industry for over 50 years.' +
+      '\n' +
+      ' We are committed to advancing the masonry trade through education, training, and professional development. Our training fund provides financial support to apprentices and tradespeople pursuing masonry-related education and certification programs.' +
+      '\n' +
+      'This includes support for various levels of apprenticeship training, specialized masonry techniques, and continuing education opportunities that enhance skills and career advancement in the masonry industry.',
+  };
 
   const data: ChipItem[] = [
     {
-      key: "eligible",
-      label: "You’re eligible",
-      icon: "checkmark-circle",
-      bg: "#3B82F6",
+      key: 'eligible',
+      label: 'You’re eligible',
+      icon: 'checkmark-circle-outline',
+      bg: Theme.colors.blue,
     },
     {
-      key: "funding",
-      label: "Up to $1950",
-      icon: "cash-outline",
-      bg: "#22C55E",
+      key: 'funding',
+      label: 'Up to $1950',
+      icon: 'cash-outline',
+      bg: Theme.colors.green,
     },
     {
-      key: "date",
-      label: "3 Months Before",
-      icon: "calendar-outline",
-      bg: "#F59E0B",
+      key: 'date',
+      label: '3 Months Before',
+      icon: 'calendar-outline',
+      bg: Theme.colors.orange,
     },
     {
-      key: "age",
-      label: "Gr 10+",
-      icon: "person-circle-outline",
-      bg: "#F59E0B",
+      key: 'age',
+      label: 'Gr 10+',
+      icon: 'person-circle-outline',
+      bg: Theme.colors.orange,
     },
     {
-      key: "location",
-      label: "Legal Work Permit",
-      icon: "home-outline",
-      bg: "#F59E0B",
+      key: 'location',
+      label: 'Legal Work Permit',
+      icon: 'home-outline',
+      bg: Theme.colors.orange,
     },
     {
-      key: "notes",
-      label: "Notes",
-      icon: "information-circle-outline",
-      bg: "#7B6CF6",
+      key: 'notes',
+      label: 'Notes',
+      icon: 'information-circle-outline',
+      bg: Theme.colors.purple,
     },
   ];
 
@@ -162,29 +179,26 @@ export default function GrantDetails() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingBottom: 24,
+          paddingTop: Theme.spacing.md,
+        }}
       >
         <Stack.Screen options={{ headerShown: false }} />
 
-        <View style={{ width: "100%", paddingTop: 12 }}>
+        <View style={styles.container}>
           {/* Top bar */}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 16,
-            }}
-          >
-            <Pressable onPress={() => router.back()} style={styles.iconBtn}>
-              <Ionicons name="chevron-back" size={22} color="#111827" />
-            </Pressable>
-            <Pressable style={styles.iconBtn}>
-              <Ionicons name="bookmark-outline" size={22} color="#6B7280" />
-            </Pressable>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="chevron-back-outline" size={22} color="#000" />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Ionicons name="bookmark-outline" size={22} color="#9CA3AF" />
+            </TouchableOpacity>
           </View>
 
           {/* Title */}
@@ -199,27 +213,60 @@ export default function GrantDetails() {
             renderItem={renderItem}
             numColumns={2}
             columnWrapperStyle={{
-              justifyContent: "space-between",
-              marginBottom: 12,
+              justifyContent: 'space-between',
+              gap: 6,
+              marginBottom: 8,
             }}
             scrollEnabled={false}
-            contentContainerStyle={{ paddingTop: 4 }}
           />
 
-          {/* About card */}
-          <View style={styles.infoCard}>
-            <Text style={styles.infoText}>
-              The Masonry Institute of BC has evolved from masonry
-              organizations, which have been promoting the local masonry
-              industry for over 50 years.
-            </Text>
-            <View style={{ alignItems: "flex-end", marginTop: 8 }}>
-              <Ionicons name="chevron-down" size={18} color="#6B6B6B" />
+          {/* About section */}
+          <View style={{ marginBottom: 28, marginTop: 19 }}>
+            <View
+              style={{
+                backgroundColor: Theme.colors.lightPurple,
+                borderRadius: Theme.radius.card,
+                paddingTop: 30,
+                paddingHorizontal: 19,
+                paddingBottom: Theme.spacing.md,
+              }}
+            >
+              <Text
+                style={[Theme.typography.body, { color: Theme.colors.black }]}
+              >
+                {isDescriptionExpanded
+                  ? grantData.fullDescription
+                  : grantData.description}
+              </Text>
+              <TouchableOpacity
+                onPress={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                className="mt-2"
+              >
+                <View className="flex-row items-center justify-end">
+                  <Text
+                    style={[
+                      Theme.typography.label,
+                      { color: Theme.colors.grey, marginRight: 5 },
+                    ]}
+                  >
+                    {isDescriptionExpanded ? 'Show less' : 'Show more'}
+                  </Text>
+                  <Ionicons
+                    name={
+                      isDescriptionExpanded
+                        ? 'chevron-up-outline'
+                        : 'chevron-down-outline'
+                    }
+                    size={16}
+                    color={Theme.colors.grey}
+                  />
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
 
           {/* Candidate messages */}
-          <View style={{ marginTop: 24, marginBottom: 20 }}>
+          <View>
             <Text style={styles.strong}>You are a strong candidate.</Text>
             <Text style={styles.sub}>
               Your profile is missing some information for this grant
@@ -230,7 +277,7 @@ export default function GrantDetails() {
           {/* CTA */}
           <Pressable
             style={styles.cta}
-            onPress={() => router.push("/grant-saved-apply")}
+            onPress={() => router.push('/grant-saved-apply')}
           >
             <Text style={styles.ctaText}>Get started</Text>
           </Pressable>
@@ -239,61 +286,61 @@ export default function GrantDetails() {
 
       {/* MODALS (unchanged) */}
       <ModalPopover
-        visible={open === "eligible"}
+        visible={open === 'eligible'}
         onClose={close}
         title="You’re eligible"
         titleIconName="checkmark-circle"
         titleIconBg="#3B82F6"
         titleIconColor="#FFFFFF"
         lines={[
-          "You appear to qualify for this grant. Please verify your details in the grant portal to confirm eligibility.",
+          'You appear to qualify for this grant. Please verify your details in the grant portal to confirm eligibility.',
         ]}
       />
       <ModalPopover
-        visible={open === "funding"}
+        visible={open === 'funding'}
         onClose={close}
         title="Up to $1950"
         titleIconName="cash-outline"
         titleIconBg="#22C55E"
         titleIconColor="#FFFFFF"
         lines={[
-          "You can receive up to $1950 to be applied to tuition.",
-          "First year masons may be eligible to receive an additional $155 to cover textbook costs.",
+          'You can receive up to $1950 to be applied to tuition.',
+          'First year masons may be eligible to receive an additional $155 to cover textbook costs.',
         ]}
       />
       <ModalPopover
-        visible={open === "date"}
+        visible={open === 'date'}
         onClose={close}
         title="3 Months Before"
         titleIconName="calendar-outline"
         titleIconBg="#F59E0B"
         titleIconColor="#FFFFFF"
         lines={[
-          "Application to this grant must be received 3 months prior to the month training starts.",
+          'Application to this grant must be received 3 months prior to the month training starts.',
         ]}
       />
       <ModalPopover
-        visible={open === "age"}
+        visible={open === 'age'}
         onClose={close}
         title="Gr 10+"
         titleIconName="person-circle-outline"
         titleIconBg="#F59E0B"
         titleIconColor="#FFFFFF"
         lines={[
-          "You must be minimum in Grade 10 and enrolled in the Trowel Trades Training Association.",
+          'You must be minimum in Grade 10 and enrolled in the Trowel Trades Training Association.',
         ]}
       />
       <ModalPopover
-        visible={open === "location"}
+        visible={open === 'location'}
         onClose={close}
         title="Legal Work Permit"
         titleIconName="home-outline"
         titleIconBg="#F59E0B"
         titleIconColor="#FFFFFF"
-        lines={["You must be legally allowed to work in Canada."]}
+        lines={['You must be legally allowed to work in Canada.']}
       />
       <ModalPopover
-        visible={open === "notes"}
+        visible={open === 'notes'}
         onClose={close}
         title="Notes"
         titleIconName="information-circle-outline"
@@ -303,37 +350,30 @@ export default function GrantDetails() {
         <View style={{ marginTop: 4 }}>
           <Text
             style={{
-              fontSize: 15,
-              lineHeight: 20,
-              color: "#0B0B0F",
-              fontWeight: "600",
-              marginBottom: 8,
+              ...Theme.typography.body,
+              marginBottom: 15,
             }}
           >
             Successful applicants must be:
           </Text>
           {[
-            "Enrolled at the Trowel Trades Training Association",
-            "In Level 1, 2, or 3 of their apprenticeship",
-            "Priority will be given to applicants who are members of the Masonry Institute of BC",
+            'Enrolled at the Trowel Trades Training Association',
+            'In Level 1, 2, or 3 of their apprenticeship',
+            'Priority will be given to applicants who are members of the Masonry Institute of BC',
           ].map((t, i) => (
-            <View key={i} style={{ flexDirection: "row", marginBottom: 8 }}>
+            <View key={i} style={{ flexDirection: 'row', marginBottom: 8 }}>
               <Text
                 style={{
-                  fontSize: 15,
-                  lineHeight: 20,
-                  color: "#4B5563",
+                  ...Theme.typography.body,
                   marginRight: 8,
                 }}
               >
-                {"\u2022"}
+                {'\u2022'}
               </Text>
               <Text
                 style={{
                   flex: 1,
-                  fontSize: 15,
-                  lineHeight: 20,
-                  color: "#4B5563",
+                  ...Theme.typography.body,
                 }}
               >
                 {t}
@@ -349,57 +389,52 @@ export default function GrantDetails() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    flex: 1,
+    backgroundColor: Theme.colors.white,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
   iconBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 26,
-    lineHeight: 30,
-    fontWeight: "800",
-    color: "#0B0B0F",
-    marginBottom: 16,
+    ...Theme.typography.h2,
+    color: Theme.colors.black,
+    marginBottom: 22,
   },
   gridItem: {
     flex: 1,
   },
-  infoCard: {
-    marginTop: 20,
-    backgroundColor: "#ECEBFF",
-    borderRadius: 12,
-    padding: 16,
-  },
-  infoText: {
-    fontSize: 15,
-    lineHeight: 20,
-    color: "#0B0B0F",
-  },
   strong: {
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#7B6CF6",
-    marginBottom: 4,
+    textAlign: 'center',
+    ...Theme.typography.subhead1,
+    color: Theme.colors.purple,
+    marginBottom: 10,
   },
   sub: {
-    textAlign: "center",
-    fontSize: 16,
-    color: "#F59E0B",
+    textAlign: 'center',
+    ...Theme.typography.body,
+    color: Theme.colors.lightOrange,
+    marginBottom: 10,
   },
   cta: {
-    marginTop: 8,
-    backgroundColor: "#E1882C",
-    borderRadius: 28,
-    height: 56,
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: Theme.colors.orange,
+    borderRadius: Theme.radius.button,
+    ...Theme.padding.buttonLg,
   },
   ctaText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000",
+    ...Theme.typography.button,
+    color: Theme.colors.black,
+    textAlign: 'center',
   },
 });

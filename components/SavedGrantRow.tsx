@@ -1,5 +1,6 @@
-import { Pressable, View, Text } from 'react-native';
+import { Theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { Pressable, Text, View } from 'react-native';
 
 type Props = {
   label: string; // e.g., "Apply to your saved grant"
@@ -11,24 +12,44 @@ export default function SavedGrantRow({ label, onPress }: Props) {
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      className="rounded-[10px] bg-[#7260CC]"
       style={{
         height: 60,
         paddingHorizontal: 20,
         paddingVertical: 15,
+        backgroundColor: Theme.colors.purple,
+        borderRadius: Theme.radius.card,
       }}
     >
-      <View className="flex-row items-center justify-between">
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <Text
-          className="text-[16px] font-montserrat-bold leading-[22px] text-[#FFFFFF]"
+          style={[Theme.typography.subhead1, { color: Theme.colors.white }]}
           numberOfLines={1}
         >
           {label}
         </Text>
 
         {/* Right chevron, centered and consistent size */}
-        <View className="h-8 w-8 items-center justify-center rounded-full bg-[#EFEFFF]">
-          <Ionicons name="arrow-forward-outline" size={22} color="#7260CC" />
+        <View
+          style={{
+            width: 30,
+            height: 30,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: Theme.colors.lightPurple,
+            borderRadius: 50,
+          }}
+        >
+          <Ionicons
+            name="arrow-forward-outline"
+            size={22}
+            color={Theme.colors.purple}
+          />
         </View>
       </View>
     </Pressable>

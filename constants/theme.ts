@@ -1,31 +1,32 @@
-// Colour 
+// Colour
 export const Colors = {
   // Purples
-  purple: "#8E7BFF",
-  lightPurple: "#EFEFFF",
-  brightPurple: "#8E78FF",
-  purpleStroke: "#C3B7FF",
+  purple: '#7260CC',
+  lightPurple: '#EFEFFF',
+  brightPurple: '#8E78FF',
+  purpleStroke: '#C3B7FF',
   // Oranges
-  orange: "#FF890C",
-  lightOrange: "#FFA341",
+  orange: '#FF890C',
+  lightOrange: '#FFA341',
   // Neutrals
-  black: "#000000",
-  white: "#FFFFFF",
-  grey: "#B2B1B8",
-  lightGrey: "#F6F6F6",
-  darkGrey: "#646466",
+  black: '#000000',
+  white: '#FFFFFF',
+  grey: '#B2B1B8',
+  lightGrey: '#F6F6F6',
+  darkGrey: '#646466',
   // Signals
-  blue: "#6FCEFD",
-  green: "#7CD23E",
-  yellow: "#FFE554",
-  red: "#E83B4D",
+  blue: '#6FCEFD',
+  green: '#7CD23E',
+  yellow: '#FFE554',
+  red: '#E83B4D',
 };
 
 // Font
 export const Fonts = {
-  medium: "Montserrat-Medium",
-  semibold: "Montserrat-SemiBold",
-  bold: "Montserrat-Bold",
+  medium: 'Montserrat-Medium',
+  semibold: 'Montserrat-SemiBold',
+  bold: 'Montserrat-Bold',
+  extrabold: 'Montserrat-ExtraBold',
 };
 
 // Typography styles
@@ -36,25 +37,26 @@ export const Typography = {
   subhead1: { fontFamily: Fonts.bold, fontSize: 16, lineHeight: 20 },
   subhead2: { fontFamily: Fonts.medium, fontSize: 16, lineHeight: 20 },
   body: { fontFamily: Fonts.medium, fontSize: 14, lineHeight: 18 },
+  bodyBold: { fontFamily: Fonts.bold, fontSize: 14, lineHeight: 18 },
   label: { fontFamily: Fonts.medium, fontSize: 12, lineHeight: 16 },
-  button: { fontFamily: Fonts.semibold, fontSize: 15, lineHeight: 19 }, 
+  button: { fontFamily: Fonts.semibold, fontSize: 15, lineHeight: 19 },
 };
 
-// Spacing 
+// Spacing
 export const Spacing = {
-  xs: 4, 
+  xs: 4,
   sm: 8,
   md: 12, // related
   lg: 28, // unrelated
   xl: 40, // header top padding
-}
+};
 
-// Shadows 
+// Shadows
 export const Shadow = {
   cardShadow: {
-    shadowColor: "#C3B7FF",
-    shadowOffset: { width: 1, height: 2},
-    shadowOpacity: 0.25, 
+    shadowColor: '#C3B7FF',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.25,
     shadowRadius: 4.8,
     elevation: 3, // for Android
   },
@@ -68,7 +70,7 @@ export const Radius = {
 };
 
 export const Layout = {
-  width: "90%",
+  width: '90%',
 };
 
 export const Padding = {
@@ -87,7 +89,5 @@ export const Theme = {
   layout: Layout,
   padding: Padding,
 };
-
-
 
 export default Theme;

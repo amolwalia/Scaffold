@@ -1,43 +1,46 @@
-import BottomNavigation from "@/components/BottomNavigation";
-import SparkleIcon from "@/components/SparkleIcon";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
-import React, { useState } from "react";
+import BottomNavigation from '@/components/BottomNavigation';
+import SparkleIcon from '@/components/SparkleIcon';
+import { Theme } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Stack, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
+  SafeAreaView,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 const PRESET_GOAL =
-  "My future goal as a mason is to become a certified journeyman and eventually run my own small contracting business. I want to focus on custom stone and brickwork for residential homes.";
+  'My future goal as a mason is to become a certified journeyman and eventually run my own small contracting business. I want to focus on custom stone and brickwork for residential homes.';
 
 export default function GeneratedApplicationScreen() {
   const router = useRouter();
   const [writtenAnswers, setWrittenAnswers] = useState({
-    goal: "",
-    career: "",
+    goal: '',
+    career: '',
   });
 
   const profileData = {
-    fullName: "Mateo Alvarez",
-    streetAddress: "123 Main Street",
-    city: "Vancouver, BC",
-    email: "mateo.alvarez@email.com",
-    phone: "(604) 555-0123",
-    currentEmployer: "ABC Construction Ltd.",
-    tuitionCost: "$2,500",
-    apprenticeshipLevel: "Level 2",
+    fullName: 'Mateo Alvarez',
+    streetAddress: '123 Main Street',
+    city: 'Vancouver, BC',
+    email: 'mateo.alvarez@email.com',
+    phone: '(604) 555-0123',
+    currentEmployer: 'ABC Construction Ltd.',
+    tuitionCost: '$2,500',
+    apprenticeshipLevel: 'Level 2',
   };
 
   const handleApplyPress = () => {
-    console.log("Apply button pressed - navigate to external portal");
+    console.log('Apply button pressed - navigate to external portal');
   };
 
   const handleUploadDocuments = () => {
-    console.log("Upload documents pressed");
+    console.log('Upload documents pressed');
   };
 
   const insertPresetGoal = () => {
@@ -45,41 +48,89 @@ export default function GeneratedApplicationScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <Stack.Screen options={{ headerShown: false }} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingBottom: 24,
+          paddingTop: Theme.spacing.md,
+        }}
+      >
+        <Stack.Screen options={{ headerShown: false }} />
 
-      {/* Custom Header */}
-      <View className="flex-row items-center justify-between px-4 py-6 pt-12">
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons name="bookmark" size={24} color="#9CA3AF" />
-        </TouchableOpacity>
-      </View>
+        {/* Custom Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="chevron-back-outline" size={22} color="#000" />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Ionicons name="bookmark-outline" size={22} color="#9CA3AF" />
+          </TouchableOpacity>
+        </View>
 
-      <ScrollView className="flex-1">
         {/* Top Section */}
-        <View className="px-4 mb-6">
-          <Text className="text-2xl font-bold text-gray-900 mb-2">
+        <View
+          style={{
+            marginBottom: 34,
+          }}
+        >
+          <Text
+            style={[
+              Theme.typography.body,
+              { color: Theme.colors.black, marginBottom: 10 },
+            ]}
+          >
             You're almost done!
           </Text>
-          <Text className="text-xl font-bold text-gray-900 mb-4">
+          <Text
+            style={[
+              Theme.typography.h2,
+              { color: Theme.colors.black, marginBottom: 10 },
+            ]}
+          >
             Masonry Institute of BC Training Fund
           </Text>
-          <Text className="text-gray-700 text-base leading-relaxed mb-4">
-            We've auto-filled your application using your profile{" "}
-            <Text className="text-purple-600">
-              Finish applying through the portal
+          <Text
+            style={[
+              Theme.typography.body,
+              { color: Theme.colors.black, marginBottom: 23 },
+            ]}
+          >
+            We've auto-filled your application using your profile{' '}
+            <Text
+              style={[Theme.typography.body, { color: Theme.colors.purple }]}
+            >
+              Finish applying through the{' '}
+              <Text
+                style={[
+                  Theme.typography.bodyBold,
+                  { color: Theme.colors.purple },
+                ]}
+              >
+                portal
+              </Text>
             </Text>
             .
           </Text>
 
           <TouchableOpacity
-            className="bg-[#7CD23E] rounded-xl py-5 flex-row items-center justify-center mb-6"
+            style={{
+              backgroundColor: Theme.colors.green,
+              borderRadius: Theme.radius.card,
+              paddingTop: 25,
+              paddingBottom: 25,
+              paddingLeft: 16,
+              paddingRight: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
             onPress={handleApplyPress}
           >
-            <Text className="text-black font-medium text-base mr-2">
+            <Text
+              style={[Theme.typography.body, { color: Theme.colors.black }]}
+            >
               Apply here
             </Text>
             <Ionicons name="open-outline" size={20} color="black" />
@@ -87,60 +138,63 @@ export default function GeneratedApplicationScreen() {
         </View>
 
         {/* Application Template Section */}
-        <View className="px-4 mb-8">
-          <Text className="text-xl font-bold text-gray-900 mb-4">
-            Your application template
+        <View style={{ marginBottom: 32 }}>
+          <Text
+            style={[
+              Theme.typography.h2,
+              { color: Theme.colors.black, marginBottom: 20 },
+            ]}
+          >
+            Your application
           </Text>
 
           {/* Basic Profile */}
-          <View className="bg-gray-50 border border-green-500 rounded-2xl p-4 mb-4">
-            <Text className="text-lg font-bold text-gray-900 mb-4">
-              Basic Profile
-            </Text>
+          <View style={styles.applicationCard}>
+            <Text style={styles.applicationCardTitle}>Basic Profile</Text>
 
-            <View className="space-y-3">
-              <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">Full Name</Text>
-                <Text className="text-gray-900 text-base">
+            <View style={styles.applicationCardContent}>
+              <View style={styles.applicationCardItem}>
+                <Text style={styles.applicationCardItemLabel}>Full Name</Text>
+                <Text style={styles.applicationCardItemValue}>
                   {profileData.fullName}
                 </Text>
               </View>
 
-              <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">
+              <View style={styles.applicationCardItem}>
+                <Text style={styles.applicationCardItemLabel}>
                   Street Address
                 </Text>
-                <Text className="text-gray-900 text-base">
+                <Text style={styles.applicationCardItemValue}>
                   {profileData.streetAddress}
                 </Text>
               </View>
 
-              <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">City</Text>
-                <Text className="text-gray-900 text-base">
+              <View style={styles.applicationCardItem}>
+                <Text style={styles.applicationCardItemLabel}>City</Text>
+                <Text style={styles.applicationCardItemValue}>
                   {profileData.city}
                 </Text>
               </View>
 
-              <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">Email</Text>
-                <Text className="text-gray-900 text-base">
+              <View style={styles.applicationCardItem}>
+                <Text style={styles.applicationCardItemLabel}>Email</Text>
+                <Text style={styles.applicationCardItemValue}>
                   {profileData.email}
                 </Text>
               </View>
 
-              <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">Phone</Text>
-                <Text className="text-gray-900 text-base">
+              <View style={styles.applicationCardItem}>
+                <Text style={styles.applicationCardItemLabel}>Phone</Text>
+                <Text style={styles.applicationCardItemValue}>
                   {profileData.phone}
                 </Text>
               </View>
 
-              <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">
+              <View style={styles.applicationCardItem}>
+                <Text style={styles.applicationCardItemLabel}>
                   Current Employer
                 </Text>
-                <Text className="text-gray-900 text-base">
+                <Text style={styles.applicationCardItemValue}>
                   {profileData.currentEmployer}
                 </Text>
               </View>
@@ -148,26 +202,26 @@ export default function GeneratedApplicationScreen() {
           </View>
 
           {/* Education and training */}
-          <View className="bg-gray-50 border border-green-500 rounded-2xl p-4 mb-4">
-            <Text className="text-lg font-bold text-gray-900 mb-4">
+          <View style={styles.applicationCard}>
+            <Text style={styles.applicationCardTitle}>
               Education and training
             </Text>
 
-            <View className="space-y-3">
-              <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">
+            <View style={styles.applicationCardContent}>
+              <View style={styles.applicationCardItem}>
+                <Text style={styles.applicationCardItemLabel}>
                   Cost of Tuition
                 </Text>
-                <Text className="text-gray-900 text-base">
+                <Text style={styles.applicationCardItemValue}>
                   {profileData.tuitionCost}
                 </Text>
               </View>
 
-              <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">
+              <View style={styles.applicationCardItem}>
+                <Text style={styles.applicationCardItemLabel}>
                   Apprenticeship Level
                 </Text>
-                <Text className="text-gray-900 text-base">
+                <Text style={styles.applicationCardItemValue}>
                   {profileData.apprenticeshipLevel}
                 </Text>
               </View>
@@ -175,22 +229,20 @@ export default function GeneratedApplicationScreen() {
           </View>
 
           {/* References */}
-          <View className="bg-gray-50 border border-green-500 rounded-2xl p-4 mb-4">
-            <Text className="text-lg font-bold text-gray-900 mb-4">
-              References
-            </Text>
+          <View style={styles.applicationCard}>
+            <Text style={styles.applicationCardTitle}>References</Text>
 
-            <View className="space-y-3">
-              <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">Full Name</Text>
-                <Text className="text-gray-400 text-base italic">
+            <View style={styles.applicationCardContent}>
+              <View style={styles.applicationCardItem}>
+                <Text style={styles.applicationCardItemLabel}>Full Name</Text>
+                <Text style={styles.applicationCardItemValue}>
                   Not provided
                 </Text>
               </View>
 
-              <View className="flex-row items-center justify-between">
-                <Text className="text-gray-600 text-sm mb-1">Phone</Text>
-                <Text className="text-gray-400 text-base italic">
+              <View style={styles.applicationCardItem}>
+                <Text style={styles.applicationCardItemLabel}>Phone</Text>
+                <Text style={styles.applicationCardItemValue}>
                   Not provided
                 </Text>
               </View>
@@ -198,21 +250,35 @@ export default function GeneratedApplicationScreen() {
           </View>
 
           {/* Written Answers */}
-          <View className="bg-gray-50 border border-green-500 rounded-2xl p-4 mb-4">
-            <Text className="text-lg font-bold text-gray-900 mb-4">
-              Written Answers
-            </Text>
+          <View style={styles.applicationCard}>
+            <Text style={styles.applicationCardTitle}>Written Answers</Text>
 
-            <View className="space-y-4">
+            <View style={styles.applicationCardContent}>
               <View>
                 {/* Label + sparkle icon */}
-                <View className="relative mb-2 pr-8">
-                  <Text className="text-gray-600 text-sm mb-2">
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text
+                    style={[
+                      Theme.typography.body,
+                      {
+                        color: Theme.colors.darkGrey,
+                        marginBottom: Theme.spacing.sm,
+                        fontStyle: 'italic',
+                      },
+                    ]}
+                  >
                     What is your future goal as a mason?
                   </Text>
 
                   <TouchableOpacity
-                    className="absolute right-0 top-0 "
+                    style={{ position: 'absolute', right: 0, top: 0 }}
                     onPress={insertPresetGoal}
                     hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
                     accessibilityRole="button"
@@ -223,7 +289,15 @@ export default function GeneratedApplicationScreen() {
                 </View>
 
                 <TextInput
-                  className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 min-h-[80px] mb-2"
+                  style={{
+                    backgroundColor: Theme.colors.white,
+                    borderRadius: Theme.radius.card,
+                    padding: Theme.spacing.md,
+                    minHeight: 80,
+                    marginBottom: Theme.spacing.sm,
+                    ...Theme.typography.body,
+                  }}
+                  placeholderTextColor={Theme.colors.grey}
                   placeholder="Enter your response here..."
                   value={writtenAnswers.goal}
                   onChangeText={(text) =>
@@ -235,11 +309,21 @@ export default function GeneratedApplicationScreen() {
               </View>
 
               <View>
-                <Text className="text-gray-600 text-sm mb-4">
+                <Text
+                  style={[
+                    Theme.typography.body,
+                    {
+                      color: Theme.colors.darkGrey,
+                      marginBottom: Theme.spacing.sm,
+                      fontStyle: 'italic',
+                      paddingRight: 10,
+                    },
+                  ]}
+                >
                   Why have you chosen a career in masonry?
                 </Text>
                 <TouchableOpacity
-                  className="absolute right-0 top-0"
+                  style={{ position: 'absolute', right: 0, top: 0 }}
                   onPress={insertPresetGoal}
                   hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
                   accessibilityRole="button"
@@ -248,7 +332,15 @@ export default function GeneratedApplicationScreen() {
                   <SparkleIcon />
                 </TouchableOpacity>
                 <TextInput
-                  className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 min-h-[80px]"
+                  style={{
+                    backgroundColor: Theme.colors.white,
+                    borderRadius: Theme.radius.card,
+                    padding: Theme.spacing.md,
+                    minHeight: 80,
+                    marginBottom: Theme.spacing.sm,
+                    ...Theme.typography.body,
+                  }}
+                  placeholderTextColor={Theme.colors.grey}
                   placeholder="Enter your response here..."
                   value={writtenAnswers.career}
                   onChangeText={(text) =>
@@ -262,51 +354,62 @@ export default function GeneratedApplicationScreen() {
           </View>
 
           {/* Documents */}
-          <View className="bg-gray-50 border border-green-500 rounded-2xl p-4 mb-6">
-            <Text className="text-lg font-bold text-gray-900 mb-4">
-              Documents
-            </Text>
+          <View style={styles.applicationCard}>
+            <Text style={styles.applicationCardTitle}>Documents</Text>
 
-            <View className="space-y-3">
-              <View className="flex-row items-center">
-                <Ionicons name="folder" size={20} color="#F97316" />
-                <Text className="text-gray-900 text-base ml-3">
+            <View style={styles.applicationCardContent}>
+              <View style={styles.applicationCardItem}>
+                <Ionicons name="folder" size={20} color={Theme.colors.orange} />
+                <Text style={styles.documentItem}>
                   Unofficial transcript (high school or post-secondary)
                 </Text>
               </View>
 
-              <View className="flex-row items-center">
-                <Ionicons name="folder" size={20} color="#F97316" />
-                <Text className="text-gray-900 text-base ml-3">
+              <View style={styles.applicationCardItem}>
+                <Ionicons name="folder" size={20} color={Theme.colors.orange} />
+                <Text style={styles.documentItem}>
                   Proof of registration and acceptance in your program
                 </Text>
               </View>
 
-              <View className="flex-row items-center">
-                <Ionicons name="folder" size={20} color="#F97316" />
-                <Text className="text-gray-900 text-base ml-3">
+              <View style={styles.applicationCardItem}>
+                <Ionicons name="folder" size={20} color={Theme.colors.orange} />
+                <Text style={styles.documentItem}>
                   Letter of support from your current employer
                 </Text>
               </View>
 
-              <View className="flex-row items-center">
-                <Ionicons name="folder" size={20} color="#F97316" />
-                <Text className="text-gray-900 text-base ml-3">
+              <View style={styles.applicationCardItem}>
+                <Ionicons name="folder" size={20} color={Theme.colors.orange} />
+                <Text style={styles.documentItem}>
                   Confirmation of membership status with the Masonry Institute
                   of BC
                 </Text>
               </View>
 
               <TouchableOpacity
-                className="flex-row items-center mt-4"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: Theme.spacing.md,
+                }}
                 onPress={handleUploadDocuments}
               >
                 <Ionicons
                   name="cloud-upload-outline"
                   size={20}
-                  color="#3B82F6"
+                  color={Theme.colors.darkGrey}
                 />
-                <Text className="text-blue-600 text-base ml-3 font-medium">
+                <Text
+                  style={[
+                    Theme.typography.body,
+                    {
+                      color: Theme.colors.darkGrey,
+                      marginLeft: Theme.spacing.sm,
+                    },
+                  ]}
+                >
                   Upload documents
                 </Text>
               </TouchableOpacity>
@@ -316,6 +419,57 @@ export default function GeneratedApplicationScreen() {
       </ScrollView>
 
       <BottomNavigation activeTab="grants" />
-    </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Theme.colors.white,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 26,
+  },
+  applicationCard: {
+    backgroundColor: Theme.colors.lightGrey,
+    borderWidth: 1,
+    borderColor: Theme.colors.green,
+    borderRadius: Theme.radius.card,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    marginBottom: 12,
+  },
+  applicationCardTitle: {
+    ...Theme.typography.subhead1,
+    color: Theme.colors.black,
+    marginBottom: 20,
+  },
+  applicationCardContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 12,
+  },
+  applicationCardItem: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  applicationCardItemLabel: {
+    ...Theme.typography.body,
+    color: Theme.colors.darkGrey,
+  },
+  applicationCardItemValue: {
+    ...Theme.typography.body,
+    color: Theme.colors.black,
+  },
+  documentItem: {
+    ...Theme.typography.body,
+    color: Theme.colors.black,
+    marginLeft: Theme.spacing.md,
+  },
+});

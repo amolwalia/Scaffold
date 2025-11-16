@@ -1,6 +1,7 @@
-import { View, Text, Pressable } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Pressable, Text, View } from 'react-native';
 
 type Props = {
   percent: number; // 0..1  e.g., 0.4
@@ -16,21 +17,45 @@ export default function FinishProfileCard({
   const pct = Math.max(0, Math.min(1, percent)) * 100;
 
   return (
-    <View className="rounded-[10px] bg-[#F3F2FF] px-4 py-5">
+    <View
+      style={{
+        backgroundColor: Theme.colors.lightPurple,
+        borderRadius: Theme.radius.card,
+        padding: 20,
+      }}
+    >
       {/* Text block */}
-      <Text className="text-[18px] font-montserrat-semibold leading-[24px] text-[#000000]">
+      <Text style={[Theme.typography.h3, { color: Theme.colors.black }]}>
         Your profile is{' '}
-        <Text className="font-montserrat-extrabold text-[#FF890C]">
+        <Text
+          style={[
+            Theme.typography.h3,
+            { color: Theme.colors.orange, fontFamily: Theme.fonts.extrabold },
+          ]}
+        >
           {Math.round(pct)}%
         </Text>{' '}
         complete!
       </Text>
-      <Text className=" text-[14px] font-montserrat-medium leading-[20px] text-[#000000]">
+      <Text
+        style={[
+          Theme.typography.body,
+          { color: Theme.colors.black, marginTop: 3 },
+        ]}
+      >
         Fill out the next step now.
       </Text>
 
       {/* Progress bar */}
-      <View className="mt-6 h-[14px] bg-white/90 rounded-full overflow-hidden">
+      <View
+        style={{
+          marginTop: 24,
+          height: 14,
+          backgroundColor: Theme.colors.white,
+          borderRadius: 100,
+          overflow: 'hidden',
+        }}
+      >
         {/* gradient fill */}
         <View
           style={{
@@ -40,7 +65,7 @@ export default function FinishProfileCard({
           className="rounded-full"
         >
           <LinearGradient
-            colors={['#FFA341', '#C3B7FF']} // orange → lavender
+            colors={[Theme.colors.lightOrange, Theme.colors.purpleStroke]} // orange → lavender
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             style={{ flex: 1 }}
@@ -61,17 +86,38 @@ export default function FinishProfileCard({
       </View>
 
       {/* CTA */}
-      <View className="mt-6 flex-row items-center justify-end gap-4">
-        <Text className="text-[16px] font-montserrat-bold text-[#8E78FF]">
+      <View
+        style={{
+          marginTop: 24,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          gap: 16,
+        }}
+      >
+        <Text
+          style={[Theme.typography.subhead1, { color: Theme.colors.purple }]}
+        >
           {ctaLabel}
         </Text>
 
         <Pressable
           onPress={onPress}
           accessibilityRole="button"
-          className="h-8 w-8 items-center justify-center rounded-full bg-[#7260CC] active:opacity-80"
+          style={{
+            width: 30,
+            height: 30,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: Theme.colors.purple,
+            borderRadius: 50,
+          }}
         >
-          <Ionicons name="arrow-forward-outline" size={22} color="#F6F6F6" />
+          <Ionicons
+            name="arrow-forward-outline"
+            size={22}
+            color={Theme.colors.white}
+          />
         </Pressable>
       </View>
     </View>
