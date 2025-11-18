@@ -1,8 +1,16 @@
+import GrantFilterSheet, { GRANT_SORT_OPTIONS, GrantSortId } from "@/components/GrantFilterSheet";
 import { Theme } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View, } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Grant from "../../components/grant";
 import GrantSubFilters from "../../components/GrantSubFilters";
 
@@ -17,6 +25,7 @@ interface GrantData {
   eligible?: boolean;
   saved?: boolean;
   applied?: boolean;
+  active?: boolean;
 }
 
 const sampleGrants: GrantData[] = [
@@ -31,6 +40,7 @@ const sampleGrants: GrantData[] = [
     eligible: true,
     saved: false,
     applied: false,
+    active: true,
   },
   {
     id: "2",
@@ -43,6 +53,7 @@ const sampleGrants: GrantData[] = [
     eligible: true,
     saved: false,
     applied: false,
+    active: true,
   },
   {
     id: "3",
@@ -55,6 +66,7 @@ const sampleGrants: GrantData[] = [
     eligible: true,
     saved: true,
     applied: false,
+    active: true,
   },
   {
     id: "4",
@@ -67,6 +79,7 @@ const sampleGrants: GrantData[] = [
     eligible: true,
     saved: false,
     applied: true,
+    active: true,
   },
   {
     id: "5",
@@ -79,8 +92,28 @@ const sampleGrants: GrantData[] = [
     eligible: false,
     saved: false,
     applied: false,
+    active: false,
   },
 ];
+
+const getAmountValue = (amount: string) => {
+  const numeric = amount.replace(/[^0-9.]/g, "");
+  const value = parseFloat(numeric);
+  return Number.isNaN(value) ? 0 : value;
+};
+
+const getDeadlineTimestamp = (deadline: string) => {
+  const year = new Date().getFullYear();
+  const parts = deadline.split("-").map((part) => part.trim());
+  const target = parts[parts.length - 1] || deadline;
+  if (!target.includes("/")) return 0;
+  const sanitized = target.replace(/[^0-9/]/g, "");
+  const [monthStr, dayStr] = sanitized.split("/");
+  const month = Number(monthStr);
+  const day = Number(dayStr);
+  if (Number.isNaN(month) || Number.isNaN(day)) return 0;
+  return new Date(year, month - 1, day).getTime();
+};
 
 export default function GrantsScreen() {
   const router = useRouter();
@@ -90,8 +123,10 @@ export default function GrantsScreen() {
   const [selectedSubFilter, setSelectedSubFilter] =
     useState<"Saved" | "Applied">("Saved");
   const [grants, setGrants] = useState<GrantData[]>(sampleGrants);
+  const [selectedSortId, setSelectedSortId] = useState<GrantSortId>("all");
+  const [sortVisible, setSortVisible] = useState(false);
 
-  const tabs: Array<"All" | "Eligible" | "My Grants"> = [
+  const tabs: ("All" | "Eligible" | "My Grants")[] = [
     "All",
     "Eligible",
     "My Grants",
@@ -104,17 +139,59 @@ export default function GrantsScreen() {
       g.title.toLowerCase().includes(q) ||
       g.organization.toLowerCase().includes(q);
 
-    if (selectedTab === "Eligible")
-      return grants.filter((g) => bySearch(g) && g.eligible);
-    if (selectedTab === "My Grants") {
+    let result = grants.filter(bySearch);
+
+    if (selectedTab === "Eligible") {
+      result = result.filter((g) => g.eligible);
+    } else if (selectedTab === "My Grants") {
       if (selectedSubFilter === "Saved")
-        return grants.filter((g) => bySearch(g) && g.saved);
-      if (selectedSubFilter === "Applied")
-        return grants.filter((g) => bySearch(g) && g.applied);
-      return grants.filter((g) => bySearch(g) && (g.saved || g.applied));
+        result = result.filter((g) => g.saved);
+      else if (selectedSubFilter === "Applied")
+        result = result.filter((g) => g.applied);
+      else result = result.filter((g) => g.saved || g.applied);
     }
-    return grants.filter(bySearch);
-  }, [grants, searchQuery, selectedTab, selectedSubFilter]);
+
+    let finalResult = [...result];
+    switch (selectedSortId) {
+      case "active":
+        finalResult = finalResult.filter((g) => g.active);
+        break;
+      case "newest":
+        finalResult = finalResult.sort(
+          (a, b) => getDeadlineTimestamp(b.deadline) - getDeadlineTimestamp(a.deadline)
+        );
+        break;
+      case "oldest":
+        finalResult = finalResult.sort(
+          (a, b) => getDeadlineTimestamp(a.deadline) - getDeadlineTimestamp(b.deadline)
+        );
+        break;
+      case "amountHigh":
+        finalResult = finalResult.sort(
+          (a, b) => getAmountValue(b.amount) - getAmountValue(a.amount)
+        );
+        break;
+      case "amountLow":
+        finalResult = finalResult.sort(
+          (a, b) => getAmountValue(a.amount) - getAmountValue(b.amount)
+        );
+        break;
+      default:
+        break;
+    }
+
+    return finalResult;
+  }, [
+    grants,
+    searchQuery,
+    selectedTab,
+    selectedSubFilter,
+    selectedSortId,
+  ]);
+
+  const selectedSortLabel =
+    GRANT_SORT_OPTIONS.find((option) => option.id === selectedSortId)?.label ??
+    "All";
 
   const handleGrantPress = (grant: GrantData) => {
     router.push({
@@ -231,8 +308,20 @@ export default function GrantsScreen() {
         <Text style={[Theme.typography.subhead1, { color: Theme.colors.black }]}>
           {sectionTitle}
         </Text>
-        <TouchableOpacity hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+        <TouchableOpacity
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          onPress={() => setSortVisible(true)}
+          style={styles.sortTrigger}
+        >
           <Ionicons name="swap-vertical" size={20} color={Theme.colors.darkGrey} />
+          <Text
+            style={[
+              Theme.typography.label,
+              { marginLeft: 6, color: Theme.colors.darkGrey },
+            ]}
+          >
+            {selectedSortLabel}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -261,6 +350,13 @@ export default function GrantsScreen() {
             </Text>
           </View>
         }
+      />
+
+      <GrantFilterSheet
+        visible={sortVisible}
+        selectedId={selectedSortId}
+        onSelect={setSelectedSortId}
+        onClose={() => setSortVisible(false)}
       />
     </View>
   );
@@ -323,6 +419,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  sortTrigger: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   listContent: {
     paddingBottom: Theme.spacing.md,

@@ -14,6 +14,8 @@ interface GrantProps {
   description: string;
   eligible?: boolean;
   saved?: boolean;
+  applied?: boolean;
+  active?: boolean;
   onPress?: () => void;
   onView?: () => void;
   onSave?: () => void;
