@@ -1,4 +1,6 @@
-import VoiceInputOverlay from "@/components/VoiceInputOverlay";
+import VoiceInputOverlay, {
+  VoiceResultExtras,
+} from "@/components/VoiceInputOverlay";
 import { Ionicons } from "@expo/vector-icons";
 import {
   AudioModule,
@@ -25,8 +27,21 @@ export default function EducationExperience2() {
   const [graduationDate, setGraduationDate] = useState("");
 
   // receives final voice text
-  const handleVoiceInput = (transcribedText: string) => {
-    setHighSchoolName(transcribedText);
+  const handleVoiceInput = (
+    transcribedText: string,
+    extras?: VoiceResultExtras
+  ) => {
+    const structured = extras?.structuredData;
+    if (structured?.highSchoolName?.trim()) {
+      setHighSchoolName(structured.highSchoolName.trim());
+    } else if (transcribedText) {
+      setHighSchoolName(transcribedText);
+    }
+
+    if (structured?.graduationDate?.trim()) {
+      setGraduationDate(structured.graduationDate.trim());
+    }
+
     setShowVoiceOverlay(false);
   };
 
@@ -111,6 +126,7 @@ export default function EducationExperience2() {
           <VoiceInputOverlay
             visible={showVoiceOverlay}
             onClose={() => setShowVoiceOverlay(false)}
+            contextFields={["highSchoolName", "graduationDate"]}
             onResult={handleVoiceInput} // keep consistent naming
           />
         )}

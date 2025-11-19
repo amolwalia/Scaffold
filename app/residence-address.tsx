@@ -1,7 +1,9 @@
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
+import VoiceInputOverlay, {
+  VoiceResultExtras,
+} from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -13,34 +15,68 @@ import {
 
 export default function ResidenceAddress() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingResidence = editingMode === "edit-residence";
   const { profileData, updateProfileData } = useProfile();
   const [addressLine1, setAddressLine1] = useState(profileData.address.split(",")[0] || "");
   const [addressLine2, setAddressLine2] = useState(profileData.address.split(",")[1] || "");
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState(profileData.postalCode || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
-  const [activeField, setActiveField] = useState<string | null>(null);
 
-  const handleVoiceResult = (text: string) => {
-    if (activeField === "addressLine1") {
+  const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
+    const structured = extras?.structuredData;
+    let nextLine1 = addressLine1;
+    let nextLine2 = addressLine2;
+    let nextCity = city;
+    let nextPostal = postalCode;
+
+    if (structured) {
+      if (structured.addressLine1?.trim()) {
+        nextLine1 = structured.addressLine1.trim();
+        setAddressLine1(nextLine1);
+      }
+      if (structured.addressLine2?.trim()) {
+        nextLine2 = structured.addressLine2.trim();
+        setAddressLine2(nextLine2);
+      }
+      if (structured.city?.trim()) {
+        nextCity = structured.city.trim();
+        setCity(nextCity);
+      }
+      if (structured.postalCode?.trim()) {
+        nextPostal = structured.postalCode.trim();
+        setPostalCode(nextPostal);
+      }
+    } else if (text) {
+      nextLine1 = text;
       setAddressLine1(text);
-    } else if (activeField === "addressLine2") {
-      setAddressLine2(text);
-    } else if (activeField === "city") {
-      setCity(text);
-    } else if (activeField === "postalCode") {
-      setPostalCode(text);
     }
-    const fullAddress = [addressLine1, addressLine2, city].filter(Boolean).join(", ");
-    updateProfileData({ address: fullAddress, postalCode });
+
+    const fullAddress = [nextLine1, nextLine2, nextCity]
+      .filter(Boolean)
+      .join(", ");
+    updateProfileData({ address: fullAddress, postalCode: nextPostal });
     setShowVoiceOverlay(false);
-    setActiveField(null);
   };
 
   const handleNext = () => {
     const fullAddress = [addressLine1, addressLine2, city].filter(Boolean).join(", ");
     updateProfileData({ address: fullAddress, postalCode });
-    router.push("/residence-province");
+    if (isEditingResidence && editingMode) {
+      router.push({
+        pathname: "/residence-province",
+        params: { mode: editingMode, returnTo: returnToPath },
+      });
+    } else {
+      router.push("/residence-province");
+    }
   };
 
   return (
@@ -119,10 +155,7 @@ export default function ResidenceAddress() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.voiceButton}
-          onPress={() => {
-            setActiveField("addressLine1");
-            setShowVoiceOverlay(true);
-          }}
+          onPress={() => setShowVoiceOverlay(true)}
         >
           <Ionicons name="mic" size={24} color="#8B5CF6" />
         </TouchableOpacity>
@@ -136,8 +169,8 @@ export default function ResidenceAddress() {
         visible={showVoiceOverlay}
         onClose={() => {
           setShowVoiceOverlay(false);
-          setActiveField(null);
         }}
+        contextFields={["addressLine1", "addressLine2", "city", "postalCode"]}
         onResult={handleVoiceResult}
       />
     </View>
@@ -241,4 +274,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

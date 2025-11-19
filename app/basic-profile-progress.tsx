@@ -1,12 +1,22 @@
+import ProfileExitModal from "@/components/ProfileExitModal";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function BasicProfileProgress() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingBasic = editingMode === "edit-basic";
   const { profileData } = useProfile();
+  const [showExitModal, setShowExitModal] = useState(false);
 
   // Calculate completion for basic profile section
   const progress = useMemo(() => {
@@ -22,7 +32,16 @@ export default function BasicProfileProgress() {
   }, [profileData]);
 
   const handleContinue = () => {
-    router.push("/residence-address");
+    if (isEditingBasic) {
+      router.replace(returnToPath as any);
+    } else {
+      router.push("/residence-address");
+    }
+  };
+
+  const handleExit = () => {
+    setShowExitModal(false);
+    router.push("/(tabs)/profile");
   };
 
   return (
@@ -34,7 +53,10 @@ export default function BasicProfileProgress() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Basic Profile</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -62,9 +84,17 @@ export default function BasicProfileProgress() {
 
       <View style={styles.footer}>
         <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Continue</Text>
+          <Text style={styles.continueButtonText}>
+            {isEditingBasic ? "Save & Close" : "Continue"}
+          </Text>
         </TouchableOpacity>
       </View>
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={handleExit}
+      />
     </View>
   );
 }
@@ -162,4 +192,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

@@ -1,7 +1,10 @@
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
+import ProfileExitModal from "@/components/ProfileExitModal";
+import VoiceInputOverlay, {
+  VoiceResultExtras,
+} from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -13,28 +16,70 @@ import {
 
 export default function BasicProfileName() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingBasic = editingMode === "edit-basic";
   const { profileData, updateProfileData } = useProfile();
   const [firstName, setFirstName] = useState(profileData.name.split(" ")[0] || "");
   const [lastName, setLastName] = useState(profileData.name.split(" ").slice(1).join(" ") || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
-  const [activeField, setActiveField] = useState<"firstName" | "lastName" | null>(null);
+  const [showExitModal, setShowExitModal] = useState(false);
 
-  const handleVoiceResult = (text: string) => {
-    if (activeField === "firstName") {
+  const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
+    const structured = extras?.structuredData;
+    const nextFirst = structured?.firstName?.trim();
+    const nextLast = structured?.lastName?.trim();
+
+    let updatedFirst = firstName;
+    let updatedLast = lastName;
+
+    if (nextFirst) {
+      updatedFirst = nextFirst;
+      setFirstName(nextFirst);
+    } else if (!structured && text) {
+      updatedFirst = text;
       setFirstName(text);
-      updateProfileData({ name: `${text} ${lastName}`.trim() });
-    } else if (activeField === "lastName") {
-      setLastName(text);
-      updateProfileData({ name: `${firstName} ${text}`.trim() });
     }
+
+    if (nextLast) {
+      updatedLast = nextLast;
+      setLastName(nextLast);
+    } else if (!structured && !nextFirst && text) {
+      updatedLast = text;
+      setLastName(text);
+    }
+
+    updateProfileData({
+      name: `${updatedFirst} ${updatedLast}`.trim(),
+    });
     setShowVoiceOverlay(false);
-    setActiveField(null);
+  };
+
+  const navigateForward = (path: string) => {
+    if (isEditingBasic && editingMode) {
+      router.push({
+        pathname: path as any,
+        params: { mode: editingMode, returnTo: returnToPath },
+      });
+    } else {
+      router.push(path as any);
+    }
   };
 
   const handleNext = () => {
     const fullName = `${firstName} ${lastName}`.trim();
     updateProfileData({ name: fullName });
-    router.push("/basic-profile-dob");
+    navigateForward("/basic-profile-dob");
+  };
+
+  const handleExit = () => {
+    setShowExitModal(false);
+    router.replace(returnToPath as any);
   };
 
   return (
@@ -47,7 +92,10 @@ export default function BasicProfileName() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Basic Profile</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -90,10 +138,7 @@ export default function BasicProfileName() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.voiceButton}
-          onPress={() => {
-            setActiveField("firstName");
-            setShowVoiceOverlay(true);
-          }}
+          onPress={() => setShowVoiceOverlay(true)}
         >
           <Ionicons name="mic" size={24} color="#8B5CF6" />
         </TouchableOpacity>
@@ -107,9 +152,15 @@ export default function BasicProfileName() {
         visible={showVoiceOverlay}
         onClose={() => {
           setShowVoiceOverlay(false);
-          setActiveField(null);
         }}
+        contextFields={["firstName", "lastName"]}
         onResult={handleVoiceResult}
+      />
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={handleExit}
       />
     </View>
   );
@@ -203,4 +254,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

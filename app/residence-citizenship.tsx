@@ -1,7 +1,7 @@
 import VoiceInputOverlay from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -13,6 +13,14 @@ import {
 
 export default function ResidenceCitizenship() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingResidence = editingMode === "edit-residence";
   const { profileData, updateProfileData } = useProfile();
   const [citizenshipStatus, setCitizenshipStatus] = useState(profileData.citizenshipStatus || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
@@ -25,7 +33,11 @@ export default function ResidenceCitizenship() {
 
   const handleNext = () => {
     updateProfileData({ citizenshipStatus });
-    router.push("/residence-progress");
+    if (isEditingResidence) {
+      router.replace(returnToPath as any);
+    } else {
+      router.push("/residence-progress");
+    }
   };
 
   return (
@@ -72,13 +84,16 @@ export default function ResidenceCitizenship() {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>Next</Text>
+          <Text style={styles.nextButtonText}>
+            {isEditingResidence ? "Save & Close" : "Next"}
+          </Text>
         </TouchableOpacity>
       </View>
 
       <VoiceInputOverlay
         visible={showVoiceOverlay}
         onClose={() => setShowVoiceOverlay(false)}
+        contextField="citizenshipStatus"
         onResult={handleVoiceResult}
       />
     </View>
@@ -172,4 +187,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

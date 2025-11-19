@@ -1,11 +1,19 @@
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function ResidenceProgress() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingResidence = editingMode === "edit-residence";
   const { profileData } = useProfile();
 
   // Calculate overall progress (Basic + Residence)
@@ -30,7 +38,11 @@ export default function ResidenceProgress() {
   }, [profileData]);
 
   const handleContinue = () => {
-    router.push("/household-size");
+    if (isEditingResidence) {
+      router.replace(returnToPath as any);
+    } else {
+      router.push("/household-size");
+    }
   };
 
   return (
@@ -68,7 +80,9 @@ export default function ResidenceProgress() {
 
       <View style={styles.footer}>
         <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Continue</Text>
+          <Text style={styles.continueButtonText}>
+            {isEditingResidence ? "Save & Close" : "Continue"}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -165,4 +179,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

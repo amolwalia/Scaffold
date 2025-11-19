@@ -1,7 +1,8 @@
+import ProfileExitModal from "@/components/ProfileExitModal";
 import VoiceInputOverlay from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -14,9 +15,18 @@ const GENDERS = ["Male", "Female", "Non-Binary", "Prefer Not to Say"];
 
 export default function BasicProfileGender() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingBasic = editingMode === "edit-basic";
   const { profileData, updateProfileData } = useProfile();
   const [selectedGender, setSelectedGender] = useState(profileData.gender || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   const handleVoiceResult = (text: string) => {
     const lowerText = text.toLowerCase();
@@ -30,11 +40,27 @@ export default function BasicProfileGender() {
     setShowVoiceOverlay(false);
   };
 
+  const navigateForward = (path: string) => {
+    if (isEditingBasic && editingMode) {
+      router.push({
+        pathname: path as any,
+        params: { mode: editingMode, returnTo: returnToPath },
+      });
+    } else {
+      router.push(path as any);
+    }
+  };
+
   const handleNext = () => {
     if (selectedGender) {
       updateProfileData({ gender: selectedGender });
-      router.push("/basic-profile-contact");
+      navigateForward("/basic-profile-contact");
     }
+  };
+
+  const handleExit = () => {
+    setShowExitModal(false);
+    router.replace(returnToPath as any);
   };
 
   return (
@@ -46,7 +72,10 @@ export default function BasicProfileGender() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Basic Profile</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -106,7 +135,14 @@ export default function BasicProfileGender() {
       <VoiceInputOverlay
         visible={showVoiceOverlay}
         onClose={() => setShowVoiceOverlay(false)}
+        contextField="gender"
         onResult={handleVoiceResult}
+      />
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={handleExit}
       />
     </View>
   );
@@ -216,4 +252,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

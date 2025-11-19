@@ -108,18 +108,19 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   editButton: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#7CD23E",
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    alignSelf: "flex-start",
-    marginTop: 12,
+    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 32,
+    alignSelf: "stretch",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 16,
   },
   editButtonText: {
-    color: "#7CD23E",
-    fontSize: 14,
+    color: "#3EB208",
+    fontSize: 16,
     fontWeight: "600",
   },
 });
-

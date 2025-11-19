@@ -291,7 +291,8 @@ export default function SignIn() {
           setShowVoiceOverlay(false);
           setActiveField(null);
         }}
-        onTranscribe={handleTranscribe}
+        contextField={activeField ?? undefined}
+        onResult={handleTranscribe}
       />
     </View>
   );
@@ -362,4 +363,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

@@ -1,7 +1,7 @@
 import VoiceInputOverlay from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -25,6 +25,14 @@ const PROVINCES = [
 
 export default function ResidenceProvince() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingResidence = editingMode === "edit-residence";
   const { profileData, updateProfileData } = useProfile();
   const [selectedProvince, setSelectedProvince] = useState(profileData.province || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
@@ -44,7 +52,14 @@ export default function ResidenceProvince() {
   const handleNext = () => {
     if (selectedProvince) {
       updateProfileData({ province: selectedProvince });
-      router.push("/residence-citizenship");
+      if (isEditingResidence && editingMode) {
+        router.push({
+          pathname: "/residence-citizenship",
+          params: { mode: editingMode, returnTo: returnToPath },
+        });
+      } else {
+        router.push("/residence-citizenship");
+      }
     }
   };
 
@@ -117,6 +132,7 @@ export default function ResidenceProvince() {
       <VoiceInputOverlay
         visible={showVoiceOverlay}
         onClose={() => setShowVoiceOverlay(false)}
+        contextField="province"
         onResult={handleVoiceResult}
       />
     </View>
@@ -230,4 +246,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

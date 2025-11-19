@@ -1,7 +1,9 @@
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
+import VoiceInputOverlay, {
+  VoiceResultExtras,
+} from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -13,36 +15,68 @@ import {
 
 export default function HouseholdGuardian() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingHousehold = editingMode === "edit-household";
   const { profileData, updateProfileData } = useProfile();
   const [firstName, setFirstName] = useState(profileData.guardianName.split(" ")[0] || "");
   const [lastName, setLastName] = useState(profileData.guardianName.split(" ").slice(1).join(" ") || "");
   const [phone, setPhone] = useState(profileData.guardianPhone || "");
   const [email, setEmail] = useState(profileData.guardianEmail || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
-  const [activeField, setActiveField] = useState<string | null>(null);
 
-  const handleVoiceResult = (text: string) => {
-    if (activeField === "firstName") {
+  const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
+    const structured = extras?.structuredData;
+    let nextFirst = firstName;
+    let nextLast = lastName;
+
+    if (structured?.guardianFirstName?.trim()) {
+      nextFirst = structured.guardianFirstName.trim();
+      setFirstName(nextFirst);
+    } else if (!structured && text) {
+      nextFirst = text;
       setFirstName(text);
-    } else if (activeField === "lastName") {
-      setLastName(text);
-    } else if (activeField === "phone") {
+    }
+
+    if (structured?.guardianLastName?.trim()) {
+      nextLast = structured.guardianLastName.trim();
+      setLastName(nextLast);
+    }
+
+    if (structured?.guardianPhone?.trim()) {
+      setPhone(structured.guardianPhone.trim());
+      updateProfileData({ guardianPhone: structured.guardianPhone.trim() });
+    } else if (!structured && !structured?.guardianFirstName && text) {
       setPhone(text);
       updateProfileData({ guardianPhone: text });
-    } else if (activeField === "email") {
-      setEmail(text);
-      updateProfileData({ guardianEmail: text });
     }
-    const fullName = `${firstName} ${lastName}`.trim();
-    updateProfileData({ guardianName: fullName });
+
+    if (structured?.guardianEmail?.trim()) {
+      setEmail(structured.guardianEmail.trim());
+      updateProfileData({ guardianEmail: structured.guardianEmail.trim() });
+    }
+
+    updateProfileData({ guardianName: `${nextFirst} ${nextLast}`.trim() });
     setShowVoiceOverlay(false);
-    setActiveField(null);
   };
 
   const handleNext = () => {
     const fullName = `${firstName} ${lastName}`.trim();
-    updateProfileData({ guardianName: fullName, guardianPhone: phone, guardianEmail: email });
-    router.push("/household-progress");
+    updateProfileData({
+      guardianName: fullName,
+      guardianPhone: phone,
+      guardianEmail: email,
+    });
+    if (isEditingHousehold) {
+      router.replace(returnToPath as any);
+    } else {
+      router.push("/household-progress");
+    }
   };
 
   return (
@@ -121,16 +155,15 @@ export default function HouseholdGuardian() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.voiceButton}
-          onPress={() => {
-            setActiveField("firstName");
-            setShowVoiceOverlay(true);
-          }}
+          onPress={() => setShowVoiceOverlay(true)}
         >
           <Ionicons name="mic" size={24} color="#8B5CF6" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>Next</Text>
+          <Text style={styles.nextButtonText}>
+            {isEditingHousehold ? "Save & Close" : "Next"}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -138,8 +171,13 @@ export default function HouseholdGuardian() {
         visible={showVoiceOverlay}
         onClose={() => {
           setShowVoiceOverlay(false);
-          setActiveField(null);
         }}
+        contextFields={[
+          "guardianFirstName",
+          "guardianLastName",
+          "guardianPhone",
+          "guardianEmail",
+        ]}
         onResult={handleVoiceResult}
       />
     </View>
@@ -233,4 +271,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

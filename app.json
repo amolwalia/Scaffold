@@ -11,7 +11,6 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSSpeechRecognitionUsageDescription": "Allow $(PRODUCT_NAME) to use speech recognition.",
         "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to use the microphone."
       },
       "bundleIdentifier": "com.anonymous.Scaffold"
@@ -62,12 +61,14 @@
         }
       ],
       "expo-font",
-      "expo-speech-recognition",
       "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "openaiApiKey": "${EXPO_PUBLIC_OPENAI_API_KEY}"
     }
   }
 }

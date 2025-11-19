@@ -1,7 +1,10 @@
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
+import ProfileExitModal from "@/components/ProfileExitModal";
+import VoiceInputOverlay, {
+  VoiceResultExtras,
+} from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -18,31 +21,87 @@ const MONTHS = [
 
 export default function BasicProfileDOB() {
   const router = useRouter();
-  const { profileData, updateProfileData } = useProfile();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingBasic = editingMode === "edit-basic";
+  const { updateProfileData } = useProfile();
   const [month, setMonth] = useState("January");
   const [day, setDay] = useState("15");
   const [year, setYear] = useState("2003");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
   const [showMonthPicker, setShowMonthPicker] = useState(false);
 
-  const handleVoiceResult = (text: string) => {
-    // Parse date from voice input (e.g., "January 15 2003")
-    const parts = text.trim().split(/\s+/);
-    if (parts.length >= 3) {
-      const m = parts[0];
-      const d = parts[1];
-      const y = parts[2];
-      if (MONTHS.includes(m)) setMonth(m);
-      if (!isNaN(Number(d)) && Number(d) >= 1 && Number(d) <= 31) setDay(d);
-      if (!isNaN(Number(y)) && Number(y) >= 1900 && Number(y) <= 2010) setYear(y);
+  const applyDateParts = (value: string) => {
+    const cleanValue = value.trim();
+    let nextMonth = month;
+    let nextDay = day;
+    let nextYear = year;
+
+    if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(cleanValue)) {
+      const [y, m, d] = cleanValue.split("-");
+      const monthIndex = Math.max(
+        0,
+        Math.min(MONTHS.length - 1, Number(m) - 1)
+      );
+      nextMonth = MONTHS[monthIndex];
+      nextDay = String(Number(d));
+      nextYear = y;
+    } else {
+      const parts = cleanValue.replace(/,/g, " ").split(/\s+/);
+      if (parts.length >= 3) {
+        const [m, d, y] = parts;
+        if (MONTHS.includes(m)) {
+          nextMonth = m;
+        }
+        if (!Number.isNaN(Number(d))) {
+          nextDay = String(Number(d));
+        }
+        if (!Number.isNaN(Number(y))) {
+          nextYear = y;
+        }
+      }
     }
-    updateProfileData({ dateOfBirth: `${month} ${day}, ${year}` });
+
+    setMonth(nextMonth);
+    setDay(nextDay);
+    setYear(nextYear);
+    updateProfileData({ dateOfBirth: `${nextMonth} ${nextDay}, ${nextYear}` });
+  };
+
+  const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
+    const structuredValue = extras?.structuredData?.dateOfBirth?.trim();
+    const value = structuredValue || text;
+    if (value) {
+      applyDateParts(value);
+    }
     setShowVoiceOverlay(false);
+  };
+
+  const navigateForward = (path: string) => {
+    if (isEditingBasic && editingMode) {
+      router.push({
+        pathname: path as any,
+        params: { mode: editingMode, returnTo: returnToPath },
+      });
+    } else {
+      router.push(path as any);
+    }
   };
 
   const handleNext = () => {
     updateProfileData({ dateOfBirth: `${month} ${day}, ${year}` });
-    router.push("/basic-profile-gender");
+    navigateForward("/basic-profile-gender");
+  };
+
+  const handleExit = () => {
+    setShowExitModal(false);
+    router.replace(returnToPath as any);
   };
 
   return (
@@ -54,7 +113,10 @@ export default function BasicProfileDOB() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Basic Profile</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -144,7 +206,14 @@ export default function BasicProfileDOB() {
       <VoiceInputOverlay
         visible={showVoiceOverlay}
         onClose={() => setShowVoiceOverlay(false)}
+        contextFields={["dateOfBirth"]}
         onResult={handleVoiceResult}
+      />
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={handleExit}
       />
     </View>
   );
@@ -280,4 +349,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

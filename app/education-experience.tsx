@@ -1,7 +1,9 @@
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
+import VoiceInputOverlay, {
+  VoiceResultExtras,
+} from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -14,42 +16,83 @@ import {
 
 export default function EducationExperience() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingEducation = editingMode === "edit-education";
   const { profileData, updateProfileData } = useProfile();
-  const [tradeSchoolName, setTradeSchoolName] = useState(profileData.tradeSchoolName || "");
-  const [tradeProgramName, setTradeProgramName] = useState(profileData.tradeProgramName || "");
-  const [graduationDate, setGraduationDate] = useState(profileData.tradeGraduationDate || "");
+  const [tradeSchoolName, setTradeSchoolName] = useState(
+    profileData.tradeSchoolName || ""
+  );
+  const [tradeProgramName, setTradeProgramName] = useState(
+    profileData.tradeProgramName || ""
+  );
+  const [graduationDate, setGraduationDate] = useState(
+    profileData.tradeGraduationDate || ""
+  );
   const [trade, setTrade] = useState(profileData.trade || "");
-  const [apprenticeshipLevel, setApprenticeshipLevel] = useState(profileData.apprenticeshipLevel || "");
+  const [apprenticeshipLevel, setApprenticeshipLevel] = useState(
+    profileData.apprenticeshipLevel || ""
+  );
+  const [showApprenticeshipPicker, setShowApprenticeshipPicker] =
+    useState(false);
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
-  const [activeField, setActiveField] = useState<string | null>(null);
-  const [showApprenticeshipPicker, setShowApprenticeshipPicker] = useState(false);
 
-  const APPRENTICESHIP_LEVELS = ["Level 1", "Level 2", "Level 3", "Level 4", "Year 1", "Year 2", "Year 3", "Year 4"];
+  const APPRENTICESHIP_LEVELS = [
+    "Level 1",
+    "Level 2",
+    "Level 3",
+    "Level 4",
+    "Year 1",
+    "Year 2",
+    "Year 3",
+    "Year 4",
+  ];
 
-  const handleVoiceResult = (text: string) => {
-    if (activeField === "tradeSchoolName") {
+  const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
+    const structured = extras?.structuredData;
+    if (structured?.tradeSchoolName?.trim()) {
+      setTradeSchoolName(structured.tradeSchoolName.trim());
+      updateProfileData({ tradeSchoolName: structured.tradeSchoolName.trim() });
+    } else if (!structured && text) {
       setTradeSchoolName(text);
       updateProfileData({ tradeSchoolName: text });
-    } else if (activeField === "tradeProgramName") {
-      setTradeProgramName(text);
-      updateProfileData({ tradeProgramName: text });
-    } else if (activeField === "graduationDate") {
-      setGraduationDate(text);
-      updateProfileData({ tradeGraduationDate: text });
-    } else if (activeField === "trade") {
-      setTrade(text);
-      updateProfileData({ trade: text });
-    } else if (activeField === "apprenticeshipLevel") {
+    }
+
+    if (structured?.tradeProgramName?.trim()) {
+      setTradeProgramName(structured.tradeProgramName.trim());
+      updateProfileData({
+        tradeProgramName: structured.tradeProgramName.trim(),
+      });
+    }
+
+    if (structured?.graduationDate?.trim()) {
+      setGraduationDate(structured.graduationDate.trim());
+      updateProfileData({
+        tradeGraduationDate: structured.graduationDate.trim(),
+      });
+    }
+
+    if (structured?.trade?.trim()) {
+      setTrade(structured.trade.trim());
+      updateProfileData({ trade: structured.trade.trim() });
+    }
+
+    if (structured?.apprenticeshipLevel?.trim()) {
       const match = APPRENTICESHIP_LEVELS.find((l) =>
-        text.toLowerCase().includes(l.toLowerCase())
+        structured.apprenticeshipLevel.toLowerCase().includes(l.toLowerCase())
       );
       if (match) {
         setApprenticeshipLevel(match);
         updateProfileData({ apprenticeshipLevel: match });
       }
     }
+
     setShowVoiceOverlay(false);
-    setActiveField(null);
   };
 
   const handleNext = () => {
@@ -60,7 +103,16 @@ export default function EducationExperience() {
       trade,
       apprenticeshipLevel,
     });
-    router.push("/profile-picture?source=onboarding");
+    // Use a typed push object to avoid TypeScript route literal restrictions
+    router.push({
+      pathname: "/profile-picture",
+      params: { source: "onboarding" },
+    } as any);
+    if (isEditingEducation) {
+      router.replace(returnToPath as any);
+    } else {
+      router.push("/(tabs)/profile");
+    }
   };
 
   return (
@@ -89,7 +141,10 @@ export default function EducationExperience() {
         </View>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.sectionTitle}>Trade-Specific Education</Text>
 
         <View style={styles.formContainer}>
@@ -139,9 +194,15 @@ export default function EducationExperience() {
 
           <TouchableOpacity
             style={styles.input}
-            onPress={() => setShowApprenticeshipPicker(!showApprenticeshipPicker)}
+            onPress={() =>
+              setShowApprenticeshipPicker(!showApprenticeshipPicker)
+            }
           >
-            <Text style={apprenticeshipLevel ? styles.inputText : styles.placeholderText}>
+            <Text
+              style={
+                apprenticeshipLevel ? styles.inputText : styles.placeholderText
+              }
+            >
               {apprenticeshipLevel || "Apprenticeship Level / Year..."}
             </Text>
             <Ionicons name="chevron-down" size={20} color="#9CA3AF" />
@@ -170,16 +231,15 @@ export default function EducationExperience() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.voiceButton}
-          onPress={() => {
-            setActiveField("tradeSchoolName");
-            setShowVoiceOverlay(true);
-          }}
+          onPress={() => setShowVoiceOverlay(true)}
         >
           <Ionicons name="mic" size={24} color="#8B5CF6" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>Next</Text>
+          <Text style={styles.nextButtonText}>
+            {isEditingEducation ? "Save & Close" : "Next"}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -187,8 +247,14 @@ export default function EducationExperience() {
         visible={showVoiceOverlay}
         onClose={() => {
           setShowVoiceOverlay(false);
-          setActiveField(null);
         }}
+        contextFields={[
+          "tradeSchoolName",
+          "tradeProgramName",
+          "graduationDate",
+          "trade",
+          "apprenticeshipLevel",
+        ]}
         onResult={handleVoiceResult}
       />
     </View>

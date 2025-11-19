@@ -1,7 +1,9 @@
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
+import VoiceInputOverlay, {
+  VoiceResultExtras,
+} from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -13,12 +15,19 @@ import {
 
 export default function EducationBackground() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingEducation = editingMode === "edit-education";
   const { profileData, updateProfileData } = useProfile();
   const [highestEducation, setHighestEducation] = useState(profileData.highestEducation || "");
   const [highSchoolName, setHighSchoolName] = useState(profileData.highSchoolName || "");
   const [graduationDate, setGraduationDate] = useState(profileData.graduationDate || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
-  const [activeField, setActiveField] = useState<string | null>(null);
   const [showEducationPicker, setShowEducationPicker] = useState(false);
 
   const EDUCATION_LEVELS = [
@@ -30,24 +39,34 @@ export default function EducationBackground() {
     "Doctorate",
   ];
 
-  const handleVoiceResult = (text: string) => {
-    if (activeField === "highestEducation") {
-      const match = EDUCATION_LEVELS.find((e) =>
-        text.toLowerCase().includes(e.toLowerCase())
-      );
-      if (match) {
-        setHighestEducation(match);
-        updateProfileData({ highestEducation: match });
-      }
-    } else if (activeField === "highSchoolName") {
+  const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
+    const structured = extras?.structuredData;
+    const nextEducation = structured?.highestEducation || text;
+    const matchedEducation = nextEducation
+      ? EDUCATION_LEVELS.find((level) =>
+          nextEducation.toLowerCase().includes(level.toLowerCase())
+        )
+      : null;
+
+    if (matchedEducation) {
+      setHighestEducation(matchedEducation);
+      updateProfileData({ highestEducation: matchedEducation });
+    }
+
+    if (structured?.highSchoolName?.trim()) {
+      setHighSchoolName(structured.highSchoolName.trim());
+      updateProfileData({ highSchoolName: structured.highSchoolName.trim() });
+    } else if (!structured && text && !matchedEducation) {
       setHighSchoolName(text);
       updateProfileData({ highSchoolName: text });
-    } else if (activeField === "graduationDate") {
-      setGraduationDate(text);
-      updateProfileData({ graduationDate: text });
     }
+
+    if (structured?.graduationDate?.trim()) {
+      setGraduationDate(structured.graduationDate.trim());
+      updateProfileData({ graduationDate: structured.graduationDate.trim() });
+    }
+
     setShowVoiceOverlay(false);
-    setActiveField(null);
   };
 
   const handleNext = () => {
@@ -56,7 +75,14 @@ export default function EducationBackground() {
       highSchoolName,
       graduationDate,
     });
-    router.push("/education-experience");
+    if (isEditingEducation && editingMode) {
+      router.push({
+        pathname: "/education-experience",
+        params: { mode: editingMode, returnTo: returnToPath },
+      });
+    } else {
+      router.push("/education-experience");
+    }
   };
 
   return (
@@ -136,10 +162,7 @@ export default function EducationBackground() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.voiceButton}
-          onPress={() => {
-            setActiveField("highestEducation");
-            setShowVoiceOverlay(true);
-          }}
+          onPress={() => setShowVoiceOverlay(true)}
         >
           <Ionicons name="mic" size={24} color="#8B5CF6" />
         </TouchableOpacity>
@@ -153,8 +176,8 @@ export default function EducationBackground() {
         visible={showVoiceOverlay}
         onClose={() => {
           setShowVoiceOverlay(false);
-          setActiveField(null);
         }}
+        contextFields={["highestEducation", "highSchoolName", "graduationDate"]}
         onResult={handleVoiceResult}
       />
     </View>
@@ -278,4 +301,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

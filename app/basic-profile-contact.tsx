@@ -1,7 +1,10 @@
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
+import ProfileExitModal from "@/components/ProfileExitModal";
+import VoiceInputOverlay, {
+  VoiceResultExtras,
+} from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -13,27 +16,64 @@ import {
 
 export default function BasicProfileContact() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingBasic = editingMode === "edit-basic";
   const { profileData, updateProfileData } = useProfile();
   const [phone, setPhone] = useState(profileData.phone || "");
   const [email, setEmail] = useState(profileData.email || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
-  const [activeField, setActiveField] = useState<"phone" | "email" | null>(null);
+  const [showExitModal, setShowExitModal] = useState(false);
 
-  const handleVoiceResult = (text: string) => {
-    if (activeField === "phone") {
+  const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
+    const structured = extras?.structuredData;
+    const nextPhone = structured?.phone?.trim();
+    const nextEmail = structured?.email?.trim();
+
+    if (nextPhone) {
+      setPhone(nextPhone);
+      updateProfileData({ phone: nextPhone });
+    } else if (!structured && text) {
       setPhone(text);
       updateProfileData({ phone: text });
-    } else if (activeField === "email") {
-      setEmail(text);
-      updateProfileData({ email: text });
     }
+
+    if (nextEmail) {
+      setEmail(nextEmail);
+      updateProfileData({ email: nextEmail });
+    }
+
     setShowVoiceOverlay(false);
-    setActiveField(null);
+  };
+
+  const navigateForward = (path: string) => {
+    if (isEditingBasic && editingMode) {
+      router.push({
+        pathname: path as any,
+        params: { mode: editingMode, returnTo: returnToPath },
+      });
+    } else {
+      router.push(path as any);
+    }
   };
 
   const handleNext = () => {
     updateProfileData({ phone, email });
-    router.push("/basic-profile-progress");
+    if (isEditingBasic) {
+      router.replace(returnToPath as any);
+    } else {
+      navigateForward("/basic-profile-progress");
+    }
+  };
+
+  const handleExit = () => {
+    setShowExitModal(false);
+    router.replace(returnToPath as any);
   };
 
   return (
@@ -45,7 +85,10 @@ export default function BasicProfileContact() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Basic Profile</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -88,16 +131,15 @@ export default function BasicProfileContact() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.voiceButton}
-          onPress={() => {
-            setActiveField("phone");
-            setShowVoiceOverlay(true);
-          }}
+          onPress={() => setShowVoiceOverlay(true)}
         >
           <Ionicons name="mic" size={24} color="#8B5CF6" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>Next</Text>
+          <Text style={styles.nextButtonText}>
+            {isEditingBasic ? "Save & Close" : "Next"}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -105,9 +147,15 @@ export default function BasicProfileContact() {
         visible={showVoiceOverlay}
         onClose={() => {
           setShowVoiceOverlay(false);
-          setActiveField(null);
         }}
+        contextFields={["phone", "email"]}
         onResult={handleVoiceResult}
+      />
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={handleExit}
       />
     </View>
   );
@@ -200,4 +248,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

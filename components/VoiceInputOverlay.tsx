@@ -1,21 +1,33 @@
-import React, { useEffect, useRef, useState } from "react";
+import { transcribeAndCleanAudio } from "@/utilities/voiceTranscription";
+import { Ionicons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
+  ActivityIndicator,
   Animated,
   Easing,
+  Modal,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+
+export interface VoiceResultExtras {
+  rawText: string;
+  structuredData?: Record<string, string>;
+}
 
 interface VoiceInputOverlayProps {
   visible: boolean;
   onClose: () => void;
-  onResult: (text: string) => void;
+  onResult: (text: string, extras?: VoiceResultExtras) => void;
+  contextField?: string | null;
+  contextFields?: string[];
+  contextPrompt?: string;
 }
 
 const BAR_COUNT = 6;
@@ -25,17 +37,25 @@ export default function VoiceInputOverlay({
   visible,
   onClose,
   onResult,
+  contextField,
+  contextFields,
+  contextPrompt,
 }: VoiceInputOverlayProps) {
-  const [phase, setPhase] = useState<"idle" | "listening" | "review">("idle");
+  const [phase, setPhase] = useState<
+    "idle" | "listening" | "processing" | "review"
+  >("idle");
   const [recognizedText, setRecognizedText] = useState("");
+  const [rawTranscript, setRawTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [structuredData, setStructuredData] = useState<
+    Record<string, string> | null
+  >(null);
+  const recordingRef = useRef<Audio.Recording | null>(null);
 
-  // waveform animation setup
-  const bars = Array.from(
-    { length: BAR_COUNT },
-    () => useRef(new Animated.Value(1)).current
-  );
+  const bars = useRef(
+    Array.from({ length: BAR_COUNT }, () => new Animated.Value(1))
+  ).current;
 
   useEffect(() => {
     if (isListening) {
@@ -57,67 +77,160 @@ export default function VoiceInputOverlay({
           ])
         )
       );
-      loops.forEach((a) => a.start());
-      return () => loops.forEach((a) => a.stop());
+      loops.forEach((animation) => animation.start());
+      return () => loops.forEach((animation) => animation.stop());
     }
-  }, [isListening]);
+  }, [bars, isListening]);
+
+  const resetState = () => {
+    setPhase("idle");
+    setRecognizedText("");
+    setRawTranscript("");
+    setIsListening(false);
+    setErrorMessage(null);
+    setStructuredData(null);
+  };
+
+  const cancelRecording = useCallback(async () => {
+    if (recordingRef.current) {
+      try {
+        await recordingRef.current.stopAndUnloadAsync();
+        const uri = recordingRef.current.getURI();
+        if (uri) {
+          await FileSystem.deleteAsync(uri, { idempotent: true });
+        }
+      } catch {
+        // ignore cleanup errors
+      } finally {
+        recordingRef.current = null;
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      void cancelRecording();
+    };
+  }, [cancelRecording]);
+
+  const handleClosePress = () => {
+    cancelRecording();
+    resetState();
+    onClose();
+  };
 
   const startListening = async () => {
     try {
-      if (Platform.OS === "web" || typeof window !== "undefined") {
-        const SpeechRecognition =
-          (window as any).SpeechRecognition ||
-          (window as any).webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-          alert("Speech recognition not supported on this device.");
-          return;
-        }
-
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = "en-US";
-
-        recognition.onresult = (event: any) => {
-          let text = "";
-          for (let i = 0; i < event.results.length; i++) {
-            text += event.results[i][0].transcript + " ";
-          }
-          setRecognizedText(text.trim());
-        };
-
-        recognition.onerror = (err: any) => console.error("Speech error:", err);
-        recognition.onend = () => setIsListening(false);
-
-        recognition.start();
-        recognitionRef.current = recognition;
-        setPhase("listening");
-        setIsListening(true);
-      } else {
-        alert("Speech recognition requires Expo Web or device browser mode.");
+      if (Platform.OS === "web") {
+        alert("Voice recording works best on a device or emulator.");
+        return;
       }
+
+      const permission = await Audio.requestPermissionsAsync();
+      if (permission.status !== "granted") {
+        alert("Microphone access is required for voice input.");
+        return;
+      }
+
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+
+      const recording = new Audio.Recording();
+      await recording.prepareToRecordAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      await recording.startAsync();
+
+      recordingRef.current = recording;
+      setPhase("listening");
+      setIsListening(true);
+      setRecognizedText("");
+      setRawTranscript("");
+      setErrorMessage(null);
     } catch (e) {
       console.error("Speech start failed:", e);
+      setErrorMessage("Unable to start recording. Please try again.");
     }
   };
 
-  const stopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
+  const stopListening = async () => {
+    if (!recordingRef.current) {
+      setPhase("review");
+      return;
     }
+
     setIsListening(false);
-    setPhase("review");
+    setPhase("processing");
+    setErrorMessage(null);
+    setRecognizedText("Transcribing your response...");
+
+    let uri: string | null = null;
+    try {
+      await recordingRef.current.stopAndUnloadAsync();
+      uri = recordingRef.current.getURI();
+    } catch (error) {
+      console.error("Unable to stop recording:", error);
+    } finally {
+      recordingRef.current = null;
+    }
+
+    if (!uri) {
+      setErrorMessage("Recording file unavailable. Please try again.");
+      setPhase("review");
+      return;
+    }
+
+    try {
+      const { rawText, cleanedText, structuredData } =
+        await transcribeAndCleanAudio({
+          uri,
+          field: contextField,
+          fields: contextFields,
+          promptOverride: contextPrompt,
+        });
+      setRawTranscript(rawText);
+      setRecognizedText(cleanedText || rawText || "");
+      setStructuredData(structuredData || null);
+    } catch (error) {
+      console.error("Transcription failed:", error);
+      setRawTranscript("");
+      setRecognizedText("");
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to transcribe. Please try again."
+      );
+    } finally {
+      setPhase("review");
+      try {
+        await FileSystem.deleteAsync(uri, { idempotent: true });
+      } catch {
+        // ignore cleanup errors
+      }
+    }
+  };
+
+  const handleStopPress = () => {
+    stopListening();
   };
 
   const handleRetry = () => {
-    setRecognizedText("");
-    setPhase("idle");
+    resetState();
   };
 
   const handleConfirm = () => {
-    onResult(recognizedText);
-    setRecognizedText("");
-    setPhase("idle");
+    onResult(
+      recognizedText.trim(),
+      rawTranscript
+        ? { rawText: rawTranscript, structuredData: structuredData || undefined }
+        : undefined
+    );
+    resetState();
   };
 
   const renderWaveform = () => (
@@ -131,11 +244,13 @@ export default function VoiceInputOverlay({
     </View>
   );
 
+  const isProcessing = phase === "processing";
+
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          <TouchableOpacity onPress={onClose} style={styles.close}>
+          <TouchableOpacity onPress={handleClosePress} style={styles.close}>
             <Ionicons name="close" size={24} color="#B0B0B0" />
           </TouchableOpacity>
 
@@ -143,10 +258,11 @@ export default function VoiceInputOverlay({
 
           {phase === "idle" && (
             <>
-              <Text style={styles.heading}>Go ahead, I'm listening!</Text>
+              <Text style={styles.heading}>Go ahead, I&apos;m listening!</Text>
               <TouchableOpacity
-                style={styles.startButton}
+                style={[styles.startButton, isProcessing && styles.disabledButton]}
                 onPress={startListening}
+                disabled={isProcessing}
               >
                 <Ionicons name="mic-outline" size={22} color="#8B5CF6" />
                 <Text style={styles.startText}>Start</Text>
@@ -161,13 +277,24 @@ export default function VoiceInputOverlay({
                   {recognizedText || "Listening... speak now"}
                 </Text>
               </ScrollView>
-              <TouchableOpacity
-                style={styles.stopButton}
-                onPress={stopListening}
-              >
+              <TouchableOpacity style={styles.stopButton} onPress={handleStopPress}>
                 <Ionicons name="pause" size={26} color="#FFF" />
                 <Text style={styles.stopText}>Stop</Text>
               </TouchableOpacity>
+            </>
+          )}
+
+          {phase === "processing" && (
+            <>
+              <ScrollView style={styles.scroll}>
+                <Text style={styles.transcript}>
+                  {recognizedText || "Transcribing your response..."}
+                </Text>
+              </ScrollView>
+              <View style={styles.processingButton}>
+                <ActivityIndicator color="#FFF" />
+                <Text style={styles.stopText}>Processing</Text>
+              </View>
             </>
           )}
 
@@ -177,8 +304,13 @@ export default function VoiceInputOverlay({
                 Got it. Should I go ahead with this?
               </Text>
               <ScrollView style={styles.scroll}>
-                <Text style={styles.transcript}>{recognizedText}</Text>
+                <Text style={styles.transcript}>
+                  {recognizedText || "No transcript available."}
+                </Text>
               </ScrollView>
+              {errorMessage && (
+                <Text style={styles.errorText}>{errorMessage}</Text>
+              )}
               <View style={styles.actions}>
                 <TouchableOpacity
                   style={styles.circleLight}
@@ -189,12 +321,17 @@ export default function VoiceInputOverlay({
                 <TouchableOpacity
                   style={styles.circleOutline}
                   onPress={startListening}
+                  disabled={isProcessing}
                 >
                   <Ionicons name="mic-outline" size={22} color="#8B5CF6" />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.circleConfirm}
+                  style={[
+                    styles.circleConfirm,
+                    (!recognizedText || !!errorMessage) && styles.disabledConfirm,
+                  ]}
                   onPress={handleConfirm}
+                  disabled={!recognizedText || !!errorMessage}
                 >
                   <Ionicons name="checkmark" size={22} color="#FFF" />
                 </TouchableOpacity>
@@ -233,6 +370,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#7C3AED",
     marginBottom: 16,
+    textAlign: "center",
   },
   scroll: { maxHeight: 140, marginBottom: 24 },
   transcript: { textAlign: "center", fontSize: 14, color: "#000" },
@@ -250,6 +388,15 @@ const styles = StyleSheet.create({
   stopButton: {
     alignItems: "center",
     backgroundColor: "#8B5CF6",
+    borderRadius: 50,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+  },
+  processingButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#A78BFA",
     borderRadius: 50,
     paddingVertical: 14,
     paddingHorizontal: 28,
@@ -276,6 +423,12 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 14,
   },
+  disabledConfirm: {
+    opacity: 0.5,
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
   waveformContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -289,5 +442,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 3,
     borderRadius: 3,
     backgroundColor: "#8B5CF6",
+  },
+  errorText: {
+    color: "#DC2626",
+    textAlign: "center",
+    marginBottom: 12,
   },
 });

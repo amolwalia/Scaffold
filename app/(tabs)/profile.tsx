@@ -146,7 +146,7 @@ export default function Profile() {
   const spinnerAnimation = useRef<Animated.CompositeAnimation | null>(null);
   const spin = rotation.interpolate({
     inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
+    outputRange: ["0deg", "3600deg"],
   });
 
   useEffect(() => {
@@ -365,7 +365,6 @@ export default function Profile() {
     cancelEditing();
   };
 
-
   // Calculate completion counts
   const basicProfileComplete = useMemo(() => {
     const fields = [
@@ -434,29 +433,25 @@ export default function Profile() {
     educationComplete,
   ]);
 
-  const openProfilePicture = () => {
-    router.push("/profile-picture?source=profile");
+  const startSectionEdit = (
+    section: "basic" | "residence" | "household" | "education"
+  ) => {
+    const sectionRoutes: Record<typeof section, string> = {
+      basic: "/basic-profile-name",
+      residence: "/residence-address",
+      household: "/household-size",
+      education: "/education-background",
+    };
+    router.push({
+      pathname: sectionRoutes[section],
+      params: { mode: `edit-${section}`, returnTo: "/(tabs)/profile" },
+    });
   };
 
-  const handleEditBasicProfile = () => {
-    // TODO: Navigate to edit basic profile
-    console.log("Edit basic profile");
-  };
-
-  const handleEditResidence = () => {
-    // TODO: Navigate to edit residence
-    console.log("Edit residence");
-  };
-
-  const handleEditHousehold = () => {
-    // TODO: Navigate to edit household
-    console.log("Edit household");
-  };
-
-  const handleDocuments = () => {
-    // TODO: Navigate to documents
-    console.log("Navigate to documents");
-  };
+  const handleEditBasicProfile = () => startSectionEdit("basic");
+  const handleEditResidence = () => startSectionEdit("residence");
+  const handleEditHousehold = () => startSectionEdit("household");
+  const handleEditEducation = () => startSectionEdit("education");
 
   const handleContinue = () => {
     router.push("/basic-profile-name");
@@ -547,9 +542,12 @@ export default function Profile() {
               basicProfileComplete.filled === basicProfileComplete.total
             }
             completionCount={basicProfileComplete.count}
-            showEditButton={false}
+            onEdit={handleEditBasicProfile}
           >
-            <ProfileField label="Name:" value={displayValue(profileData.name)} />
+            <ProfileField
+              label="Name:"
+              value={displayValue(profileData.name)}
+            />
             <ProfileField
               label="Date of birth:"
               value={displayValue(profileData.dateOfBirth)}
@@ -573,7 +571,7 @@ export default function Profile() {
             title="Residence information"
             completed={residenceComplete.filled === residenceComplete.total}
             completionCount={residenceComplete.count}
-            showEditButton={false}
+            onEdit={handleEditResidence}
           >
             <ProfileField
               label="Address:"
@@ -598,7 +596,7 @@ export default function Profile() {
             title="Household information"
             completed={householdComplete.filled === householdComplete.total}
             completionCount={householdComplete.count}
-            showEditButton={false}
+            onEdit={handleEditHousehold}
           >
             <ProfileField
               label="Household size:"
@@ -636,7 +634,7 @@ export default function Profile() {
             title="Education/Experience"
             completed={educationComplete.filled === educationComplete.total}
             completionCount={educationComplete.count}
-            showEditButton={false}
+            onEdit={handleEditEducation}
           >
             <ProfileField
               label="Highest level of Education:"

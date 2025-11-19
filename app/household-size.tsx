@@ -1,7 +1,9 @@
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
+import VoiceInputOverlay, {
+  VoiceResultExtras,
+} from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -13,35 +15,70 @@ import {
 
 export default function HouseholdSize() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{
+    mode?: string;
+    returnTo?: string;
+  }>();
+  const editingMode = typeof mode === "string" ? mode : undefined;
+  const returnToPath =
+    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
+  const isEditingHousehold = editingMode === "edit-household";
   const { profileData, updateProfileData } = useProfile();
   const [householdSize, setHouseholdSize] = useState(profileData.householdSize || "");
   const [member1, setMember1] = useState("");
   const [member2, setMember2] = useState("");
   const [member3, setMember3] = useState("");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
-  const [activeField, setActiveField] = useState<string | null>(null);
 
-  const handleVoiceResult = (text: string) => {
-    if (activeField === "householdSize") {
+  const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
+    const structured = extras?.structuredData;
+    let nextHousehold = householdSize;
+    let nextMember1 = member1;
+    let nextMember2 = member2;
+    let nextMember3 = member3;
+
+    if (structured) {
+      if (structured.householdSize?.trim()) {
+        nextHousehold = structured.householdSize.trim();
+        setHouseholdSize(nextHousehold);
+        updateProfileData({ householdSize: nextHousehold });
+      }
+      if (structured.member1?.trim()) {
+        nextMember1 = structured.member1.trim();
+        setMember1(nextMember1);
+      }
+      if (structured.member2?.trim()) {
+        nextMember2 = structured.member2.trim();
+        setMember2(nextMember2);
+      }
+      if (structured.member3?.trim()) {
+        nextMember3 = structured.member3.trim();
+        setMember3(nextMember3);
+      }
+    } else if (text) {
+      nextHousehold = text;
       setHouseholdSize(text);
       updateProfileData({ householdSize: text });
-    } else if (activeField === "member1") {
-      setMember1(text);
-    } else if (activeField === "member2") {
-      setMember2(text);
-    } else if (activeField === "member3") {
-      setMember3(text);
     }
-    const composition = [member1, member2, member3].filter(Boolean).join(", ");
+
+    const composition = [nextMember1, nextMember2, nextMember3]
+      .filter(Boolean)
+      .join(", ");
     updateProfileData({ familyComposition: composition });
     setShowVoiceOverlay(false);
-    setActiveField(null);
   };
 
   const handleNext = () => {
     const composition = [member1, member2, member3].filter(Boolean).join(", ");
     updateProfileData({ householdSize, familyComposition: composition });
-    router.push("/household-income");
+    if (isEditingHousehold && editingMode) {
+      router.push({
+        pathname: "/household-income",
+        params: { mode: editingMode, returnTo: returnToPath },
+      });
+    } else {
+      router.push("/household-income");
+    }
   };
 
   return (
@@ -119,10 +156,7 @@ export default function HouseholdSize() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.voiceButton}
-          onPress={() => {
-            setActiveField("householdSize");
-            setShowVoiceOverlay(true);
-          }}
+          onPress={() => setShowVoiceOverlay(true)}
         >
           <Ionicons name="mic" size={24} color="#8B5CF6" />
         </TouchableOpacity>
@@ -136,8 +170,8 @@ export default function HouseholdSize() {
         visible={showVoiceOverlay}
         onClose={() => {
           setShowVoiceOverlay(false);
-          setActiveField(null);
         }}
+        contextFields={["householdSize", "member1", "member2", "member3"]}
         onResult={handleVoiceResult}
       />
     </View>
@@ -231,4 +265,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-
