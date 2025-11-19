@@ -60,7 +60,7 @@ export default function EducationExperience() {
       trade,
       apprenticeshipLevel,
     });
-    router.push("/(tabs)/profile");
+    router.push("/profile-picture?source=onboarding");
   };
 
   return (
@@ -314,4 +314,3 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-

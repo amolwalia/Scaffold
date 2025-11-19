@@ -14,6 +14,7 @@ interface ProfileData {
   gender: string;
   phone: string;
   email: string;
+  profileImageUri: string;
   // Residence
   address: string;
   postalCode: string;
@@ -68,6 +69,7 @@ const defaultProfileData: ProfileData = {
   tradeGraduationDate: "",
   trade: "",
   apprenticeshipLevel: "",
+  profileImageUri: "",
 };
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
@@ -138,4 +140,3 @@ export function useProfile() {
   }
   return context;
 }
-

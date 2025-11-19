@@ -3,6 +3,7 @@ import ProfileSectionCard from "@/components/ProfileSectionCard";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -433,6 +434,10 @@ export default function Profile() {
     educationComplete,
   ]);
 
+  const openProfilePicture = () => {
+    router.push("/profile-picture?source=profile");
+  };
+
   const handleEditBasicProfile = () => {
     // TODO: Navigate to edit basic profile
     console.log("Edit basic profile");
@@ -465,12 +470,30 @@ export default function Profile() {
       >
         {/* Profile Header */}
         <View style={styles.header}>
-          <View style={styles.profilePictureContainer}>
-            <Ionicons name="person" size={48} color="#E9D5FF" />
-            <TouchableOpacity style={styles.cameraIcon}>
-              <Ionicons name="camera" size={16} color="#8B5CF6" />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.profilePictureContainer}
+            activeOpacity={0.85}
+            onPress={openProfilePicture}
+          >
+            {profileData.profileImageUri ? (
+              <Image
+                source={{ uri: profileData.profileImageUri }}
+                style={styles.profilePicture}
+                contentFit="cover"
+              />
+            ) : (
+              <Ionicons name="person" size={48} color="#FFFFFF" />
+            )}
+            {!profileData.profileImageUri && (
+              <TouchableOpacity
+                style={styles.cameraIcon}
+                onPress={openProfilePicture}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="camera" size={16} color="#8B5CF6" />
+              </TouchableOpacity>
+            )}
+          </TouchableOpacity>
           <Text
             style={[
               styles.profileName,
@@ -704,6 +727,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#FFFFFF",
     position: "relative",
+    overflow: "hidden",
+  },
+  profilePicture: {
+    width: "100%",
+    height: "100%",
   },
   cameraIcon: {
     position: "absolute",
