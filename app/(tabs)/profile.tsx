@@ -453,6 +453,10 @@ export default function Profile() {
   const handleEditHousehold = () => startSectionEdit("household");
   const handleEditEducation = () => startSectionEdit("education");
 
+  const openProfilePicture = () => {
+    router.push("/profile-picture?source=profile");
+  };
+
   const handleContinue = () => {
     router.push("/basic-profile-name");
   };
