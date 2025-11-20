@@ -1,8 +1,8 @@
 import GrantFilterSheet, { GRANT_SORT_OPTIONS, GrantSortId } from "@/components/GrantFilterSheet";
 import { Theme } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import { useGlobalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -115,16 +115,36 @@ const getDeadlineTimestamp = (deadline: string) => {
   return new Date(year, month - 1, day).getTime();
 };
 
+const normalizeTab = (value?: string): "All" | "Eligible" | "My Grants" => {
+  if (value === "Eligible") return "Eligible";
+  if (value === "My Grants") return "My Grants";
+  return "All";
+};
+
+const readTabParam = (
+  value: string | string[] | undefined
+): "All" | "Eligible" | "My Grants" => {
+  if (!value) return "All";
+  const raw = Array.isArray(value) ? value[0] : value;
+  return normalizeTab(raw);
+};
+
 export default function GrantsScreen() {
   const router = useRouter();
+  const params = useGlobalSearchParams<{ tab?: string }>();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTab, setSelectedTab] =
-    useState<"All" | "Eligible" | "My Grants">("All");
+  const [selectedTab, setSelectedTab] = useState<
+    "All" | "Eligible" | "My Grants"
+  >(() => readTabParam(params.tab));
   const [selectedSubFilter, setSelectedSubFilter] =
     useState<"Saved" | "Applied">("Saved");
   const [grants, setGrants] = useState<GrantData[]>(sampleGrants);
   const [selectedSortId, setSelectedSortId] = useState<GrantSortId>("all");
   const [sortVisible, setSortVisible] = useState(false);
+
+  useEffect(() => {
+    setSelectedTab(readTabParam(params.tab));
+  }, [params.tab]);
 
   const tabs: ("All" | "Eligible" | "My Grants")[] = [
     "All",
@@ -203,6 +223,8 @@ export default function GrantsScreen() {
         amount: grant.amount,
         deadline: grant.deadline,
         eligible: grant.eligible ? "true" : "false",
+        saved: grant.saved ? "true" : "false",
+        description: grant.description,
       },
     });
   };
@@ -370,7 +392,7 @@ const styles = StyleSheet.create({
   header: {
     alignSelf: "center",
     width: Theme.layout.width,
-    paddingTop: 48,
+    paddingTop: 24,
     paddingBottom: Theme.spacing.lg,
     marginTop: Theme.spacing.xl,
   },
