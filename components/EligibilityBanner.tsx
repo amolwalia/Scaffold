@@ -30,12 +30,7 @@ export default function EligibilityBanner({
         ]}
       >
         You’re eligible for{' '}
-        <Text
-          style={[
-            Theme.typography.h3,
-            { color: Theme.colors.orange, fontFamily: Theme.fonts.extrabold },
-          ]}
-        >
+       <Text className="font-montserrat-bold text-[18px] text-[#FF890C] ml-1">
           {count} Grants
         </Text>
       </Text>
@@ -85,7 +80,7 @@ export default function EligibilityBanner({
         style={{
           paddingTop: 20,
           paddingBottom: 0,
-          borderTopWidth: 1,
+          borderTopWidth: 3,
           borderTopColor: Theme.colors.lightGrey,
           borderStyle: 'solid',
         }}

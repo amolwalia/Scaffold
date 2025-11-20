@@ -27,12 +27,7 @@ export default function FinishProfileCard({
       {/* Text block */}
       <Text style={[Theme.typography.h3, { color: Theme.colors.black }]}>
         Your profile is{' '}
-        <Text
-          style={[
-            Theme.typography.h3,
-            { color: Theme.colors.orange, fontFamily: Theme.fonts.extrabold },
-          ]}
-        >
+        <Text className="font-montserrat-bold text-[18px] text-[#FF890C] ml-1">
           {Math.round(pct)}%
         </Text>{' '}
         complete!
