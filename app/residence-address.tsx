@@ -1,3 +1,4 @@
+import ProfileExitModal from "@/components/ProfileExitModal";
 import VoiceInputOverlay, {
   VoiceResultExtras,
 } from "@/utilities/useVoiceToText";
@@ -29,6 +30,7 @@ export default function ResidenceAddress() {
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState(profileData.postalCode || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
     const structured = extras?.structuredData;
@@ -88,7 +90,10 @@ export default function ResidenceAddress() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Residence information</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -172,6 +177,15 @@ export default function ResidenceAddress() {
         }}
         contextFields={["addressLine1", "addressLine2", "city", "postalCode"]}
         onResult={handleVoiceResult}
+      />
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={() => {
+          setShowExitModal(false);
+          router.replace(returnToPath as any);
+        }}
       />
     </View>
   );

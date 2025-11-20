@@ -1,3 +1,4 @@
+import ProfileExitModal from "@/components/ProfileExitModal";
 import VoiceInputOverlay, {
   VoiceResultExtras,
 } from "@/utilities/useVoiceToText";
@@ -29,6 +30,7 @@ export default function EducationBackground() {
   const [graduationDate, setGraduationDate] = useState(profileData.graduationDate || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
   const [showEducationPicker, setShowEducationPicker] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   const EDUCATION_LEVELS = [
     "High School",
@@ -94,7 +96,10 @@ export default function EducationBackground() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Education/Experience</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -179,6 +184,15 @@ export default function EducationBackground() {
         }}
         contextFields={["highestEducation", "highSchoolName", "graduationDate"]}
         onResult={handleVoiceResult}
+      />
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={() => {
+          setShowExitModal(false);
+          router.replace(returnToPath as any);
+        }}
       />
     </View>
   );

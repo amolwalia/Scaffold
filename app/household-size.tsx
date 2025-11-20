@@ -1,3 +1,4 @@
+import ProfileExitModal from "@/components/ProfileExitModal";
 import VoiceInputOverlay, {
   VoiceResultExtras,
 } from "@/utilities/useVoiceToText";
@@ -29,6 +30,7 @@ export default function HouseholdSize() {
   const [member2, setMember2] = useState("");
   const [member3, setMember3] = useState("");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
     const structured = extras?.structuredData;
@@ -90,7 +92,10 @@ export default function HouseholdSize() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Household information</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -173,6 +178,15 @@ export default function HouseholdSize() {
         }}
         contextFields={["householdSize", "member1", "member2", "member3"]}
         onResult={handleVoiceResult}
+      />
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={() => {
+          setShowExitModal(false);
+          router.replace(returnToPath as any);
+        }}
       />
     </View>
   );

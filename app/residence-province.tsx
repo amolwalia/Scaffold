@@ -1,3 +1,4 @@
+import ProfileExitModal from "@/components/ProfileExitModal";
 import VoiceInputOverlay from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -36,6 +37,7 @@ export default function ResidenceProvince() {
   const { profileData, updateProfileData } = useProfile();
   const [selectedProvince, setSelectedProvince] = useState(profileData.province || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   const handleVoiceResult = (text: string) => {
     const lowerText = text.toLowerCase();
@@ -72,7 +74,10 @@ export default function ResidenceProvince() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Residence information</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -134,6 +139,15 @@ export default function ResidenceProvince() {
         onClose={() => setShowVoiceOverlay(false)}
         contextField="province"
         onResult={handleVoiceResult}
+      />
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={() => {
+          setShowExitModal(false);
+          router.replace(returnToPath as any);
+        }}
       />
     </View>
   );

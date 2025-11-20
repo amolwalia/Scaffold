@@ -1,3 +1,4 @@
+import ProfileExitModal from "@/components/ProfileExitModal";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
@@ -22,6 +23,7 @@ export default function ProfilePictureScreen() {
   const [selectedImage, setSelectedImage] = useState(
     profileData.profileImageUri || ""
   );
+  const [showExitModal, setShowExitModal] = useState(false);
   const editingFromProfile = sourceParam === "profile";
 
   const requestPermission = async () => {
@@ -92,7 +94,7 @@ export default function ProfilePictureScreen() {
         <TouchableOpacity
           accessibilityRole="button"
           style={styles.headerButton}
-          onPress={handleClose}
+          onPress={() => setShowExitModal(true)}
         >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
@@ -141,6 +143,12 @@ export default function ProfilePictureScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={confirmExit}
+      />
     </View>
   );
 }
@@ -247,3 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+  const confirmExit = () => {
+    setShowExitModal(false);
+    handleClose();
+  };

@@ -1,7 +1,8 @@
+import ProfileExitModal from "@/components/ProfileExitModal";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function ResidenceProgress() {
@@ -15,6 +16,7 @@ export default function ResidenceProgress() {
     typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
   const isEditingResidence = editingMode === "edit-residence";
   const { profileData } = useProfile();
+  const [showExitModal, setShowExitModal] = useState(false);
 
   // Calculate overall progress (Basic + Residence)
   const progress = useMemo(() => {
@@ -54,7 +56,10 @@ export default function ResidenceProgress() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Residence information</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -85,6 +90,15 @@ export default function ResidenceProgress() {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={() => {
+          setShowExitModal(false);
+          router.replace(returnToPath as any);
+        }}
+      />
     </View>
   );
 }

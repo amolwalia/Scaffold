@@ -1,3 +1,4 @@
+import ProfileExitModal from "@/components/ProfileExitModal";
 import VoiceInputOverlay, {
   VoiceResultExtras,
 } from "@/utilities/useVoiceToText";
@@ -29,6 +30,7 @@ export default function HouseholdGuardian() {
   const [phone, setPhone] = useState(profileData.guardianPhone || "");
   const [email, setEmail] = useState(profileData.guardianEmail || "");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
     const structured = extras?.structuredData;
@@ -88,7 +90,10 @@ export default function HouseholdGuardian() {
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Household information</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={styles.headerButton}
+        >
           <Ionicons name="close" size={24} color="#000" />
         </TouchableOpacity>
       </View>
@@ -179,6 +184,15 @@ export default function HouseholdGuardian() {
           "guardianEmail",
         ]}
         onResult={handleVoiceResult}
+      />
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={() => {
+          setShowExitModal(false);
+          router.replace(returnToPath as any);
+        }}
       />
     </View>
   );

@@ -1,3 +1,4 @@
+import ProfileExitModal from "@/components/ProfileExitModal";
 import VoiceInputOverlay, {
   VoiceResultExtras,
 } from "@/utilities/useVoiceToText";
@@ -41,16 +42,14 @@ export default function EducationExperience() {
   const [showApprenticeshipPicker, setShowApprenticeshipPicker] =
     useState(false);
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   const APPRENTICESHIP_LEVELS = [
-    "Level 1",
-    "Level 2",
-    "Level 3",
-    "Level 4",
-    "Year 1",
-    "Year 2",
-    "Year 3",
-    "Year 4",
+    "First Year Apprentice",
+    "Second Year Apprentice",
+    "Third Year Apprentice",
+    "Fourth Year Apprentice",
+    "Journeyman",
   ];
 
   const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
@@ -128,7 +127,7 @@ export default function EducationExperience() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Education/Experience</Text>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => setShowExitModal(true)}
           style={styles.headerButton}
         >
           <Ionicons name="close" size={24} color="#000" />
@@ -193,7 +192,7 @@ export default function EducationExperience() {
           />
 
           <TouchableOpacity
-            style={styles.input}
+            style={styles.dropdownButton}
             onPress={() =>
               setShowApprenticeshipPicker(!showApprenticeshipPicker)
             }
@@ -205,15 +204,23 @@ export default function EducationExperience() {
             >
               {apprenticeshipLevel || "Apprenticeship Level / Year..."}
             </Text>
-            <Ionicons name="chevron-down" size={20} color="#9CA3AF" />
+            <Ionicons
+              name={showApprenticeshipPicker ? "chevron-up" : "chevron-down"}
+              size={18}
+              color="#9CA3AF"
+            />
           </TouchableOpacity>
 
           {showApprenticeshipPicker && (
             <View style={styles.picker}>
-              {APPRENTICESHIP_LEVELS.map((level) => (
+              {APPRENTICESHIP_LEVELS.map((level, index) => (
                 <TouchableOpacity
                   key={level}
-                  style={styles.pickerOption}
+                  style={[
+                    styles.pickerOption,
+                    index === APPRENTICESHIP_LEVELS.length - 1 &&
+                      styles.pickerOptionLast,
+                  ]}
                   onPress={() => {
                     setApprenticeshipLevel(level);
                     setShowApprenticeshipPicker(false);
@@ -256,6 +263,15 @@ export default function EducationExperience() {
           "apprenticeshipLevel",
         ]}
         onResult={handleVoiceResult}
+      />
+
+      <ProfileExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onExit={() => {
+          setShowExitModal(false);
+          router.replace(returnToPath as any);
+        }}
       />
     </View>
   );
@@ -315,14 +331,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 8,
+    borderWidth: 1.2,
+    borderColor: "#DCD6E5",
+    borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
     color: "#0B0B0F",
     marginBottom: 16,
+  },
+  dropdownButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1.2,
+    borderColor: "#DCD6E5",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 12,
   },
   inputText: {
     fontSize: 16,
@@ -333,18 +361,21 @@ const styles = StyleSheet.create({
     color: "#9CA3AF",
   },
   picker: {
-    marginTop: -16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 8,
-    maxHeight: 200,
+    borderWidth: 1.2,
+    borderColor: "#DCD6E5",
+    borderRadius: 16,
     backgroundColor: "#FFFFFF",
+    marginBottom: 24,
+    overflow: "hidden",
   },
   pickerOption: {
-    padding: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderBottomColor: "rgba(0,0,0,0.08)",
+  },
+  pickerOptionLast: {
+    borderBottomWidth: 0,
   },
   pickerOptionText: {
     fontSize: 16,
