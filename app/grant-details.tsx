@@ -2,8 +2,8 @@ import BottomNavigation from '@/components/BottomNavigation';
 
 import { Theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useMemo, useState } from 'react';
 import {
   FlatList,
   ListRenderItemInfo,
@@ -109,41 +109,61 @@ type ChipItem = {
 
 export default function GrantDetails() {
   const router = useRouter();
+  const params = useLocalSearchParams<{
+    id?: string;
+    title?: string;
+    organization?: string;
+    amount?: string;
+    deadline?: string;
+    description?: string;
+    eligible?: string;
+    saved?: string;
+  }>();
   const [open, setOpen] = useState<null | Key>(null);
   const close = () => setOpen(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
-  const grantData = {
-    title: 'Masonry Institute of BC Training Fund',
-    organization: 'Masonry Institute',
-    amount: 'Up to $1,950',
-    deadline: '3m before training starts',
-    description:
-      'The Masonry Institute of BC has evolved from masonry organizations, which have been promoting the local masonry industry for over 50 years.',
-    fullDescription:
-      'The Masonry Institute of BC has evolved from masonry organizations, which have been promoting the local masonry industry for over 50 years.' +
-      '\n' +
-      ' We are committed to advancing the masonry trade through education, training, and professional development. Our training fund provides financial support to apprentices and tradespeople pursuing masonry-related education and certification programs.' +
-      '\n' +
-      'This includes support for various levels of apprenticeship training, specialized masonry techniques, and continuing education opportunities that enhance skills and career advancement in the masonry industry.',
-  };
+  const grantData = useMemo(() => {
+    const desc =
+      params.description ||
+      'The Masonry Institute of BC has evolved from masonry organizations, which have been promoting the local masonry industry for over 50 years.';
+    return {
+      id: params.id ?? '',
+      title: params.title ?? 'Grant Details',
+      organization: params.organization ?? 'Unknown organization',
+      amount: params.amount ?? 'Up to $0',
+      deadline: params.deadline ?? 'TBD',
+      description: desc,
+      fullDescription:
+        desc +
+        '\n' +
+        ' We are committed to advancing the masonry trade through education, training, and professional development. Our training fund provides financial support to apprentices and tradespeople pursuing masonry-related education and certification programs.' +
+        '\n' +
+        'This includes support for various levels of apprenticeship training, specialized masonry techniques, and continuing education opportunities that enhance skills and career advancement in the masonry industry.',
+      eligible: params.eligible === 'true',
+      saved: params.saved === 'true',
+    };
+  }, [params]);
+  const [isSaved, setIsSaved] = useState(grantData.saved);
 
   const data: ChipItem[] = [
     {
       key: 'eligible',
-      label: 'You’re eligible',
-      icon: 'checkmark-circle-outline',
-      bg: Theme.colors.blue,
+      label: grantData.eligible ? 'You’re eligible' : 'Check requirements',
+      icon: grantData.eligible
+        ? 'checkmark-circle-outline'
+        : 'alert-circle-outline',
+      bg: grantData.eligible ? Theme.colors.blue : Theme.colors.orange,
     },
     {
       key: 'funding',
-      label: 'Up to $1950',
+      label: grantData.amount,
       icon: 'cash-outline',
       bg: Theme.colors.green,
     },
     {
       key: 'date',
-      label: '3 Months Before',
+      label: grantData.deadline,
       icon: 'calendar-outline',
       bg: Theme.colors.orange,
     },
@@ -192,19 +212,27 @@ export default function GrantDetails() {
 
         <View style={styles.container}>
           {/* Top bar */}
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="chevron-back-outline" size={22} color="#000" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Ionicons name="bookmark-outline" size={22} color="#9CA3AF" />
-            </TouchableOpacity>
-          </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="chevron-back-outline" size={22} color="#000" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setIsSaved((prev) => !prev)}
+          hitSlop={10}
+          accessibilityRole="button"
+        >
+          <Ionicons
+            name={isSaved ? 'bookmark' : 'bookmark-outline'}
+            size={22}
+            color={isSaved ? Theme.colors.brightPurple : '#9CA3AF'}
+          />
+        </TouchableOpacity>
+      </View>
 
-          {/* Title */}
-          <Text style={styles.title}>
-            Masonry Institute of BC Training Fund
-          </Text>
+      {/* Title */}
+      <Text style={styles.title}>
+        {grantData.title}
+      </Text>
 
           {/* Chips grid — robust on iOS/Android/Web */}
           <FlatList
@@ -284,7 +312,7 @@ export default function GrantDetails() {
         </View>
       </ScrollView>
 
-      {/* MODALS (unchanged) */}
+      {/* MODALS */}
       <ModalPopover
         visible={open === 'eligible'}
         onClose={close}
