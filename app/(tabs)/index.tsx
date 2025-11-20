@@ -1,28 +1,78 @@
-import { Theme } from '@/constants/theme';
-import { useRouter } from 'expo-router';
-import { SafeAreaView, ScrollView, Text, View } from 'react-native';
-import EligibilityBanner from '../../components/EligibilityBanner';
-import FinishProfileCard from '../../components/FinishProfileCard';
-import HeaderGreeting from '../../components/HeaderGreeting';
-import SavedGrantRow from '../../components/SavedGrantRow';
+import { Theme } from "@/constants/theme";
+import { useProfile } from "@/contexts/ProfileContext";
+import { useRouter } from "expo-router";
+import { SafeAreaView, ScrollView, Text, View } from "react-native";
+import EligibilityBanner from "../../components/EligibilityBanner";
+import FinishProfileCard from "../../components/FinishProfileCard";
+import HeaderGreeting from "../../components/HeaderGreeting";
+import SavedGrantRow from "../../components/SavedGrantRow";
 
 export default function HomeTab() {
   const router = useRouter();
-  const user = { name: 'Mateo Alvarez', role: 'Apprentice Electrician' };
+  const { profileData } = useProfile();
+  const basicFields = [
+    profileData.name,
+    profileData.dateOfBirth,
+    profileData.gender,
+    profileData.phone,
+    profileData.email,
+  ];
+  const residenceFields = [
+    profileData.address,
+    profileData.postalCode,
+    profileData.province,
+    profileData.citizenshipStatus,
+  ];
+  const householdFields = [
+    profileData.householdSize,
+    profileData.familyComposition,
+    profileData.annualFamilyNetIncome,
+    profileData.guardianName,
+    profileData.guardianPhone,
+    profileData.guardianEmail,
+  ];
+  const educationFields = [
+    profileData.highestEducation,
+    profileData.highSchoolName,
+    profileData.graduationDate,
+    profileData.tradeSchoolName,
+    profileData.tradeProgramName,
+    profileData.tradeGraduationDate,
+    profileData.trade,
+    profileData.apprenticeshipLevel,
+  ];
+  const totalFields =
+    basicFields.length +
+    residenceFields.length +
+    householdFields.length +
+    educationFields.length;
+  const filledFields =
+    basicFields.filter(Boolean).length +
+    residenceFields.filter(Boolean).length +
+    householdFields.filter(Boolean).length +
+    educationFields.filter(Boolean).length;
+  const profilePercent = totalFields ? filledFields / totalFields : 0;
+  const headerName = profileData.name?.trim() || "Friend";
+  const roleParts = [
+    profileData.apprenticeshipLevel?.trim(),
+    profileData.trade?.trim(),
+  ].filter(Boolean);
+  const roleText =
+    roleParts.length > 0 ? roleParts.join(" • ") : "Share your apprenticeship";
   const eligible = {
     count: 4,
     total: 7750,
     items: [
-      'StrongerBC Future Skills Grant',
-      'Youth Work in Trades (WRK) Scholarship',
-      'LNG Canada Trades Training Fund',
-      'Masonry Institute of BC Training Fund',
+      "StrongerBC Future Skills Grant",
+      "Youth Work in Trades (WRK) Scholarship",
+      "LNG Canada Trades Training Fund",
+      "Masonry Institute of BC Training Fund",
     ],
     icons: [
-      require('../../assets/images/workBC.png'),
-      require('../../assets/images/workBC.png'),
-      require('../../assets/images/LNG.png'),
-      require('../../assets/images/Masonry.png'),
+      require("../../assets/images/workBC.png"),
+      require("../../assets/images/workBC.png"),
+      require("../../assets/images/LNG.png"),
+      require("../../assets/images/Masonry.png"),
     ],
   };
 
@@ -36,9 +86,9 @@ export default function HomeTab() {
         {/* phone-width canvas for web parity */}
         <View className="w-full px-5 mx-auto">
           <HeaderGreeting
-            name={user.name}
-            role={user.role}
-            onBellPress={() => router.push('/notifications')}
+            name={headerName}
+            role={roleText}
+            onBellPress={() => router.push("/notifications")}
           />
 
           <EligibilityBanner
@@ -49,7 +99,15 @@ export default function HomeTab() {
           />
 
           <View style={{ marginTop: 12 }}>
-            <SavedGrantRow label="Explore your eligible grants now" />
+            <SavedGrantRow
+              label="Explore your eligible grants now"
+              onPress={() =>
+                router.push({
+                  pathname: "/(tabs)/grants",
+                  params: { tab: "Eligible" },
+                })
+              }
+            />
           </View>
 
           <Text
@@ -61,11 +119,9 @@ export default function HomeTab() {
             Finish your profile!
           </Text>
           <FinishProfileCard
-            percent={0.4}
-            ctaLabel="Education Information"
-            onPress={() => {
-              /* navigate */
-            }}
+            percent={profilePercent}
+            ctaLabel={profilePercent >= 1 ? "Profile Complete" : "Continue Profile"}
+            onPress={() => router.push("/(tabs)/profile")}
           />
         </View>
       </ScrollView>
