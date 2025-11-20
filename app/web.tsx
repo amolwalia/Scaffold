@@ -1,3 +1,4 @@
+import ApplicationTemplet from '@/components/ApplicationTemplet';
 import { Theme } from '@/constants/theme';
 import { SafeAreaView, ScrollView, Text, View } from 'react-native';
 
@@ -6,7 +7,7 @@ export default function WebOnlyTab() {
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
         style={{ backgroundColor: Theme.colors.white }}
-        contentContainerStyle={{ paddingVertical: 48, paddingHorizontal: 20 }}
+        contentContainerStyle={{ paddingVertical: 20, paddingHorizontal: 20 }}
       >
         <View>
           <Text
@@ -15,21 +16,9 @@ export default function WebOnlyTab() {
               { color: Theme.colors.black, marginBottom: 12 },
             ]}
           >
-            Web Workspace
+            Web Supplement
           </Text>
-          <Text
-            style={[
-              Theme.typography.body,
-              { color: Theme.colors.grayDark, marginBottom: 16 },
-            ]}
-          >
-            This tab stays hidden from the bottom navigation but is reachable by
-            typing /web in the browser address bar.
-          </Text>
-          <Text style={[Theme.typography.body, { color: Theme.colors.black }]}>
-            Build any web-only tools or prototypes here without surfacing them
-            inside the mobile navigation.
-          </Text>
+          <ApplicationTemplet />
         </View>
       </ScrollView>
     </SafeAreaView>
