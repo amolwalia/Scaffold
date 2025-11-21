@@ -1,6 +1,8 @@
+import { evaluateGrantEligibility, grantCatalog } from "@/constants/grants";
 import { Theme } from "@/constants/theme";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useRouter } from "expo-router";
+import React, { useMemo } from "react";
 import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import EligibilityBanner from "../../components/EligibilityBanner";
 import FinishProfileCard from "../../components/FinishProfileCard";
@@ -10,6 +12,10 @@ import SavedGrantRow from "../../components/SavedGrantRow";
 export default function HomeTab() {
   const router = useRouter();
   const { profileData } = useProfile();
+  const parseAmount = (amount: string) => {
+    const numeric = Number(amount.replace(/[^0-9.]/g, ""));
+    return Number.isFinite(numeric) ? numeric : 0;
+  };
   const basicFields = [
     profileData.name,
     profileData.dateOfBirth,
@@ -59,22 +65,24 @@ export default function HomeTab() {
   ].filter(Boolean);
   const roleText =
     roleParts.length > 0 ? roleParts.join(" • ") : "Share your apprenticeship";
-  const eligible = {
-    count: 4,
-    total: 7750,
-    items: [
-      "StrongerBC Future Skills Grant",
-      "Youth Work in Trades (WRK) Scholarship",
-      "LNG Canada Trades Training Fund",
-      "Masonry Institute of BC Training Fund",
-    ],
-    icons: [
-      require("../../assets/images/workBC.png"),
-      require("../../assets/images/workBC.png"),
-      require("../../assets/images/LNG.png"),
-      require("../../assets/images/Masonry.png"),
-    ],
-  };
+  const eligibleSummary = useMemo(() => {
+    const matches = grantCatalog.filter((grant) =>
+      evaluateGrantEligibility(grant, profileData).eligible
+    );
+    const total = matches.reduce(
+      (sum, grant) => sum + parseAmount(grant.amount),
+      0
+    );
+    const items = matches.slice(0, 4).map((grant) => grant.title);
+    return {
+      count: matches.length,
+      total,
+      items:
+        items.length > 0
+          ? items
+          : ["Complete your profile to unlock grant matches"],
+    };
+  }, [profileData]);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -92,10 +100,9 @@ export default function HomeTab() {
           />
 
           <EligibilityBanner
-            count={eligible.count}
-            grants={eligible.items}
-            total={eligible.total}
-            icons={eligible.icons}
+            count={eligibleSummary.count}
+            grants={eligibleSummary.items}
+            total={eligibleSummary.total}
           />
 
           <View style={{ marginTop: 12 }}>

@@ -1,10 +1,13 @@
-import BottomNavigation from '@/components/BottomNavigation';
-import SparkleIcon from '@/components/SparkleIcon';
-import { Theme } from '@/constants/theme';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import BottomNavigation from "@/components/BottomNavigation";
+import SparkleIcon from "@/components/SparkleIcon";
+import { getGrantById } from "@/constants/grants";
+import { Theme } from "@/constants/theme";
+import { useProfile } from "@/contexts/ProfileContext";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useMemo, useState } from "react";
 import {
+  Linking,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -12,43 +15,71 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
+} from "react-native";
 
 const PRESET_GOAL =
-  'My future goal as a mason is to become a certified journeyman and eventually run my own small contracting business. I want to focus on custom stone and brickwork for residential homes.';
+  "My future goal is to become a certified journeyperson and eventually lead my own crew on complex builds. I want to keep learning advanced techniques so I can mentor other apprentices.";
+const PRESET_CAREER =
+  "I chose this trade because I enjoy building tangible projects, solving problems with my hands, and seeing the impact our work has on communities.";
 
 export default function GeneratedApplicationScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ id?: string }>();
+  const grant = getGrantById(params.id);
+  const { profileData } = useProfile();
   const [writtenAnswers, setWrittenAnswers] = useState({
-    goal: '',
-    career: '',
+    goal: "",
+    career: "",
   });
 
-  const profileData = {
-    fullName: 'Mateo Alvarez',
-    streetAddress: '123 Main Street',
-    city: 'Vancouver, BC',
-    email: 'mateo.alvarez@email.com',
-    phone: '(604) 555-0123',
-    currentEmployer: 'ABC Construction Ltd.',
-    tuitionCost: '$2,500',
-    apprenticeshipLevel: 'Level 2',
-  };
+  const autoFilledProfile = useMemo(
+    () => ({
+      fullName: profileData.name || "Add your name",
+      streetAddress: profileData.address || "Add your address",
+      city:
+        [profileData.province, profileData.postalCode].filter(Boolean).join(", ") ||
+        "Add your city/province",
+      email: profileData.email || "Add your email",
+      phone: profileData.phone || "Add your phone number",
+      currentEmployer:
+        profileData.tradeSchoolName ||
+        profileData.guardianName ||
+        "Add your current employer or school",
+      tuitionCost: grant?.amount || "Add your tuition estimate",
+      apprenticeshipLevel:
+        profileData.apprenticeshipLevel || "Add your apprenticeship level",
+    }),
+    [profileData, grant]
+  );
+
+  const docList = grant?.apply.requiredDocuments ?? [
+    "Unofficial transcript (high school or post-secondary)",
+    "Proof of registration and acceptance in your program",
+    "Letter of support from your current employer",
+  ];
 
   const handleApplyPress = () => {
-    console.log('Apply button pressed - navigate to external portal');
+    const url = grant?.apply.portal.url;
+    if (url) {
+      Linking.openURL(url).catch(() => console.log("Unable to open portal URL"));
+      return;
+    }
+    console.log("Apply button pressed - navigate to external portal");
   };
 
   const handleUploadDocuments = () => {
-    console.log('Upload documents pressed');
+    console.log("Upload documents pressed");
   };
 
   const insertPresetGoal = () => {
     setWrittenAnswers((prev) => ({ ...prev, goal: PRESET_GOAL }));
   };
+  const insertPresetCareer = () => {
+    setWrittenAnswers((prev) => ({ ...prev, career: PRESET_CAREER }));
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -81,7 +112,7 @@ export default function GeneratedApplicationScreen() {
               { color: Theme.colors.black, marginBottom: 10 },
             ]}
           >
-            You're almost done!
+            You&apos;re almost done!
           </Text>
           <Text
             style={[
@@ -89,7 +120,7 @@ export default function GeneratedApplicationScreen() {
               { color: Theme.colors.black, marginBottom: 10 },
             ]}
           >
-            Masonry Institute of BC Training Fund
+            {grant?.title ?? "Grant application template"}
           </Text>
           <Text
             style={[
@@ -97,18 +128,18 @@ export default function GeneratedApplicationScreen() {
               { color: Theme.colors.black, marginBottom: 23 },
             ]}
           >
-            We've auto-filled your application using your profile{' '}
+            We&apos;ve auto-filled your application using your profile{" "}
             <Text
               style={[Theme.typography.body, { color: Theme.colors.purple }]}
             >
-              Finish applying through the{' '}
+              Finish applying through the{" "}
               <Text
                 style={[
                   Theme.typography.bodyBold,
                   { color: Theme.colors.purple },
                 ]}
               >
-                portal
+                {grant?.apply.portal.label || "portal"}
               </Text>
             </Text>
             .
@@ -131,7 +162,7 @@ export default function GeneratedApplicationScreen() {
             <Text
               style={[Theme.typography.body, { color: Theme.colors.black }]}
             >
-              Apply here
+              {grant?.apply.portal.label || "Apply here"}
             </Text>
             <Ionicons name="open-outline" size={20} color="black" />
           </TouchableOpacity>
@@ -156,7 +187,7 @@ export default function GeneratedApplicationScreen() {
               <View style={styles.applicationCardItem}>
                 <Text style={styles.applicationCardItemLabel}>Full Name</Text>
                 <Text style={styles.applicationCardItemValue}>
-                  {profileData.fullName}
+                  {autoFilledProfile.fullName}
                 </Text>
               </View>
 
@@ -165,28 +196,28 @@ export default function GeneratedApplicationScreen() {
                   Street Address
                 </Text>
                 <Text style={styles.applicationCardItemValue}>
-                  {profileData.streetAddress}
+                  {autoFilledProfile.streetAddress}
                 </Text>
               </View>
 
               <View style={styles.applicationCardItem}>
                 <Text style={styles.applicationCardItemLabel}>City</Text>
                 <Text style={styles.applicationCardItemValue}>
-                  {profileData.city}
+                  {autoFilledProfile.city}
                 </Text>
               </View>
 
               <View style={styles.applicationCardItem}>
                 <Text style={styles.applicationCardItemLabel}>Email</Text>
                 <Text style={styles.applicationCardItemValue}>
-                  {profileData.email}
+                  {autoFilledProfile.email}
                 </Text>
               </View>
 
               <View style={styles.applicationCardItem}>
                 <Text style={styles.applicationCardItemLabel}>Phone</Text>
                 <Text style={styles.applicationCardItemValue}>
-                  {profileData.phone}
+                  {autoFilledProfile.phone}
                 </Text>
               </View>
 
@@ -195,7 +226,7 @@ export default function GeneratedApplicationScreen() {
                   Current Employer
                 </Text>
                 <Text style={styles.applicationCardItemValue}>
-                  {profileData.currentEmployer}
+                  {autoFilledProfile.currentEmployer}
                 </Text>
               </View>
             </View>
@@ -213,7 +244,7 @@ export default function GeneratedApplicationScreen() {
                   Cost of Tuition
                 </Text>
                 <Text style={styles.applicationCardItemValue}>
-                  {profileData.tuitionCost}
+                  {autoFilledProfile.tuitionCost}
                 </Text>
               </View>
 
@@ -222,7 +253,7 @@ export default function GeneratedApplicationScreen() {
                   Apprenticeship Level
                 </Text>
                 <Text style={styles.applicationCardItemValue}>
-                  {profileData.apprenticeshipLevel}
+                  {autoFilledProfile.apprenticeshipLevel}
                 </Text>
               </View>
             </View>
@@ -258,10 +289,10 @@ export default function GeneratedApplicationScreen() {
                 {/* Label + sparkle icon */}
                 <View
                   style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
                   <Text
@@ -270,15 +301,15 @@ export default function GeneratedApplicationScreen() {
                       {
                         color: Theme.colors.darkGrey,
                         marginBottom: Theme.spacing.sm,
-                        fontStyle: 'italic',
+                        fontStyle: "italic",
                       },
                     ]}
                   >
-                    What is your future goal as a mason?
+                    What is your future goal in your trade?
                   </Text>
 
                   <TouchableOpacity
-                    style={{ position: 'absolute', right: 0, top: 0 }}
+                    style={{ position: "absolute", right: 0, top: 0 }}
                     onPress={insertPresetGoal}
                     hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
                     accessibilityRole="button"
@@ -315,16 +346,16 @@ export default function GeneratedApplicationScreen() {
                     {
                       color: Theme.colors.darkGrey,
                       marginBottom: Theme.spacing.sm,
-                      fontStyle: 'italic',
+                      fontStyle: "italic",
                       paddingRight: 10,
                     },
                   ]}
                 >
-                  Why have you chosen a career in masonry?
+                  Why have you chosen this career path?
                 </Text>
                 <TouchableOpacity
-                  style={{ position: 'absolute', right: 0, top: 0 }}
-                  onPress={insertPresetGoal}
+                  style={{ position: "absolute", right: 0, top: 0 }}
+                  onPress={insertPresetCareer}
                   hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
                   accessibilityRole="button"
                   accessibilityLabel="Insert suggested answer"
@@ -358,46 +389,24 @@ export default function GeneratedApplicationScreen() {
             <Text style={styles.applicationCardTitle}>Documents</Text>
 
             <View style={styles.applicationCardContent}>
-              <View style={styles.applicationCardItem}>
-                <Ionicons name="folder" size={20} color={Theme.colors.orange} />
-                <Text style={styles.documentItem}>
-                  Unofficial transcript (high school or post-secondary)
-                </Text>
-              </View>
-
-              <View style={styles.applicationCardItem}>
-                <Ionicons name="folder" size={20} color={Theme.colors.orange} />
-                <Text style={styles.documentItem}>
-                  Proof of registration and acceptance in your program
-                </Text>
-              </View>
-
-              <View style={styles.applicationCardItem}>
-                <Ionicons name="folder" size={20} color={Theme.colors.orange} />
-                <Text style={styles.documentItem}>
-                  Letter of support from your current employer
-                </Text>
-              </View>
-
-              <View style={styles.applicationCardItem}>
-                <Ionicons name="folder" size={20} color={Theme.colors.orange} />
-                <Text style={styles.documentItem}>
-                  Confirmation of membership status with the Masonry Institute
-                  of BC
-                </Text>
-              </View>
+              {docList.map((doc, index) => (
+                <View key={doc} style={styles.applicationCardItem}>
+                  <Ionicons name="folder" size={20} color={Theme.colors.orange} />
+                  <Text style={styles.documentItem}>{doc}</Text>
+                </View>
+              ))}
 
               <TouchableOpacity
                 style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginTop: Theme.spacing.md,
-                }}
-                onPress={handleUploadDocuments}
-              >
-                <Ionicons
-                  name="cloud-upload-outline"
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginTop: Theme.spacing.md,
+                  }}
+                  onPress={handleUploadDocuments}
+                >
+                  <Ionicons
+                    name="cloud-upload-outline"
                   size={20}
                   color={Theme.colors.darkGrey}
                 />

@@ -1,5 +1,16 @@
-import GrantFilterSheet, { GRANT_SORT_OPTIONS, GrantSortId } from "@/components/GrantFilterSheet";
+import GrantFilterSheet, {
+  GRANT_SORT_OPTIONS,
+  GrantSortId,
+} from "@/components/GrantFilterSheet";
+import Grant from "@/components/grant";
+import GrantSubFilters from "@/components/GrantSubFilters";
+import {
+  evaluateGrantEligibility,
+  grantCatalog,
+  GrantDefinition,
+} from "@/constants/grants";
 import { Theme } from "@/constants/theme";
+import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
@@ -11,90 +22,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Grant from "../../components/grant";
-import GrantSubFilters from "../../components/GrantSubFilters";
 
-interface GrantData {
-  id: string;
-  title: string;
-  organization: string;
-  amount: string;
-  deadline: string;
-  category: string;
-  description: string;
-  eligible?: boolean;
-  saved?: boolean;
-  applied?: boolean;
-  active?: boolean;
-}
-
-const sampleGrants: GrantData[] = [
-  {
-    id: "1",
-    title: "StrongerBC Future Skills Grant",
-    organization: "WorkBC",
-    amount: "Up to $3,500",
-    deadline: "7/14 - 8/20",
-    category: "Education",
-    description: "",
-    eligible: true,
-    saved: false,
-    applied: false,
-    active: true,
-  },
-  {
-    id: "2",
-    title: "Youth Work in Trades (WRK) Scholarship",
-    organization: "WorkBC",
-    amount: "Up to $1,000",
-    deadline: "9/2 - 11/14",
-    category: "Education",
-    description: "",
-    eligible: true,
-    saved: false,
-    applied: false,
-    active: true,
-  },
-  {
-    id: "3",
-    title: "LNG Canada Trades Training Fund",
-    organization: "BC Ca",
-    amount: "Up to $1,300",
-    deadline: "2/28",
-    category: "Training",
-    description: "",
-    eligible: true,
-    saved: true,
-    applied: false,
-    active: true,
-  },
-  {
-    id: "4",
-    title: "Masonry Institute of BC Training Fund",
-    organization: "Masonry Institute",
-    amount: "Up to $1,950",
-    deadline: "3m before training starts",
-    category: "Training",
-    description: "",
-    eligible: true,
-    saved: false,
-    applied: true,
-    active: true,
-  },
-  {
-    id: "5",
-    title: "Soroptimist - Live your dream awards",
-    organization: "Soroptimist",
-    amount: "Up to $10,000",
-    deadline: "8/1 - 11/14",
-    category: "Awards",
-    description: "",
-    eligible: false,
-    saved: false,
-    applied: false,
-    active: false,
-  },
-];
+type GrantListItem = GrantDefinition & {
+  eligible: boolean;
+  saved: boolean;
+  applied: boolean;
+};
 
 const getAmountValue = (amount: string) => {
   const numeric = amount.replace(/[^0-9.]/g, "");
@@ -132,13 +65,24 @@ const readTabParam = (
 export default function GrantsScreen() {
   const router = useRouter();
   const params = useGlobalSearchParams<{ tab?: string }>();
+  const { profileData } = useProfile();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState<
     "All" | "Eligible" | "My Grants"
   >(() => readTabParam(params.tab));
   const [selectedSubFilter, setSelectedSubFilter] =
     useState<"Saved" | "Applied">("Saved");
-  const [grants, setGrants] = useState<GrantData[]>(sampleGrants);
+  const [grantState, setGrantState] = useState<
+    Record<string, { saved: boolean; applied: boolean }>
+  >(() =>
+    grantCatalog.reduce<Record<string, { saved: boolean; applied: boolean }>>(
+      (acc, grant) => {
+        acc[grant.id] = { saved: false, applied: false };
+        return acc;
+      },
+      {}
+    )
+  );
   const [selectedSortId, setSelectedSortId] = useState<GrantSortId>("all");
   const [sortVisible, setSortVisible] = useState(false);
 
@@ -152,14 +96,27 @@ export default function GrantsScreen() {
     "My Grants",
   ];
 
+  const grantsWithEligibility: GrantListItem[] = useMemo(() => {
+    return grantCatalog.map((grant) => {
+      const state = grantState[grant.id] ?? { saved: false, applied: false };
+      const eligibility = evaluateGrantEligibility(grant, profileData);
+      return {
+        ...grant,
+        eligible: eligibility.eligible,
+        saved: state.saved,
+        applied: state.applied,
+      };
+    });
+  }, [grantState, profileData]);
+
   const filteredGrants = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    const bySearch = (g: GrantData) =>
+    const bySearch = (g: GrantListItem) =>
       !q ||
       g.title.toLowerCase().includes(q) ||
       g.organization.toLowerCase().includes(q);
 
-    let result = grants.filter(bySearch);
+    let result = grantsWithEligibility.filter(bySearch);
 
     if (selectedTab === "Eligible") {
       result = result.filter((g) => g.eligible);
@@ -202,7 +159,7 @@ export default function GrantsScreen() {
 
     return finalResult;
   }, [
-    grants,
+    grantsWithEligibility,
     searchQuery,
     selectedTab,
     selectedSubFilter,
@@ -213,32 +170,34 @@ export default function GrantsScreen() {
     GRANT_SORT_OPTIONS.find((option) => option.id === selectedSortId)?.label ??
     "All";
 
-  const handleGrantPress = (grant: GrantData) => {
+  const handleGrantPress = (grant: GrantListItem) => {
     router.push({
       pathname: "/grant-details",
       params: {
         id: grant.id,
-        title: grant.title,
-        organization: grant.organization,
-        amount: grant.amount,
-        deadline: grant.deadline,
-        eligible: grant.eligible ? "true" : "false",
         saved: grant.saved ? "true" : "false",
-        description: grant.description,
       },
     });
   };
 
-  const handleApplyPress = (grant: GrantData) => {
-    setGrants((prev) =>
-      prev.map((g) => (g.id === grant.id ? { ...g, applied: true } : g))
-    );
+  const handleApplyPress = (grant: GrantListItem) => {
+    setGrantState((prev) => {
+      const current = prev[grant.id] ?? { saved: false, applied: false };
+      return {
+        ...prev,
+        [grant.id]: { ...current, applied: true },
+      };
+    });
   };
 
-  const handleSavePress = (grant: GrantData) => {
-    setGrants((prev) =>
-      prev.map((g) => (g.id === grant.id ? { ...g, saved: !g.saved } : g))
-    );
+  const handleSavePress = (grant: GrantListItem) => {
+    setGrantState((prev) => {
+      const current = prev[grant.id] ?? { saved: false, applied: false };
+      return {
+        ...prev,
+        [grant.id]: { ...current, saved: !current.saved },
+      };
+    });
   };
 
   const sectionTitle =
@@ -355,11 +314,26 @@ export default function GrantsScreen() {
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
           <Grant
-            {...item}
+            id={item.id}
+            title={item.title}
+            organization={item.organization}
+            amount={item.amount}
+            deadline={item.deadline}
+            category={item.category}
+            description={item.description}
+            eligible={item.eligible}
+            saved={item.saved}
+            applied={item.applied}
+            active={item.active}
             onPress={() => handleGrantPress(item)}
-            onView={() => handleApplyPress(item)}
             onSave={() => handleSavePress(item)}
-            onNavigateToApply={() => router.push("/grant-details")}
+            onNavigateToApply={() => {
+              handleApplyPress(item);
+              router.push({
+                pathname: "/grant-details",
+                params: { id: item.id, saved: item.saved ? "true" : "false" },
+              });
+            }}
           />
         )}
         ListEmptyComponent={

@@ -2,7 +2,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Theme from "../theme";
 
 type InfoChipProps = {
   iconName: keyof typeof Ionicons.glyphMap;
@@ -27,7 +26,16 @@ export default function InfoChip({
         <Ionicons name={iconName} size={18} color="#fff" />
       </View>
 
-      
+      <View style={styles.labelWrap}>
+        <Text style={styles.label} numberOfLines={1}>
+          {label}
+        </Text>
+      </View>
+
+      <View style={styles.chevWrap}>
+        <Ionicons name="chevron-forward-outline" size={16} color="#111" />
+      </View>
+    </Pressable>
   );
 }
 

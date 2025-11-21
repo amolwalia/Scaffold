@@ -239,7 +239,7 @@ export default function ApplicationTemplet() {
           <SparkleIcon size={18} />
         </View>
         <Text style={styles.subtitle}>
-          We've generated some answers for you.
+          We&apos;ve generated some answers for you.
         </Text>
 
         <View style={styles.writtenAnswersContent}>
