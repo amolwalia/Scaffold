@@ -1,6 +1,6 @@
 import { Theme } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useMemo, useState } from "react";
 import {
   Image,
   ImageSourcePropType,
@@ -43,7 +43,18 @@ export default function Grant({
 }: GrantProps) {
   const amountValue = amount.replace(/^Up to\s*/i, "");
   const hasUpTo = /^up to/i.test(amount);
-  const hasLogo = Boolean(imageUrl);
+  const [logoFailed, setLogoFailed] = useState(false);
+  const fallbackInitials = useMemo(() => {
+    const source = organization || title;
+    if (!source) return "?";
+    const parts = source
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((word) => word[0]?.toUpperCase() ?? "");
+    return parts.join("") || "?";
+  }, [organization, title]);
+  const showFallback = !imageUrl || logoFailed;
 
   return (
     <TouchableOpacity
@@ -57,9 +68,28 @@ export default function Grant({
     >
       {/* Top: logo + bookmark */}
       <View style={styles.topRow}>
-        <View style={styles.logo}>
-          {hasLogo && (
-            <Image source={imageUrl} style={styles.logoImage} resizeMode="contain" />
+        <View
+          style={[
+            styles.logo,
+            {
+              borderColor: showFallback ? "transparent" : Theme.colors.lightGrey,
+              backgroundColor: !showFallback
+                ? Theme.colors.white
+                : eligible
+                ? Theme.colors.orange
+                : Theme.colors.lightGrey,
+            },
+          ]}
+        >
+          {!showFallback ? (
+            <Image
+              source={imageUrl}
+              style={styles.logoImage}
+              resizeMode="contain"
+              onError={() => setLogoFailed(true)}
+            />
+          ) : (
+            <Text style={styles.logoInitials}>{fallbackInitials}</Text>
           )}
         </View>
 
@@ -195,13 +225,19 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
     overflow: "hidden",
-    backgroundColor: Theme.colors.white,
   },
   logoImage: {
     width: "100%",
     height: "100%",
   },
+  logoInitials: {
+    color: Theme.colors.white,
+    fontFamily: Theme.fonts.bold,
+    fontSize: 14,
+  },
+
   title: {
     marginBottom: Theme.spacing.sm,
   },
