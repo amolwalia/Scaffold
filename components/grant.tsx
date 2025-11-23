@@ -1,8 +1,14 @@
 import { Theme } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
+import {
+  Image,
+  ImageSourcePropType,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface GrantProps {
   id: string;
@@ -20,10 +26,12 @@ interface GrantProps {
   onView?: () => void;
   onSave?: () => void;
   onNavigateToApply?: () => void;
+  imageUrl?: ImageSourcePropType;
 }
 
 export default function Grant({
   title,
+  organization,
   amount,
   deadline,
   eligible = false,
@@ -31,9 +39,11 @@ export default function Grant({
   onPress,
   onSave,
   onNavigateToApply,
+  imageUrl,
 }: GrantProps) {
   const amountValue = amount.replace(/^Up to\s*/i, "");
   const hasUpTo = /^up to/i.test(amount);
+  const hasLogo = Boolean(imageUrl);
 
   return (
     <TouchableOpacity
@@ -47,12 +57,11 @@ export default function Grant({
     >
       {/* Top: logo + bookmark */}
       <View style={styles.topRow}>
-          <View
-            style={[
-              styles.logo,
-              { backgroundColor: eligible ? Theme.colors.orange : Theme.colors.lightGrey },
-            ]}
-          />
+        <View style={styles.logo}>
+          {hasLogo && (
+            <Image source={imageUrl} style={styles.logoImage} resizeMode="contain" />
+          )}
+        </View>
 
         <TouchableOpacity
           onPress={(e) => {
@@ -186,8 +195,13 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
+    backgroundColor: Theme.colors.white,
   },
-
+  logoImage: {
+    width: "100%",
+    height: "100%",
+  },
   title: {
     marginBottom: Theme.spacing.sm,
   },

@@ -355,7 +355,18 @@ export default function GrantsScreen() {
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
           <Grant
-            {...item}
+            id={item.id}
+            title={item.title}
+            organization={item.organization}
+            amount={item.amount}
+            deadline={item.deadline}
+            category={item.category}
+            description={item.description}
+            eligible={item.eligible}
+            saved={item.saved}
+            applied={item.applied}
+            active={item.active}
+            imageUrl={item.imageUrl}
             onPress={() => handleGrantPress(item)}
             onView={() => handleApplyPress(item)}
             onSave={() => handleSavePress(item)}
