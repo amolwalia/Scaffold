@@ -5,6 +5,7 @@ import { useGlobalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   FlatList,
+  ImageSourcePropType,
   StyleSheet,
   Text,
   TextInput,
@@ -26,6 +27,7 @@ interface GrantData {
   saved?: boolean;
   applied?: boolean;
   active?: boolean;
+  imageUrl?: ImageSourcePropType;
 }
 
 const sampleGrants: GrantData[] = [
@@ -41,6 +43,7 @@ const sampleGrants: GrantData[] = [
     saved: false,
     applied: false,
     active: true,
+    imageUrl: require("../../assets/images/workBC.png"),
   },
   {
     id: "2",
@@ -54,6 +57,7 @@ const sampleGrants: GrantData[] = [
     saved: false,
     applied: false,
     active: true,
+    imageUrl: require("../../assets/images/workBC.png"),
   },
   {
     id: "3",
@@ -67,6 +71,7 @@ const sampleGrants: GrantData[] = [
     saved: true,
     applied: false,
     active: true,
+    imageUrl: require("../../assets/images/LNG.png"),
   },
   {
     id: "4",
@@ -80,6 +85,7 @@ const sampleGrants: GrantData[] = [
     saved: false,
     applied: true,
     active: true,
+    imageUrl: require("../../assets/images/Masonry.png"),
   },
   {
     id: "5",
@@ -93,6 +99,7 @@ const sampleGrants: GrantData[] = [
     saved: false,
     applied: false,
     active: false,
+    imageUrl: require("../../assets/images/workBC.png"),
   },
 ];
 
