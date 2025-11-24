@@ -292,17 +292,15 @@ export default function ApplicationTemplet() {
                     </View>
                 </View>
 
-                {/* Written Answers Section */}
-                <View>
-                    <View style={styles.writtenAnswersHeader}>
-                        <Text style={styles.writtenAnswersTitle}>
-                            Written Answers
-                        </Text>
-                        <SparkleIcon size={18} />
-                    </View>
-                    <Text style={styles.subtitle}>
-                        We've generated some answers for you.
-                    </Text>
+      {/* Written Answers Section */}
+      <View>
+        <View style={styles.writtenAnswersHeader}>
+          <Text style={styles.writtenAnswersTitle}>Written Answers</Text>
+          <SparkleIcon size={18} />
+        </View>
+        <Text style={styles.subtitle}>
+          We&apos;ve generated some answers for you.
+        </Text>
 
                     <View style={styles.writtenAnswersContent}>
                         <View style={styles.writtenAnswersColumn}>

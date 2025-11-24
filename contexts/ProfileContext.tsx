@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 
-interface ProfileData {
+export interface ProfileData {
   // Basic Profile
   name: string;
   dateOfBirth: string;
