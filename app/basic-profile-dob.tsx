@@ -1,12 +1,13 @@
 import ProfileExitModal from "@/components/ProfileExitModal";
+import { useProfile } from "@/contexts/ProfileContext";
 import VoiceInputOverlay, {
   VoiceResultExtras,
 } from "@/utilities/useVoiceToText";
-import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -30,9 +31,9 @@ export default function BasicProfileDOB() {
     typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
   const isEditingBasic = editingMode === "edit-basic";
   const { updateProfileData } = useProfile();
-  const [month, setMonth] = useState("January");
-  const [day, setDay] = useState("15");
-  const [year, setYear] = useState("2003");
+  const [month, setMonth] = useState("");
+  const [day, setDay] = useState("");
+  const [year, setYear] = useState("");
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
   const [showMonthPicker, setShowMonthPicker] = useState(false);
@@ -173,19 +174,23 @@ export default function BasicProfileDOB() {
 
         {showMonthPicker && (
           <View style={styles.monthPicker}>
-            {MONTHS.map((m) => (
-              <TouchableOpacity
-                key={m}
-                style={styles.monthOption}
-                onPress={() => {
-                  setMonth(m);
-                  setShowMonthPicker(false);
-                  updateProfileData({ dateOfBirth: `${m} ${day}, ${year}` });
-                }}
-              >
-                <Text style={styles.monthOptionText}>{m}</Text>
-              </TouchableOpacity>
-            ))}
+            <ScrollView>
+              <View style={styles.monthGrid}>
+                {MONTHS.map((m) => (
+                  <TouchableOpacity
+                    key={m}
+                    style={styles.monthOption}
+                    onPress={() => {
+                      setMonth(m);
+                      setShowMonthPicker(false);
+                      updateProfileData({ dateOfBirth: `${m} ${day}, ${year}` });
+                    }}
+                  >
+                    <Text style={styles.monthOptionText}>{m}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
           </View>
         )}
       </View>
@@ -308,16 +313,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E5E7EB",
     borderRadius: 8,
-    maxHeight: 200,
+    maxHeight: 220,
+    backgroundColor: "#FFFFFF",
+  },
+  monthGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   monthOption: {
-    padding: 16,
+    width: "50%",
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: "#F3F4F6",
+    borderRightWidth: 1,
+    borderRightColor: "#F3F4F6",
   },
   monthOptionText: {
     fontSize: 16,
     color: "#0B0B0F",
+    textAlign: "center",
   },
   footer: {
     flexDirection: "row",

@@ -1,4 +1,5 @@
 import { ProfileData } from "@/contexts/ProfileContext";
+import { ImageSourcePropType } from "react-native";
 
 export type GrantRequirement = {
   id: string;
@@ -34,6 +35,7 @@ export interface GrantDefinition {
   amount: string;
   deadline: string;
   category: string;
+  imageUrl?: ImageSourcePropType;
   description: string;
   fullDescription: string;
   summary: string;
@@ -99,6 +101,50 @@ const isBritishColumbia = (province: string) => {
 const defaultFullDescription = (summary: string) =>
   `${summary} This grant supports tradespeople who are investing in their training. Funding can be stacked with other awards unless noted otherwise and is typically paid directly to the training provider or employer once proof of enrollment has been received.`;
 
+const normalizePostalCode = (postal: string) =>
+  postal.replace(/\s+/g, "").toUpperCase();
+
+const ruralBCPostalPrefixes = [
+  "V0A",
+  "V0B",
+  "V0C",
+  "V0E",
+  "V0G",
+  "V0H",
+  "V0J",
+  "V0K",
+  "V0L",
+  "V0M",
+  "V0N",
+  "V0P",
+  "V0R",
+  "V0S",
+  "V0T",
+  "V0V",
+  "V0W",
+  "V0X",
+  "V0Y",
+  "V0Z",
+];
+
+const isRuralBCPostalCode = (postal: string) => {
+  if (!postal) return false;
+  const normalized = normalizePostalCode(postal);
+  if (!normalized.startsWith("V0")) return false;
+  return ruralBCPostalPrefixes.some((prefix) =>
+    normalized.startsWith(prefix)
+  );
+};
+
+const grantLogos: Record<string, ImageSourcePropType> = {
+  workbc: require("../assets/images/workBC.png"),
+  lng: require("../assets/images/LNG.png"),
+  masonry: require("../assets/images/Masonry.png"),
+  soroptimist: require("../assets/images/logo-soroptimist.svg"),
+  cfbc: require("../assets/images/cfbc-logo.svg"),
+
+};
+
 export const grantCatalog: GrantDefinition[] = [
   {
     id: "stronger-bc-future-skills",
@@ -116,6 +162,7 @@ export const grantCatalog: GrantDefinition[] = [
     ),
     active: true,
     tags: ["tuition", "short program", "bc resident"],
+    imageUrl: grantLogos.workbc,
     detailFacts: [
       {
         id: "funding",
@@ -198,7 +245,14 @@ export const grantCatalog: GrantDefinition[] = [
         field: "citizenshipStatus",
         description: "The province requires proof of citizenship or permanent residence.",
         check: (profile) =>
-          includesAny(profile.citizenshipStatus, ["citizen", "permanent", "pr", "canadian"]),
+          includesAny(profile.citizenshipStatus, [
+            "citizen",
+            "canadian",
+            "indigenous citizen",
+            "permanent resident",
+            "temporary resident",
+            "protected person",
+          ]),
       },
     ],
   },
@@ -218,6 +272,7 @@ export const grantCatalog: GrantDefinition[] = [
     ),
     active: true,
     tags: ["youth", "scholarship", "paid hours"],
+    imageUrl: grantLogos.workbc,
     detailFacts: [
       {
         id: "funding",
@@ -266,7 +321,7 @@ export const grantCatalog: GrantDefinition[] = [
       portal: {
         label: "ITA youth portal",
         instructions: "Upload your package through Youth Work in Trades or share with your school coordinator.",
-        url: "https://youth.itabc.ca/",
+        url: "https://www2.gov.bc.ca/gov/content/education-training/k-12/support/career-programs/wrk-scholarship",
       },
     },
     requirements: [
@@ -294,7 +349,15 @@ export const grantCatalog: GrantDefinition[] = [
         label: "Apprenticeship level recorded",
         field: "apprenticeshipLevel",
         check: (profile) =>
-          includesAny(profile.apprenticeshipLevel, ["youth", "level 1", "level 2"]),
+          includesAny(profile.apprenticeshipLevel, [
+            "youth",
+            "level 1",
+            "first year apprentice",
+            "first year",
+            "level 2",
+            "second year apprentice",
+            "second year",
+          ]),
       },
     ],
   },
@@ -314,6 +377,7 @@ export const grantCatalog: GrantDefinition[] = [
     ),
     active: true,
     tags: ["tuition", "employer match", "lng"],
+    imageUrl: grantLogos.lng,
     detailFacts: [
       {
         id: "funding",
@@ -401,6 +465,7 @@ export const grantCatalog: GrantDefinition[] = [
       "The Masonry Institute of BC has promoted the masonry industry for over 50 years. Funding offsets tuition, PPE, and textbook costs for apprentices registered with the Trowel Trades Training Association. Additional top-ups are available for members who participate in industry mentorship events.",
     active: true,
     tags: ["masonry", "tuition", "union"],
+    imageUrl: grantLogos.masonry,
     detailFacts: [
       {
         id: "funding",
@@ -460,20 +525,30 @@ export const grantCatalog: GrantDefinition[] = [
         id: "trade-masonry",
         label: "Masonry trade selected",
         field: "trade",
-        check: (profile) => includesAny(profile.trade, ["mason", "brick"]),
+        check: (profile) => includesAny(profile.trade, ["Bricklayer", "Masonry", "brick", "mason", "masonry", "Masonry Apprentice", "Carpentry", "Apprentice Mason", "Mason"]),
       },
       {
         id: "trowel-school",
         label: "Trowel Trades school on file",
         field: "tradeSchoolName",
-        check: (profile) => includesAny(profile.tradeSchoolName, ["trowel", "masonry"]),
+        check: (profile) => includesAny(profile.tradeSchoolName, ["trowel", "masonry", "Trowel Trades Training Association (TTTA)", "TTTA", "Trowel Trades Training Association"]),
       },
       {
         id: "level-1-3",
         label: "Level 1-3 apprentice",
         field: "apprenticeshipLevel",
         check: (profile) =>
-          includesAny(profile.apprenticeshipLevel, ["level 1", "level 2", "level 3"]),
+          includesAny(profile.apprenticeshipLevel, [
+            "level 1",
+            "first year apprentice",
+            "first year",
+            "level 2",
+            "second year apprentice",
+            "second year",
+            "level 3",
+            "third year apprentice",
+            "third year",
+          ]),
       },
     ],
   },
@@ -493,6 +568,7 @@ export const grantCatalog: GrantDefinition[] = [
     ),
     active: false,
     tags: ["women", "tuition", "childcare"],
+    imageUrl: grantLogos.soroptimist,
     detailFacts: [
       {
         id: "funding",
@@ -567,70 +643,81 @@ export const grantCatalog: GrantDefinition[] = [
   },
   {
     id: "women-in-skilled-trades",
-    title: "Women in Skilled Trades Bursary",
-    organization: "SkilledTradesBC",
-    amount: "Up to $2,000",
-    deadline: "Jan 31",
+    title: "Mott Electric GP Women in Electrical Training Fund",
+    organization: "Construction Foundation of BC",
+    amount: "Up to $1,500",
+    deadline: "Spring (May 15) / Fall (Aug 30)",
     category: "Awards",
     summary:
-      "Helps women apprentices cover travel, childcare, and tools for Red Seal training.",
+      "Supports women entering or continuing Construction Foundations or electrical apprenticeship training.",
     description:
-      "Focused bursary for women registered as ITA apprentices attending technical training in BC.",
+      "CFBC administers this Mott Electric GP fund to offset tuition and textbook costs for women pursuing electrical foundations or levels 1–4 apprenticeship training.",
     fullDescription: defaultFullDescription(
-      "Focused bursary for women registered as ITA apprentices attending technical training in BC."
+      "The fund awards two bursaries per year (spring and fall) worth up to $1,500 each. Funds are paid directly to the training institution to cover tuition and textbooks for Construction Foundations or electrical apprenticeship training."
     ),
     active: true,
-    tags: ["women", "travel", "tools"],
+    tags: ["women", "electrical", "tuition"],
+    imageUrl: grantLogos.cfbc,
     detailFacts: [
       {
         id: "funding",
-        label: "Up to $2,000",
+        label: "Up to $1,500",
         icon: "cash-outline",
         bg: "#22C55E",
-        details: ["Use funds for childcare, PPE, mileage, or tools."],
+        details: ["Two bursaries per calendar year, paid to the training institution for tuition and books."],
       },
       {
-        id: "date",
-        label: "Apply before class",
+        id: "timeline",
+        label: "Apply 1 month early",
         icon: "calendar-outline",
         bg: "#F59E0B",
-        details: ["Submit paperwork at least 30 days prior to your next technical training."],
+        details: [
+          "Spring award deadline May 15 (advised May 30).",
+          "Fall award deadline Aug 30 (advised Sept 30).",
+        ],
       },
       {
-        id: "age",
-        label: "Registered apprentice",
+        id: "program",
+        label: "Foundations or electrical apprenticeship",
         icon: "construct-outline",
         bg: "#F97316",
-        details: ["Provide your ITA apprentice number when applying."],
+        details: ["Applicants must be in Construction Foundations or Level 1–4 electrical apprenticeship."],
       },
       {
-        id: "location",
-        label: "Training in BC",
-        icon: "home-outline",
+        id: "payout",
+        label: "Institution paid",
+        icon: "briefcase-outline",
         bg: "#0EA5E9",
-        details: ["Funding is limited to training delivered within British Columbia."],
+        details: ["Award funds are sent directly to the training institution once recipients are confirmed."],
       },
     ],
     notes: [
-      "Eligible costs include childcare, mileage, PPE, and tools.",
-      "Recipients agree to share a short testimonial for SkilledTradesBC.",
+      "Applications must arrive at least one month before training begins.",
+      "Requires a 100–500 word personal goals statement plus two references.",
+      "CFBC may share recipient stories in promotional materials.",
     ],
     apply: {
       eligibilityChecks: [
-        "Registered as an ITA apprentice",
         "Identify as a woman",
-        "Training or employer located in BC",
+        "Enrolled in Construction Foundations or electrical apprenticeship (Levels 1–4)",
+        "Application submitted at least one month prior to start date",
       ],
       requiredDocuments: [
-        "ITA apprentice number confirmation",
-        "Upcoming training schedule",
-        "Expense estimate (childcare, travel, PPE)",
+        "CFBC application form",
+        "Proof of registration/acceptance and unofficial transcript",
+        "Statement of goals (100–500 words)",
+        "Budget showing tuition and textbook costs",
+        "Two references",
       ],
       portal: {
-        label: "SkilledTradesBC forms",
-        instructions: "Email the completed PDF or upload it via the SkilledTradesBC support portal.",
-        url: "https://skilledtradesbc.ca/",
+        label: "CFBC application page",
+        instructions: "Download the application and submit to info@cfbc.ca or via the CFBC bursary portal.",
+        url: "https://cfbc.ca/mott-electric-gp-women-in-electrical-training-fund/",
       },
+      tips: [
+        "Have your references ready—applications without two references are ineligible.",
+        "Attach your course start dates to confirm deadlines.",
+      ],
     },
     requirements: [
       {
@@ -640,16 +727,38 @@ export const grantCatalog: GrantDefinition[] = [
         check: (profile) => includesAny(profile.gender, ["female", "woman"]),
       },
       {
-        id: "province",
-        label: "Located in BC",
-        field: "province",
-        check: (profile) => isBritishColumbia(profile.province),
+        id: "program",
+        label: "In electrical foundations or apprenticeship",
+        field: "trade",
+        check: (profile) =>
+          includesAny(profile.trade, ["electrical", "electrician", "construction foundations"]),
       },
       {
         id: "apprentice",
-        label: "Apprenticeship level recorded",
+        label: "Foundation or Level 1–4 apprentice",
         field: "apprenticeshipLevel",
-        check: (profile) => !!profile.apprenticeshipLevel.trim(),
+        check: (profile) =>
+          includesAny(profile.apprenticeshipLevel, [
+            "construction foundations",
+            "level 1",
+            "first year",
+            "first year apprentice",
+            "level 2",
+            "second year",
+            "second year apprentice",
+            "level 3",
+            "third year",
+            "third year apprentice",
+            "level 4",
+            "fourth year",
+            "fourth year apprentice",
+          ]),
+      },
+      {
+        id: "institution",
+        label: "Training institution recorded",
+        field: "tradeSchoolName",
+        check: (profile) => !!profile.tradeSchoolName.trim(),
       },
     ],
   },
@@ -669,6 +778,7 @@ export const grantCatalog: GrantDefinition[] = [
     ),
     active: true,
     tags: ["indigenous", "living costs", "travel"],
+    imageUrl: grantLogos.workbc,
     detailFacts: [
       {
         id: "funding",
@@ -727,6 +837,7 @@ export const grantCatalog: GrantDefinition[] = [
         check: (profile) =>
           includesAny(profile.citizenshipStatus, [
             "indigenous",
+            "indigenous citizen",
             "first nations",
             "metis",
             "inuit",
@@ -762,6 +873,7 @@ export const grantCatalog: GrantDefinition[] = [
     ),
     active: true,
     tags: ["green building", "certifications", "energy"],
+    imageUrl: grantLogos.workbc,
     detailFacts: [
       {
         id: "funding",
@@ -850,6 +962,7 @@ export const grantCatalog: GrantDefinition[] = [
     ),
     active: true,
     tags: ["relocation", "northern bc", "living costs"],
+    imageUrl: grantLogos.workbc,
     detailFacts: [
       {
         id: "funding",
@@ -903,9 +1016,10 @@ export const grantCatalog: GrantDefinition[] = [
     requirements: [
       {
         id: "postal",
-        label: "Postal code entered",
+        label: "Rural BC postal code",
         field: "postalCode",
-        check: (profile) => !!profile.postalCode.trim(),
+        description: "Only rural or northern postal codes starting with V0 qualify.",
+        check: (profile) => isRuralBCPostalCode(profile.postalCode),
       },
       {
         id: "address",

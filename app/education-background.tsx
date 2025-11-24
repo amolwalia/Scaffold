@@ -1,12 +1,13 @@
 import ProfileExitModal from "@/components/ProfileExitModal";
+import { useProfile } from "@/contexts/ProfileContext";
 import VoiceInputOverlay, {
   VoiceResultExtras,
 } from "@/utilities/useVoiceToText";
-import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -125,19 +126,25 @@ export default function EducationBackground() {
 
         {showEducationPicker && (
           <View style={styles.picker}>
-            {EDUCATION_LEVELS.map((level) => (
-              <TouchableOpacity
-                key={level}
-                style={styles.pickerOption}
-                onPress={() => {
-                  setHighestEducation(level);
-                  setShowEducationPicker(false);
-                  updateProfileData({ highestEducation: level });
-                }}
-              >
-                <Text style={styles.pickerOptionText}>{level}</Text>
-              </TouchableOpacity>
-            ))}
+            <ScrollView>
+              {EDUCATION_LEVELS.map((level, index) => (
+                <TouchableOpacity
+                  key={level}
+                  style={[
+                    styles.pickerOption,
+                    index === EDUCATION_LEVELS.length - 1 &&
+                      styles.pickerOptionLast,
+                  ]}
+                  onPress={() => {
+                    setHighestEducation(level);
+                    setShowEducationPicker(false);
+                    updateProfileData({ highestEducation: level });
+                  }}
+                >
+                  <Text style={styles.pickerOptionText}>{level}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
         )}
 
@@ -273,8 +280,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E5E7EB",
     borderRadius: 8,
-    maxHeight: 200,
+    maxHeight: 220,
     backgroundColor: "#FFFFFF",
+    overflow: "hidden",
   },
   pickerOption: {
     padding: 16,

@@ -1,16 +1,23 @@
 import ProfileExitModal from "@/components/ProfileExitModal";
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
+import VoiceInputOverlay from "@/utilities/useVoiceToText";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
+const CITIZENSHIP_OPTIONS = [
+  "Citizen",
+  "Indigenous Citizen",
+  "Permanent Resident",
+  "Temporary Resident",
+  "Protected Person",
+] as const;
 
 export default function ResidenceCitizenship() {
   const router = useRouter();
@@ -23,9 +30,16 @@ export default function ResidenceCitizenship() {
     typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
   const isEditingResidence = editingMode === "edit-residence";
   const { profileData, updateProfileData } = useProfile();
-  const [citizenshipStatus, setCitizenshipStatus] = useState(profileData.citizenshipStatus || "");
+  const [citizenshipStatus, setCitizenshipStatus] = useState(
+    profileData.citizenshipStatus || ""
+  );
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownLabel = useMemo(
+    () => citizenshipStatus || "Select status",
+    [citizenshipStatus]
+  );
 
   const handleVoiceResult = (text: string) => {
     setCitizenshipStatus(text);
@@ -68,16 +82,53 @@ export default function ResidenceCitizenship() {
       <View style={styles.content}>
         <Text style={styles.sectionTitle}>Citizenship Status</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Citizenship Status..."
-          placeholderTextColor="#9CA3AF"
-          value={citizenshipStatus}
-          onChangeText={(text) => {
-            setCitizenshipStatus(text);
-            updateProfileData({ citizenshipStatus: text });
-          }}
-        />
+        <TouchableOpacity
+          style={[styles.input, styles.dropdownTrigger]}
+          activeOpacity={0.8}
+          onPress={() => setShowDropdown((prev) => !prev)}
+        >
+          <Text
+            style={[
+              styles.dropdownLabel,
+              !citizenshipStatus && styles.dropdownPlaceholder,
+            ]}
+          >
+            {dropdownLabel}
+          </Text>
+          <Ionicons
+            name={showDropdown ? "chevron-up" : "chevron-down"}
+            size={20}
+            color="#6B7280"
+          />
+        </TouchableOpacity>
+        {showDropdown && (
+          <View style={styles.dropdown}>
+            {CITIZENSHIP_OPTIONS.map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.dropdownOption,
+                  option === citizenshipStatus && styles.dropdownOptionActive,
+                ]}
+                onPress={() => {
+                  setCitizenshipStatus(option);
+                  updateProfileData({ citizenshipStatus: option });
+                  setShowDropdown(false);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.dropdownOptionText,
+                    option === citizenshipStatus &&
+                      styles.dropdownOptionTextActive,
+                  ]}
+                >
+                  {option}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
 
       <View style={styles.footer}>
@@ -170,6 +221,42 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#0B0B0F",
     marginBottom: 16,
+  },
+  dropdownTrigger: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  dropdownLabel: {
+    fontSize: 16,
+    color: "#0B0B0F",
+  },
+  dropdownPlaceholder: {
+    color: "#9CA3AF",
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 8,
+    marginTop: -4,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  dropdownOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: "#FFFFFF",
+  },
+  dropdownOptionActive: {
+    backgroundColor: "#F3F2FF",
+  },
+  dropdownOptionText: {
+    fontSize: 16,
+    color: "#0B0B0F",
+  },
+  dropdownOptionTextActive: {
+    color: "#8B5CF6",
+    fontWeight: "600",
   },
   footer: {
     flexDirection: "row",

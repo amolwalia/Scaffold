@@ -321,6 +321,7 @@ export default function GrantsScreen() {
             deadline={item.deadline}
             category={item.category}
             description={item.description}
+            imageUrl={item.imageUrl}
             eligible={item.eligible}
             saved={item.saved}
             applied={item.applied}

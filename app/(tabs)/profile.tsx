@@ -270,7 +270,7 @@ export default function Profile() {
           method: "POST",
           body: JSON.stringify({
             project_name: "Scaffold",
-            prompt: `From the document "${file.name}", extract the first name, last name, email address, phone number, school/college/university name, residential address, postal code, and province/state. Respond ONLY with JSON that matches {"first_name":string,"last_name":string,"school_name":string,"email":string,"phone":string,"address":string,"postal_code":string,"province":string}. If any value is missing, return an empty string for that field.`,
+            prompt: `From the document "${file.name}", extract every detail that can populate the profile. Respond ONLY with JSON (no prose) that matches {"first_name":string,"last_name":string,"email":string,"phone":string,"address":string,"postal_code":string,"province":string,"date_of_birth":string,"gender":string,"citizenship_status":string,"household_size":string,"family_composition":string,"annual_family_net_income":string,"guardian_name":string,"guardian_phone":string,"guardian_email":string,"highest_education":string,"school_name":string,"graduation_date":string,"trade_school_name":string,"trade_program_name":string,"trade_graduation_date":string,"trade":string,"apprenticeship_level":string}. When identifying apprenticeship_level, return the exact level label mentioned (e.g., "Level 1", "Level 2", "Level 3", "Level 4", or "Red Seal"). Use empty strings when a value cannot be found.`,
           }),
         }
       );
@@ -301,24 +301,118 @@ export default function Profile() {
       }
 
       if (parsedAnswer) {
-        const first = (parsedAnswer.first_name ?? "").trim();
-        const last = (parsedAnswer.last_name ?? "").trim();
-        const school = (parsedAnswer.school_name ?? "").trim();
-        const email = (parsedAnswer.email ?? "").trim();
-        const phone = (parsedAnswer.phone ?? parsedAnswer.phone_number ?? "")
-          .toString()
-          .trim();
-        const address = (parsedAnswer.address ?? "").trim();
-        const postal = (
-          parsedAnswer.postal_code ??
-          parsedAnswer.postalCode ??
-          ""
-        ).trim();
-        const province = (
-          parsedAnswer.province ??
-          parsedAnswer.state ??
-          ""
-        ).trim();
+        const pickValue = (...values: unknown[]) => {
+          for (const value of values) {
+            if (value !== undefined && value !== null) {
+              return typeof value === "string" ? value.trim() : String(value).trim();
+            }
+          }
+          return "";
+        };
+        const normalizeApprenticeshipLevel = (value: string) => {
+          const lower = value.toLowerCase();
+          if (!lower) return "";
+          if (lower.includes("journeyman") || lower.includes("red seal")) {
+            return "Journeyman";
+          }
+          if (lower.includes("fourth") || lower.includes("level 4") || lower.includes("4th")) {
+            return "Fourth Year Apprentice";
+          }
+          if (lower.includes("third") || lower.includes("level 3") || lower.includes("3rd")) {
+            return "Third Year Apprentice";
+          }
+          if (lower.includes("second") || lower.includes("level 2") || lower.includes("2nd")) {
+            return "Second Year Apprentice";
+          }
+          if (lower.includes("first") || lower.includes("level 1") || lower.includes("1st")) {
+            return "First Year Apprentice";
+          }
+          return value;
+        };
+
+        const first = pickValue(parsedAnswer.first_name, parsedAnswer.firstName);
+        const last = pickValue(parsedAnswer.last_name, parsedAnswer.lastName);
+        const school = pickValue(
+          parsedAnswer.school_name,
+          parsedAnswer.schoolName,
+          parsedAnswer.high_school_name,
+          parsedAnswer.highSchoolName
+        );
+        const email = pickValue(parsedAnswer.email);
+        const phone = pickValue(
+          parsedAnswer.phone,
+          parsedAnswer.phone_number,
+          parsedAnswer.phoneNumber
+        );
+        const address = pickValue(parsedAnswer.address, parsedAnswer.residential_address);
+        const postal = pickValue(parsedAnswer.postal_code, parsedAnswer.postalCode);
+        const province = pickValue(
+          parsedAnswer.province,
+          parsedAnswer.state,
+          parsedAnswer.province_state
+        );
+        const dateOfBirth = pickValue(
+          parsedAnswer.date_of_birth,
+          parsedAnswer.dateOfBirth,
+          parsedAnswer.dob
+        );
+        const gender = pickValue(parsedAnswer.gender);
+        const citizenshipStatus = pickValue(
+          parsedAnswer.citizenship_status,
+          parsedAnswer.citizenshipStatus,
+          parsedAnswer.status
+        );
+        const householdSize = pickValue(
+          parsedAnswer.household_size,
+          parsedAnswer.householdSize
+        );
+        const familyComposition = pickValue(
+          parsedAnswer.family_composition,
+          parsedAnswer.familyComposition
+        );
+        const annualIncome = pickValue(
+          parsedAnswer.annual_family_net_income,
+          parsedAnswer.annualFamilyNetIncome,
+          parsedAnswer.annual_income
+        );
+        const guardianName = pickValue(
+          parsedAnswer.guardian_name,
+          parsedAnswer.guardianName
+        );
+        const guardianPhone = pickValue(
+          parsedAnswer.guardian_phone,
+          parsedAnswer.guardianPhone
+        );
+        const guardianEmail = pickValue(
+          parsedAnswer.guardian_email,
+          parsedAnswer.guardianEmail
+        );
+        const highestEducation = pickValue(
+          parsedAnswer.highest_education,
+          parsedAnswer.highestEducation
+        );
+        const graduationDate = pickValue(
+          parsedAnswer.graduation_date,
+          parsedAnswer.graduationDate
+        );
+        const tradeSchoolName = pickValue(
+          parsedAnswer.trade_school_name,
+          parsedAnswer.tradeSchoolName
+        );
+        const tradeProgramName = pickValue(
+          parsedAnswer.trade_program_name,
+          parsedAnswer.tradeProgramName
+        );
+        const tradeGraduationDate = pickValue(
+          parsedAnswer.trade_graduation_date,
+          parsedAnswer.tradeGraduationDate
+        );
+        const tradeField = pickValue(parsedAnswer.trade);
+        const apprenticeshipLevelRaw = pickValue(
+          parsedAnswer.apprenticeship_level,
+          parsedAnswer.apprenticeshipLevel
+        );
+        const apprenticeshipLevel = normalizeApprenticeshipLevel(apprenticeshipLevelRaw);
 
         const updates: Record<string, string> = {};
         const fullName = [first, last].filter(Boolean).join(" ").trim();
@@ -329,6 +423,22 @@ export default function Profile() {
         if (address) updates.address = address;
         if (postal) updates.postalCode = postal;
         if (province) updates.province = province;
+        if (dateOfBirth) updates.dateOfBirth = dateOfBirth;
+        if (gender) updates.gender = gender;
+        if (citizenshipStatus) updates.citizenshipStatus = citizenshipStatus;
+        if (householdSize) updates.householdSize = householdSize;
+        if (familyComposition) updates.familyComposition = familyComposition;
+        if (annualIncome) updates.annualFamilyNetIncome = annualIncome;
+        if (guardianName) updates.guardianName = guardianName;
+        if (guardianPhone) updates.guardianPhone = guardianPhone;
+        if (guardianEmail) updates.guardianEmail = guardianEmail;
+        if (highestEducation) updates.highestEducation = highestEducation;
+        if (graduationDate) updates.graduationDate = graduationDate;
+        if (tradeSchoolName) updates.tradeSchoolName = tradeSchoolName;
+        if (tradeProgramName) updates.tradeProgramName = tradeProgramName;
+        if (tradeGraduationDate) updates.tradeGraduationDate = tradeGraduationDate;
+        if (tradeField) updates.trade = tradeField;
+        if (apprenticeshipLevel) updates.apprenticeshipLevel = apprenticeshipLevel;
 
         if (Object.keys(updates).length) {
           updateProfileData(updates);
@@ -461,6 +571,17 @@ export default function Profile() {
     router.push("/basic-profile-name");
   };
 
+  const handleBuildProfilePress = () => {
+    Alert.alert(
+      "Build profile",
+      "Upload your resume to build your profile in one click.",
+      [
+        { text: "Not now", style: "cancel" },
+        { text: "Upload", onPress: () => pickDocument() },
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -469,37 +590,37 @@ export default function Profile() {
       >
         {/* Profile Header */}
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.profilePictureContainer}
-            activeOpacity={0.85}
-            onPress={openProfilePicture}
-          >
-            {profileData.profileImageUri ? (
-              <Image
-                source={{ uri: profileData.profileImageUri }}
-                style={styles.profilePicture}
-                contentFit="cover"
-              />
-            ) : (
-              <Ionicons name="person" size={48} color="#FFFFFF" />
-            )}
-            {!profileData.profileImageUri && (
-              <TouchableOpacity
-                style={styles.cameraIcon}
-                onPress={openProfilePicture}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="camera" size={16} color="#8B5CF6" />
-              </TouchableOpacity>
-            )}
-          </TouchableOpacity>
+          <View style={styles.profilePictureWrapper}>
+            <TouchableOpacity
+              style={styles.profilePictureContainer}
+              activeOpacity={0.85}
+              onPress={openProfilePicture}
+            >
+              {profileData.profileImageUri ? (
+                <Image
+                  source={{ uri: profileData.profileImageUri }}
+                  style={styles.profilePicture}
+                  contentFit="cover"
+                />
+              ) : (
+                <Ionicons name="person" size={48} color="#FFFFFF" />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.cameraIcon}
+              onPress={openProfilePicture}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="camera" size={16} color="#8B5CF6" />
+            </TouchableOpacity>
+          </View>
           <Text
             style={[
               styles.profileName,
               profileData.name && styles.profileNameFilled,
             ]}
           >
-            {profileData.name || "Bob Ross"}
+            {profileData.name || "User Name"}
           </Text>
 
           {/* Buttons */}
@@ -515,9 +636,14 @@ export default function Profile() {
               onPress={pickDocument}
               activeOpacity={0.7}
             >
-              <Ionicons name="folder" size={20} color="#8B5CF6" />
-              <Text style={styles.documentsButtonText}>Documents</Text>
-              <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
+              <Ionicons
+                name="cloud-upload-outline"
+                size={20}
+                color="#6E5BDE"
+                style={styles.documentsButtonIcon}
+              />
+              <Text style={styles.documentsButtonText}>Build profile</Text>
+              <Ionicons name="chevron-forward" size={20} color="#6E5BDE" />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -525,9 +651,14 @@ export default function Profile() {
               onPress={() => router.push("../education-experience-two")}
               activeOpacity={0.7}
             >
-              <Ionicons name="create" size={20} color="#8B5CF6" />
-              <Text style={styles.documentsButtonText}>Edit Profile</Text>
-              <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
+              <Ionicons
+                name="folder-outline"
+                size={20}
+                color="#6E5BDE"
+                style={styles.documentsButtonIcon}
+              />
+              <Text style={styles.documentsButtonText}>Document</Text>
+              <Ionicons name="chevron-forward" size={20} color="#6E5BDE" />
             </TouchableOpacity>
           </View>
         </View>
@@ -718,6 +849,10 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     paddingHorizontal: 20,
   },
+  profilePictureWrapper: {
+    position: "relative",
+    marginBottom: 12,
+  },
   profilePictureContainer: {
     width: 100,
     height: 100,
@@ -725,10 +860,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#E9D5FF",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 12,
     borderWidth: 2,
     borderColor: "#FFFFFF",
-    position: "relative",
     overflow: "hidden",
   },
   profilePicture: {
@@ -737,8 +870,8 @@ const styles = StyleSheet.create({
   },
   cameraIcon: {
     position: "absolute",
-    bottom: 0,
-    right: 0,
+    top: 65,
+    right: -4,
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -747,6 +880,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 2,
     borderColor: "#E9D5FF",
+    shadowColor: "#00000040",
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 3,
   },
   profileName: {
     fontSize: 20,
@@ -760,16 +898,21 @@ const styles = StyleSheet.create({
   documentsButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F3F2FF",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    gap: 8,
+    backgroundColor: "#DAD2FF",
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderRadius: 14,
+    gap: 12,
+    flex: 1,
+  },
+  documentsButtonIcon: {
+    marginRight: 4,
   },
   documentsButtonText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
-    color: "#8B5CF6",
+    color: "#27252F",
+    flex: 1,
   },
   progressSection: {
     paddingHorizontal: 20,

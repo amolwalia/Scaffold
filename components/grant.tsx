@@ -225,8 +225,8 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
     overflow: "hidden",
+    backgroundColor: '#EFEFFF',
   },
   logoImage: {
     width: "100%",

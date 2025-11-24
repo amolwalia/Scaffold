@@ -147,7 +147,10 @@ export default function ProfilePictureScreen() {
       <ProfileExitModal
         visible={showExitModal}
         onCancel={() => setShowExitModal(false)}
-        onExit={confirmExit}
+        onExit={() => {
+          setShowExitModal(false);
+          handleClose();
+        }}
       />
     </View>
   );
@@ -255,7 +258,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-  const confirmExit = () => {
-    setShowExitModal(false);
-    handleClose();
-  };
