@@ -1,10 +1,8 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -16,12 +14,20 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 
-export default function SignIn() {
+const isValidEmail = (email: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+export default function SignUp() {
   const router = useRouter();
-  const { signIn, authLoading, session } = useAuth();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const { signUp, authLoading, session } = useAuth();
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [error, setError] = useState<string | null>(null);
-  const resetRedirect = process.env.EXPO_PUBLIC_SUPABASE_RESET_REDIRECT_URL;
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (session) {
@@ -29,50 +35,46 @@ export default function SignIn() {
     }
   }, [router, session]);
 
-  const updateField = (key: "email" | "password", value: string) => {
+  const updateField = (
+    key: "name" | "email" | "password" | "confirmPassword",
+    value: string
+  ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = async () => {
-    if (!form.email || !form.password) {
-      setError("Please enter your email and password.");
+    setNotice(null);
+    if (!form.name.trim()) {
+      setError("Please enter your name.");
       return;
     }
+    if (!isValidEmail(form.email.trim())) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (form.password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setError(null);
-    const { error: signInError } = await signIn(
-      form.email.trim(),
+    const { error: signUpError, session: newSession } = await signUp(
+      form.name.trim(),
+      form.email.trim().toLowerCase(),
       form.password
     );
-    if (signInError) {
-      setError(signInError);
+    if (signUpError) {
+      setError(signUpError);
       return;
     }
-    router.replace("/(tabs)");
-  };
-
-  const handleForgotPassword = async () => {
-    if (!form.email) {
-      Alert.alert("Enter email", "Please enter your email to reset password.");
-      return;
-    }
-    if (!resetRedirect) {
-      Alert.alert(
-        "Reset link unavailable",
-        "Set EXPO_PUBLIC_SUPABASE_RESET_REDIRECT_URL to enable password resets."
-      );
-      return;
-    }
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-      form.email.trim(),
-      { redirectTo: resetRedirect }
-    );
-    if (resetError) {
-      Alert.alert("Unable to send reset link", resetError.message);
+    if (newSession) {
+      router.replace("/(tabs)");
     } else {
-      Alert.alert(
-        "Check your email",
-        "We sent a reset link to your inbox. Follow it to update your password."
-      );
+      setNotice("Check your email to confirm your account, then log in.");
     }
   };
 
@@ -86,16 +88,27 @@ export default function SignIn() {
         keyboardShouldPersistTaps="handled"
         bounces={false}
       >
-        <View style={styles.logoWrapper}>
+        <View style={styles.logoBlock}>
           <Image
-            source={require("../assets/images/scaffold logo.svg")}
-            style={{ width: 220, height: 220 }}
+            source={require("../assets/images/scaf logo.svg")}
+            style={{ width: 120, height: 120 }}
             contentFit="contain"
-            accessibilityLabel="Scaffold logo"
+            accessibilityLabel="Scaffold icon"
           />
+          <Text style={styles.heroTitle}>
+            Sign up to unlock grants made for you.
+          </Text>
         </View>
 
         <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            placeholderTextColor="#A0A0A5"
+            autoCapitalize="words"
+            value={form.name}
+            onChangeText={(value) => updateField("name", value)}
+          />
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -105,21 +118,25 @@ export default function SignIn() {
             value={form.email}
             onChangeText={(value) => updateField("email", value)}
           />
-          <View style={styles.passwordRow}>
-            <TextInput
-              style={[styles.input, styles.passwordInput]}
-              placeholder="Password"
-              placeholderTextColor="#A0A0A5"
-              secureTextEntry
-              value={form.password}
-              onChangeText={(value) => updateField("password", value)}
-            />
-            <TouchableOpacity onPress={handleForgotPassword}>
-              <Text style={styles.forgotText}>Forgot password?</Text>
-            </TouchableOpacity>
-          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#A0A0A5"
+            secureTextEntry
+            value={form.password}
+            onChangeText={(value) => updateField("password", value)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm password"
+            placeholderTextColor="#A0A0A5"
+            secureTextEntry
+            value={form.confirmPassword}
+            onChangeText={(value) => updateField("confirmPassword", value)}
+          />
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          {notice ? <Text style={styles.noticeText}>{notice}</Text> : null}
 
           <TouchableOpacity
             style={styles.primaryButton}
@@ -130,17 +147,17 @@ export default function SignIn() {
             {authLoading ? (
               <ActivityIndicator color="#0F172A" />
             ) : (
-              <Text style={styles.primaryButtonText}>Log in</Text>
+              <Text style={styles.primaryButtonText}>Sign up</Text>
             )}
           </TouchableOpacity>
 
           <Text style={styles.switchText}>
-            Don’t have an account?{" "}
+            Already have an account?{" "}
             <Text
               style={styles.linkText}
-              onPress={() => router.push("/sign-up")}
+              onPress={() => router.replace("/sign-in")}
             >
-              Sign up
+              Log in
             </Text>
           </Text>
         </View>
@@ -158,38 +175,37 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     justifyContent: "center",
   },
-  logoWrapper: {
+  logoBlock: {
     alignItems: "center",
-    marginBottom: 36,
+    marginBottom: 32,
+  },
+  heroTitle: {
+    textAlign: "center",
+    marginTop: 16,
+    color: "#7260CC",
+    fontSize: 18,
+    fontWeight: "700",
+    lineHeight: 22,
   },
   form: {
-    gap: 16,
+    gap: 14,
   },
   input: {
     backgroundColor: "#FFFFFF",
-    borderColor: "#C9C9D2",
+    borderColor: "#D6D6DE",
     borderWidth: 1.2,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     fontSize: 16,
     color: "#0F172A",
   },
-  passwordRow: {
-    gap: 8,
-  },
-  passwordInput: {
-    paddingRight: 16,
-  },
-  forgotText: {
-    alignSelf: "flex-end",
-    marginTop: -4,
-    color: "#9696A1",
-    fontSize: 14,
-    textDecorationLine: "underline",
-  },
   errorText: {
     color: "#E83B4D",
+    fontSize: 14,
+  },
+  noticeText: {
+    color: "#6B7280",
     fontSize: 14,
   },
   primaryButton: {
@@ -198,6 +214,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 4,
     shadowColor: "#FF890C",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.22,
@@ -206,7 +223,7 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: "#0F172A",
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
   },
   switchText: {

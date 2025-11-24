@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Text, TextInput } from 'react-native';
 
+import { AuthProvider } from '@/contexts/AuthContext';
 import { ProfileProvider } from '@/contexts/ProfileContext';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
@@ -54,16 +55,21 @@ export default function RootLayout() {
   }
 
   return (
-    <ProfileProvider>
-      <Stack
-        screenOptions={{
-          contentStyle: { backgroundColor: '#FFFFFF' },
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="notifications" options={{ headerShown: false }} />
-        <Stack.Screen name="web" options={{ headerShown: false }} />
-      </Stack>
-    </ProfileProvider>
+    <AuthProvider>
+      <ProfileProvider>
+        <Stack
+          screenOptions={{
+            contentStyle: { backgroundColor: '#FFFFFF' },
+          }}
+        >
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="notifications" options={{ headerShown: false }} />
+          <Stack.Screen name="web" options={{ headerShown: false }} />
+          <Stack.Screen name="sign-in" options={{ headerShown: false }} />
+          <Stack.Screen name="sign-up" options={{ headerShown: false }} />
+        </Stack>
+      </ProfileProvider>
+    </AuthProvider>
   );
 }

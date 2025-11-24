@@ -14,6 +14,15 @@ This project is in its initial stages. We are currently setting up the foundatio
 - React Native — mobile app framework
 - Planned: Backend and database (to be decided in future phases)
 
+## Supabase Auth Setup
+
+1. Create a Supabase project and copy your `Project URL` and `anon` key.
+2. Duplicate `.env.example` to `.env` (or your preferred env file) and fill in:
+   - `EXPO_PUBLIC_SUPABASE_URL`
+   - `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+   - Optional: `EXPO_PUBLIC_SUPABASE_RESET_REDIRECT_URL` for password reset links.
+3. Start the app (`npm start` / `expo start`). You’ll see the new Supabase-backed sign up and log in screens before reaching the tabs.
+
 ## Goals (Initial Phase)
 
 - Set up the project environment using Expo

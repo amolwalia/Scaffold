@@ -1,5 +1,6 @@
 import ProfileProgressCard from "@/components/ProfileProgressCard";
 import ProfileSectionCard from "@/components/ProfileSectionCard";
+import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
@@ -140,6 +141,7 @@ function ProfileField({ label, value }: ProfileFieldProps) {
 
 export default function Profile() {
   const router = useRouter();
+  const { signOut } = useAuth();
   const { profileData, updateProfileData } = useProfile();
   const [isProcessing, setIsProcessing] = useState(false);
   const rotation = useRef(new Animated.Value(0)).current;
@@ -571,6 +573,11 @@ export default function Profile() {
     router.push("/basic-profile-name");
   };
 
+  const handleLogout = async () => {
+    await signOut();
+    router.replace("/sign-in");
+  };
+
   const handleBuildProfilePress = () => {
     Alert.alert(
       "Build profile",
@@ -814,6 +821,13 @@ export default function Profile() {
         >
           <Text style={styles.continueButtonText}>Continue...</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={handleLogout}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.continueButtonText}>Log out</Text>
+        </TouchableOpacity>
       </ScrollView>
       {isProcessing && (
         <View style={styles.processingOverlay} pointerEvents="auto">
@@ -957,6 +971,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#F59E0B",
     marginHorizontal: 20,
     marginTop: 24,
+    marginBottom: 12,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  logoutButton: {
+    backgroundColor: "#F59E0B",
+    marginHorizontal: 20,
+    marginTop: 8,
     marginBottom: 32,
     paddingVertical: 16,
     borderRadius: 12,
