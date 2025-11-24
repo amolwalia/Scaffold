@@ -1,8 +1,8 @@
+import Grant from "@/components/grant";
 import GrantFilterSheet, {
   GRANT_SORT_OPTIONS,
   GrantSortId,
 } from "@/components/GrantFilterSheet";
-import Grant from "@/components/grant";
 import GrantSubFilters from "@/components/GrantSubFilters";
 import {
   evaluateGrantEligibility,
@@ -20,7 +20,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 type GrantListItem = GrantDefinition & {
