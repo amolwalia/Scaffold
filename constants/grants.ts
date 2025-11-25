@@ -128,7 +128,7 @@ export const grantCatalog: GrantDefinition[] = [
         id: "date",
         label: "Apply 6 weeks prior",
         icon: "calendar-outline",
-        bg: "#F59E0B",
+        bg: "#6FCEFD",
         details: ["Processing takes 3–6 weeks. Apply before your intake start date."],
       },
       {
@@ -230,7 +230,7 @@ export const grantCatalog: GrantDefinition[] = [
         id: "date",
         label: "Apply before Nov 14",
         icon: "calendar-outline",
-        bg: "#F59E0B",
+        bg: "#6FCEFD",
         details: ["Submit hours and references before the provincial deadline."],
       },
       {
@@ -326,7 +326,7 @@ export const grantCatalog: GrantDefinition[] = [
         id: "date",
         label: "Apply before Feb 28",
         icon: "calendar-outline",
-        bg: "#F59E0B",
+        bg: "#6FCEFD",
         details: ["Funding windows close when yearly allocations are exhausted."],
       },
       {
@@ -413,7 +413,7 @@ export const grantCatalog: GrantDefinition[] = [
         id: "date",
         label: "Apply 3 months ahead",
         icon: "calendar-outline",
-        bg: "#F59E0B",
+        bg: "#6FCEFD",
         details: ["Funds are disbursed roughly 4 weeks before class begins."],
       },
       {
@@ -505,7 +505,7 @@ export const grantCatalog: GrantDefinition[] = [
         id: "date",
         label: "Apply by Nov 14",
         icon: "calendar-outline",
-        bg: "#F59E0B",
+        bg: "#6FCEFD",
         details: ["Applications close each November with winners notified in January."],
       },
       {
@@ -593,7 +593,7 @@ export const grantCatalog: GrantDefinition[] = [
         id: "date",
         label: "Apply before class",
         icon: "calendar-outline",
-        bg: "#F59E0B",
+        bg: "#6FCEFD",
         details: ["Submit paperwork at least 30 days prior to your next technical training."],
       },
       {
@@ -681,7 +681,7 @@ export const grantCatalog: GrantDefinition[] = [
         id: "date",
         label: "Rolling intake",
         icon: "calendar-outline",
-        bg: "#34D399",
+        bg: "#6FCEFD",
         details: ["Requests are reviewed weekly until the annual allocation is exhausted."],
       },
       {
@@ -774,7 +774,7 @@ export const grantCatalog: GrantDefinition[] = [
         id: "date",
         label: "Apply by Oct 30",
         icon: "calendar-outline",
-        bg: "#F59E0B",
+        bg: "#6FCEFD",
         details: ["Applications reviewed monthly until the fall deadline."],
       },
       {
@@ -862,7 +862,7 @@ export const grantCatalog: GrantDefinition[] = [
         id: "date",
         label: "Apply once per intake",
         icon: "calendar-outline",
-        bg: "#F59E0B",
+        bg: "#6FCEFD",
         details: ["One application per training block; submit 30 days before travel."],
       },
       {
