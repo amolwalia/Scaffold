@@ -1,9 +1,10 @@
 import ApplicationTab from "@/components/ApplicationTab";
 import ApplicationTemplet from "@/components/ApplicationTemplet";
 import LogInButton from "@/components/LogInButton";
+import { grantCatalog } from "@/constants/grants";
 import { Theme } from "@/constants/theme";
 import { useProfile } from "@/contexts/ProfileContext";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
     Image,
     ImageBackground,
@@ -15,7 +16,7 @@ import {
     View,
 } from "react-native";
 
-const applications = [
+const featuredGrantTitles = [
     "StrongerBC Future Skills Grant",
     "Youth Work in Trades (WRK) Scholarship",
     "LNG Canada Trades Training Fund",
@@ -28,11 +29,32 @@ const applications = [
 ];
 
 export default function WebOnlyTab() {
-    const [selectedApplication, setSelectedApplication] = useState<
+    const [selectedApplicationId, setSelectedApplicationId] = useState<
         string | null
     >(null);
     const { profileData } = useProfile();
-    const firstName = profileData.name.split(" ")[0] || "Full Name";
+    const firstName =
+        profileData.name?.split(" ")[0]?.trim() || "Full Name";
+
+    const applicationGrants = useMemo(
+        () =>
+            featuredGrantTitles
+                .map((title) =>
+                    grantCatalog.find((grant) => grant.title === title)
+                )
+                .filter((grant): grant is typeof grantCatalog[number] =>
+                    Boolean(grant)
+                ),
+        []
+    );
+
+    const selectedGrant = useMemo(
+        () =>
+            applicationGrants.find(
+                (grant) => grant.id === selectedApplicationId
+            ) || null,
+        [applicationGrants, selectedApplicationId]
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -41,7 +63,7 @@ export default function WebOnlyTab() {
                 <View style={styles.sidebar}>
                     <View style={styles.profileSection}>
                         <Pressable
-                            onPress={() => setSelectedApplication(null)}
+                            onPress={() => setSelectedApplicationId(null)}
                             style={({ pressed }) => [
                                 styles.profileCircle,
                                 pressed && styles.profileCirclePressed,
@@ -57,12 +79,14 @@ export default function WebOnlyTab() {
                         style={styles.tabsContainer}
                         showsVerticalScrollIndicator={false}
                     >
-                        {applications.map((app, index) => (
+                        {applicationGrants.map((grant) => (
                             <ApplicationTab
-                                key={index}
-                                title={app}
-                                isSelected={selectedApplication === app}
-                                onPress={() => setSelectedApplication(app)}
+                                key={grant.id}
+                                title={grant.title}
+                                isSelected={selectedApplicationId === grant.id}
+                                onPress={() =>
+                                    setSelectedApplicationId(grant.id)
+                                }
                             />
                         ))}
                     </ScrollView>
@@ -71,9 +95,9 @@ export default function WebOnlyTab() {
 
                 {/* Right Main Content */}
                 <View style={styles.mainContent}>
-                    {selectedApplication ? (
+                    {selectedGrant ? (
                         <View style={styles.applicationView}>
-                            <ApplicationTemplet />
+                            <ApplicationTemplet grant={selectedGrant} />
                         </View>
                     ) : (
                         <ImageBackground

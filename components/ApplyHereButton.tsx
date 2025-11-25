@@ -5,19 +5,32 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type ApplyHereButtonProps = {
     onApplyHere?: () => void;
+    disabled?: boolean;
 };
 
-export default function ApplyHereButton({ onApplyHere }: ApplyHereButtonProps) {
+export default function ApplyHereButton({
+    onApplyHere,
+    disabled,
+}: ApplyHereButtonProps) {
     return (
         <View style={styles.container}>
             <Pressable
                 style={({ pressed }) => [
                     styles.button,
-                    pressed && styles.buttonPressed,
+                    pressed && !disabled && styles.buttonPressed,
+                    disabled && styles.buttonDisabled,
                 ]}
                 onPress={onApplyHere}
+                disabled={disabled}
             >
-                <Text style={styles.buttonText}>Apply here</Text>
+                <Text
+                    style={[
+                        styles.buttonText,
+                        disabled && styles.buttonTextDisabled,
+                    ]}
+                >
+                    Apply here
+                </Text>
                 <Ionicons
                     name="open-outline"
                     size={20}
@@ -48,9 +61,15 @@ const styles = StyleSheet.create({
     buttonPressed: {
         opacity: 0.8,
     },
+    buttonDisabled: {
+        opacity: 0.5,
+    },
     buttonText: {
         ...Theme.typography.button,
         color: Theme.colors.black,
+    },
+    buttonTextDisabled: {
+        color: Theme.colors.darkGrey,
     },
     iconApplyHere: {
         marginLeft: 100,

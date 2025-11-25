@@ -1,9 +1,23 @@
+import { GrantDefinition } from "@/constants/grants";
 import { Theme } from "@/constants/theme";
-import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { useProfile } from "@/contexts/ProfileContext";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+    Linking,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
 import ApplyHereButton from "./ApplyHereButton";
 import SavePDFButton from "./SavePDFButton";
 import SparkleIcon from "./SparkleIcon";
+
+const PRESET_GOAL =
+    "My future goal is to become a certified journeyperson and eventually lead my own crew on complex builds. I want to keep learning advanced techniques so I can mentor other apprentices.";
+const PRESET_CAREER =
+    "I chose this trade because I enjoy building tangible projects, solving problems with my hands, and seeing the impact our work has on communities.";
 
 type FormData = {
     // Basic Profile
@@ -28,7 +42,21 @@ type FormData = {
     careerChoice: string;
 };
 
-export default function ApplicationTemplet() {
+type ApplicationTempletProps = {
+    grant?: GrantDefinition | null;
+};
+
+const buildName = (value: string) => {
+    const parts = value.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) {
+        return { first: "", last: "" };
+    }
+    const [first, ...rest] = parts;
+    return { first, last: rest.join(" ") };
+};
+
+export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
+    const { profileData } = useProfile();
     const [formData, setFormData] = useState<FormData>({
         firstName: "",
         lastName: "",
@@ -44,12 +72,67 @@ export default function ApplicationTemplet() {
         refFirstName: "",
         refLastName: "",
         refPhone: "",
-        futureGoal: "",
-        careerChoice: "",
+        futureGoal: PRESET_GOAL,
+        careerChoice: PRESET_CAREER,
     });
+
+    const autoFilledValues = useMemo(() => {
+        const { first: nameFirst, last: nameLast } = buildName(
+            profileData.name || ""
+        );
+        const { first: guardianFirst, last: guardianLast } = buildName(
+            profileData.guardianName || ""
+        );
+        const locationLine = [profileData.province, profileData.postalCode]
+            .filter(Boolean)
+            .join(", ");
+
+        return {
+            firstName: nameFirst,
+            lastName: nameLast,
+            phone: profileData.phone || "",
+            address: profileData.address || "",
+            city: locationLine,
+            province: profileData.province || "",
+            email: profileData.email || "",
+            currentEmployer:
+                profileData.tradeSchoolName ||
+                profileData.guardianName ||
+                profileData.tradeProgramName ||
+                "",
+            costOfTuition: grant?.amount || "",
+            graduationDate:
+                profileData.tradeGraduationDate ||
+                profileData.graduationDate ||
+                "",
+            apprenticeshipLevel: profileData.apprenticeshipLevel || "",
+            refFirstName: guardianFirst,
+            refLastName: guardianLast,
+            refPhone: profileData.guardianPhone || "",
+            futureGoal: PRESET_GOAL,
+            careerChoice: PRESET_CAREER,
+        } satisfies Partial<FormData>;
+    }, [profileData, grant]);
+
+    useEffect(() => {
+        setFormData((prev) => ({
+            ...prev,
+            ...autoFilledValues,
+        }));
+    }, [autoFilledValues]);
 
     const handleChange = (field: keyof FormData, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const applyUrl = grant?.apply.portal.url;
+
+    const handleApplyPress = () => {
+        if (applyUrl) {
+            Linking.openURL(applyUrl).catch((err) =>
+                console.log("Unable to open portal URL", err)
+            );
+        }
     };
 
     return (
@@ -338,7 +421,10 @@ export default function ApplicationTemplet() {
                 </View>
             </ScrollView>
             <View style={styles.buttonsContainer}>
-                <ApplyHereButton />
+                <ApplyHereButton
+                    onApplyHere={handleApplyPress}
+                    disabled={!applyUrl}
+                />
                 <SavePDFButton />
             </View>
         </View>
