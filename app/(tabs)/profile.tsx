@@ -177,7 +177,7 @@ export default function Profile() {
 
   const displayValue = (value: string) => value || "Empty...";
   const { width } = useWindowDimensions();
-  const stackHeaderButtons = width < 380;
+  const stackHeaderButtons = width < 480;
 
   const pickDocument = async () => {
     try {

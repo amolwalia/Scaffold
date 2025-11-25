@@ -36,21 +36,23 @@ function Chip({ label, iconName, iconBg, onPress }: ChipProps) {
         pressed && chipStyles.pressed,
       ]}
     >
-      <View style={[chipStyles.iconCircle, { backgroundColor: iconBg }]}>
-        <Ionicons name={iconName} size={16} color="#fff" />
-      </View>
+      <View style={chipStyles.content}>
+        <View style={[chipStyles.iconCircle, { backgroundColor: iconBg }]}>
+          <Ionicons name={iconName} size={16} color="#fff" />
+        </View>
 
-      <View style={chipStyles.labelWrap}>
-        <Text numberOfLines={1} ellipsizeMode="tail" style={chipStyles.label}>
-          {label}
-        </Text>
-      </View>
-      <View style={chipStyles.chevWrap}>
-        <Ionicons
-          name="chevron-forward-outline"
-          size={12}
-          color={Theme.colors.black}
-        />
+        <View style={chipStyles.labelWrap}>
+          <Text numberOfLines={1} ellipsizeMode="tail" style={chipStyles.label}>
+            {label}
+          </Text>
+        </View>
+        <View style={chipStyles.chevWrap}>
+          <Ionicons
+            name="chevron-forward-outline"
+            size={12}
+            color={Theme.colors.black}
+          />
+        </View>
       </View>
     </Pressable>
   );
@@ -67,6 +69,17 @@ const chipStyles = StyleSheet.create({
     flexWrap: "nowrap",
     width: "100%",
     overflow: "hidden",
+    flexShrink: 1,
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexShrink: 1,
+    width: "100%",
+    backgroundColor: Theme.colors.lightGrey,
+    paddingLeft: 8,
+    paddingRight: 8,
+    borderRadius: 14,
   },
   pressed: { opacity: 0.95 },
   iconCircle: {
@@ -78,6 +91,14 @@ const chipStyles = StyleSheet.create({
     marginRight: 10,
     flexShrink: 0,
   },
+  chevWrap: {
+    width: 18,
+    height: 45,
+    alignItems: "flex-end",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+
   labelWrap: {
     flexGrow: 1,
     flexShrink: 1,
@@ -88,12 +109,7 @@ const chipStyles = StyleSheet.create({
     ...Theme.typography.body,
     color: Theme.colors.black,
   },
-  chevWrap: {
-    width: 18,
-    alignItems: "flex-end",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
+  
 });
 
 type ChipItem = {
