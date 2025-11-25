@@ -73,7 +73,9 @@ export default function HomeTab() {
       (sum, grant) => sum + parseAmount(grant.amount),
       0
     );
-    const items = matches.slice(0, 4).map((grant) => grant.title);
+    const featured = matches.slice(0, 4);
+    const items = featured.map((grant) => grant.title);
+    const icons = featured.map((grant) => grant.imageUrl);
     return {
       count: matches.length,
       total,
@@ -81,6 +83,7 @@ export default function HomeTab() {
         items.length > 0
           ? items
           : ["Complete your profile to unlock grant matches"],
+      icons,
     };
   }, [profileData]);
 
@@ -103,6 +106,7 @@ export default function HomeTab() {
             count={eligibleSummary.count}
             grants={eligibleSummary.items}
             total={eligibleSummary.total}
+            icons={eligibleSummary.icons}
           />
 
           <View style={{ marginTop: 12 }}>

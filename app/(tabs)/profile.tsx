@@ -16,6 +16,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 import { SvgXml } from "react-native-svg";
@@ -175,6 +176,8 @@ export default function Profile() {
   }, [isProcessing, rotation]);
 
   const displayValue = (value: string) => value || "Empty...";
+  const { width } = useWindowDimensions();
+  const stackHeaderButtons = width < 380;
 
   const pickDocument = async () => {
     try {
@@ -631,15 +634,12 @@ export default function Profile() {
           </Text>
 
           {/* Buttons */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 10,
-            }}
-          >
+          <View style={styles.documentsRow}>
             <TouchableOpacity
-              style={styles.documentsButton}
+              style={[
+                styles.documentsButton,
+                stackHeaderButtons && styles.documentsButtonFullWidth,
+              ]}
               onPress={pickDocument}
               activeOpacity={0.7}
             >
@@ -654,7 +654,10 @@ export default function Profile() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.documentsButton}
+              style={[
+                styles.documentsButton,
+                stackHeaderButtons && styles.documentsButtonFullWidth,
+              ]}
               onPress={() => router.push("../education-experience-two")}
               activeOpacity={0.7}
             >
@@ -859,7 +862,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    paddingTop: 20,
+    paddingTop: 60,
     paddingBottom: 24,
     paddingHorizontal: 20,
   },
@@ -909,21 +912,32 @@ const styles = StyleSheet.create({
   profileNameFilled: {
     color: "#8B5CF6",
   },
+  documentsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    flexWrap: "wrap",
+  },
   documentsButton: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#DAD2FF",
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
     borderRadius: 14,
     gap: 12,
     flex: 1,
+    minWidth: 0,
+  },
+  documentsButtonFullWidth: {
+    width: "100%",
+    flexBasis: "100%",
   },
   documentsButtonIcon: {
     marginRight: 4,
   },
   documentsButtonText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "600",
     color: "#27252F",
     flex: 1,

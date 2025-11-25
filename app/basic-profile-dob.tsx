@@ -20,6 +20,26 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December"
 ];
 
+const buildDateOfBirth = (month: string, day: string, year: string) => {
+  const hasMonth = Boolean(month);
+  const hasDay = Boolean(day);
+  let datePart = "";
+
+  if (hasMonth && hasDay) {
+    datePart = `${month} ${day}`;
+  } else if (hasMonth) {
+    datePart = month;
+  } else if (hasDay) {
+    datePart = day;
+  }
+
+  if (year) {
+    return datePart ? `${datePart}, ${year}` : year;
+  }
+
+  return datePart;
+};
+
 export default function BasicProfileDOB() {
   const router = useRouter();
   const { mode, returnTo } = useLocalSearchParams<{
@@ -72,7 +92,7 @@ export default function BasicProfileDOB() {
     setMonth(nextMonth);
     setDay(nextDay);
     setYear(nextYear);
-    updateProfileData({ dateOfBirth: `${nextMonth} ${nextDay}, ${nextYear}` });
+    updateProfileData({ dateOfBirth: buildDateOfBirth(nextMonth, nextDay, nextYear) });
   };
 
   const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
@@ -96,7 +116,7 @@ export default function BasicProfileDOB() {
   };
 
   const handleNext = () => {
-    updateProfileData({ dateOfBirth: `${month} ${day}, ${year}` });
+    updateProfileData({ dateOfBirth: buildDateOfBirth(month, day, year) });
     navigateForward("/basic-profile-gender");
   };
 
@@ -150,7 +170,7 @@ export default function BasicProfileDOB() {
               value={day}
               onChangeText={(text) => {
                 setDay(text);
-                updateProfileData({ dateOfBirth: `${month} ${text}, ${year}` });
+                updateProfileData({ dateOfBirth: buildDateOfBirth(month, text, year) });
               }}
               keyboardType="numeric"
               maxLength={2}
@@ -164,7 +184,7 @@ export default function BasicProfileDOB() {
               value={year}
               onChangeText={(text) => {
                 setYear(text);
-                updateProfileData({ dateOfBirth: `${month} ${day}, ${text}` });
+                updateProfileData({ dateOfBirth: buildDateOfBirth(month, day, text) });
               }}
               keyboardType="numeric"
               maxLength={4}
@@ -183,7 +203,7 @@ export default function BasicProfileDOB() {
                     onPress={() => {
                       setMonth(m);
                       setShowMonthPicker(false);
-                      updateProfileData({ dateOfBirth: `${m} ${day}, ${year}` });
+                      updateProfileData({ dateOfBirth: buildDateOfBirth(m, day, year) });
                     }}
                   >
                     <Text style={styles.monthOptionText}>{m}</Text>

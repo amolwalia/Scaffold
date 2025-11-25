@@ -1,21 +1,27 @@
 import ProfileExitModal from "@/components/ProfileExitModal";
+import { useProfile } from "@/contexts/ProfileContext";
 import VoiceInputOverlay, {
   VoiceResultExtras,
 } from "@/utilities/useVoiceToText";
-import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 export default function ResidenceAddress() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const stackInputs = width < 420;
   const { mode, returnTo } = useLocalSearchParams<{
     mode?: string;
     returnTo?: string;
@@ -82,10 +88,14 @@ export default function ResidenceAddress() {
   };
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <View style={{ flex: 1 }}>
+        <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={styles.header}>
+        <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
@@ -104,7 +114,11 @@ export default function ResidenceAddress() {
         </View>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={{ paddingBottom: 24 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.sectionTitle}>Personal Information</Text>
 
         <TextInput
@@ -131,9 +145,9 @@ export default function ResidenceAddress() {
           }}
         />
 
-        <View style={styles.row}>
+        <View style={[styles.row, stackInputs && styles.rowStack]}>
           <TextInput
-            style={[styles.input, styles.cityInput]}
+            style={stackInputs ? [styles.input, styles.fullWidthInput] : [styles.input, styles.cityInput]}
             placeholder="City"
             placeholderTextColor="#9CA3AF"
             value={city}
@@ -145,7 +159,7 @@ export default function ResidenceAddress() {
           />
 
           <TextInput
-            style={[styles.input, styles.postalInput]}
+            style={stackInputs ? [styles.input, styles.fullWidthInput] : [styles.input, styles.postalInput]}
             placeholder="Postal Code"
             placeholderTextColor="#9CA3AF"
             value={postalCode}
@@ -155,7 +169,7 @@ export default function ResidenceAddress() {
             }}
           />
         </View>
-      </View>
+      </ScrollView>
 
       <View style={styles.footer}>
         <TouchableOpacity
@@ -187,7 +201,8 @@ export default function ResidenceAddress() {
           router.replace(returnToPath as any);
         }}
       />
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -251,12 +266,25 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     gap: 12,
+    width: "100%",
+    flexWrap: "wrap",
+  },
+  rowStack: {
+    flexDirection: "column",
   },
   cityInput: {
-    flex: 2,
+    flexGrow: 3,
+    flexBasis: "60%",
+    flexShrink: 0,
   },
   postalInput: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: "35%",
+    minWidth: 120,
+    flexShrink: 0,
+  },
+  fullWidthInput: {
+    width: "100%",
   },
   footer: {
     flexDirection: "row",

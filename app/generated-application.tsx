@@ -31,6 +31,8 @@ export default function GeneratedApplicationScreen() {
     goal: "",
     career: "",
   });
+  const [goalAnswerHeight, setGoalAnswerHeight] = useState(80);
+  const [careerAnswerHeight, setCareerAnswerHeight] = useState(80);
 
   const autoFilledProfile = useMemo(
     () => ({
@@ -325,6 +327,7 @@ export default function GeneratedApplicationScreen() {
                     borderRadius: Theme.radius.card,
                     padding: Theme.spacing.md,
                     minHeight: 80,
+                    height: goalAnswerHeight,
                     marginBottom: Theme.spacing.sm,
                     ...Theme.typography.body,
                   }}
@@ -336,6 +339,11 @@ export default function GeneratedApplicationScreen() {
                   }
                   multiline
                   textAlignVertical="top"
+                  onContentSizeChange={(event) =>
+                    setGoalAnswerHeight(
+                      Math.max(80, event.nativeEvent.contentSize.height)
+                    )
+                  }
                 />
               </View>
 
@@ -368,6 +376,7 @@ export default function GeneratedApplicationScreen() {
                     borderRadius: Theme.radius.card,
                     padding: Theme.spacing.md,
                     minHeight: 80,
+                    height: careerAnswerHeight,
                     marginBottom: Theme.spacing.sm,
                     ...Theme.typography.body,
                   }}
@@ -379,6 +388,11 @@ export default function GeneratedApplicationScreen() {
                   }
                   multiline
                   textAlignVertical="top"
+                  onContentSizeChange={(event) =>
+                    setCareerAnswerHeight(
+                      Math.max(80, event.nativeEvent.contentSize.height)
+                    )
+                  }
                 />
               </View>
             </View>
@@ -466,19 +480,31 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    width: '100%',
+    gap: 12,
   },
   applicationCardItemLabel: {
     ...Theme.typography.body,
     color: Theme.colors.darkGrey,
+    flexShrink: 0,
+    maxWidth: '40%',
   },
   applicationCardItemValue: {
     ...Theme.typography.body,
     color: Theme.colors.black,
+    textAlign: "right",
+    flexGrow: 1,
+    flexBasis: '55%',
+    flexShrink: 1,
+    minWidth: 0,
   },
   documentItem: {
     ...Theme.typography.body,
     color: Theme.colors.black,
     marginLeft: Theme.spacing.md,
+    textAlign: 'left',
+    flex: 1,
+    alignSelf: 'flex-start',
   },
 });

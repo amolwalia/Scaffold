@@ -514,7 +514,7 @@ export const grantCatalog: GrantDefinition[] = [
       portal: {
         label: "Masonry Institute portal",
         instructions: "Applications are emailed to the institute or uploaded in the member portal.",
-        url: "https://masonrybc.org/",
+        url: "https://www.masonrybc.org/apprenticeships/#:~:text=To%20be%20eligible%20to%20apply,cover%20the%20cost%20of%20textbooks",
       },
       tips: [
         "Book training at least one quarter ahead so funds can be disbursed before class starts.",
