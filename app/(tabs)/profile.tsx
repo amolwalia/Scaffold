@@ -309,7 +309,9 @@ export default function Profile() {
         const pickValue = (...values: unknown[]) => {
           for (const value of values) {
             if (value !== undefined && value !== null) {
-              return typeof value === "string" ? value.trim() : String(value).trim();
+              return typeof value === "string"
+                ? value.trim()
+                : String(value).trim();
             }
           }
           return "";
@@ -320,22 +322,41 @@ export default function Profile() {
           if (lower.includes("journeyman") || lower.includes("red seal")) {
             return "Journeyman";
           }
-          if (lower.includes("fourth") || lower.includes("level 4") || lower.includes("4th")) {
+          if (
+            lower.includes("fourth") ||
+            lower.includes("level 4") ||
+            lower.includes("4th")
+          ) {
             return "Fourth Year Apprentice";
           }
-          if (lower.includes("third") || lower.includes("level 3") || lower.includes("3rd")) {
+          if (
+            lower.includes("third") ||
+            lower.includes("level 3") ||
+            lower.includes("3rd")
+          ) {
             return "Third Year Apprentice";
           }
-          if (lower.includes("second") || lower.includes("level 2") || lower.includes("2nd")) {
+          if (
+            lower.includes("second") ||
+            lower.includes("level 2") ||
+            lower.includes("2nd")
+          ) {
             return "Second Year Apprentice";
           }
-          if (lower.includes("first") || lower.includes("level 1") || lower.includes("1st")) {
+          if (
+            lower.includes("first") ||
+            lower.includes("level 1") ||
+            lower.includes("1st")
+          ) {
             return "First Year Apprentice";
           }
           return value;
         };
 
-        const first = pickValue(parsedAnswer.first_name, parsedAnswer.firstName);
+        const first = pickValue(
+          parsedAnswer.first_name,
+          parsedAnswer.firstName
+        );
         const last = pickValue(parsedAnswer.last_name, parsedAnswer.lastName);
         const school = pickValue(
           parsedAnswer.school_name,
@@ -349,8 +370,14 @@ export default function Profile() {
           parsedAnswer.phone_number,
           parsedAnswer.phoneNumber
         );
-        const address = pickValue(parsedAnswer.address, parsedAnswer.residential_address);
-        const postal = pickValue(parsedAnswer.postal_code, parsedAnswer.postalCode);
+        const address = pickValue(
+          parsedAnswer.address,
+          parsedAnswer.residential_address
+        );
+        const postal = pickValue(
+          parsedAnswer.postal_code,
+          parsedAnswer.postalCode
+        );
         const province = pickValue(
           parsedAnswer.province,
           parsedAnswer.state,
@@ -417,7 +444,9 @@ export default function Profile() {
           parsedAnswer.apprenticeship_level,
           parsedAnswer.apprenticeshipLevel
         );
-        const apprenticeshipLevel = normalizeApprenticeshipLevel(apprenticeshipLevelRaw);
+        const apprenticeshipLevel = normalizeApprenticeshipLevel(
+          apprenticeshipLevelRaw
+        );
 
         const updates: Record<string, string> = {};
         const fullName = [first, last].filter(Boolean).join(" ").trim();
@@ -441,9 +470,11 @@ export default function Profile() {
         if (graduationDate) updates.graduationDate = graduationDate;
         if (tradeSchoolName) updates.tradeSchoolName = tradeSchoolName;
         if (tradeProgramName) updates.tradeProgramName = tradeProgramName;
-        if (tradeGraduationDate) updates.tradeGraduationDate = tradeGraduationDate;
+        if (tradeGraduationDate)
+          updates.tradeGraduationDate = tradeGraduationDate;
         if (tradeField) updates.trade = tradeField;
-        if (apprenticeshipLevel) updates.apprenticeshipLevel = apprenticeshipLevel;
+        if (apprenticeshipLevel)
+          updates.apprenticeshipLevel = apprenticeshipLevel;
 
         if (Object.keys(updates).length) {
           updateProfileData(updates);
@@ -835,7 +866,7 @@ export default function Profile() {
       {isProcessing && (
         <View style={styles.processingOverlay} pointerEvents="auto">
           <Text style={styles.processingText}>
-            Your application is processing
+            Your file is being processed, please wait...
           </Text>
           <View style={styles.loadingArt}>
             <Animated.Image

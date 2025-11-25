@@ -25,7 +25,7 @@ export default function SignIn() {
 
   useEffect(() => {
     if (session) {
-      router.replace("/(tabs)");
+      router.replace("/eligibility-info");
     }
   }, [router, session]);
 
@@ -47,7 +47,7 @@ export default function SignIn() {
       setError(signInError);
       return;
     }
-    router.replace("/(tabs)");
+    router.replace("/eligibility-info");
   };
 
   const handleForgotPassword = async () => {

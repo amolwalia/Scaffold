@@ -68,6 +68,8 @@ export default function RootLayout() {
           <Stack.Screen name="web" options={{ headerShown: false }} />
           <Stack.Screen name="sign-in" options={{ headerShown: false }} />
           <Stack.Screen name="sign-up" options={{ headerShown: false }} />
+          <Stack.Screen name="confirm-email" options={{ headerShown: false }} />
+          <Stack.Screen name="upload-resume" options={{ headerShown: false }} />
         </Stack>
       </ProfileProvider>
     </AuthProvider>

@@ -27,7 +27,6 @@ export default function SignUp() {
     confirmPassword: "",
   });
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (session) {
@@ -43,7 +42,6 @@ export default function SignUp() {
   };
 
   const handleSubmit = async () => {
-    setNotice(null);
     if (!form.name.trim()) {
       setError("Please enter your name.");
       return;
@@ -73,9 +71,9 @@ export default function SignUp() {
     }
     if (newSession) {
       router.replace("/(tabs)");
-    } else {
-      setNotice("Check your email to confirm your account, then log in.");
+      return;
     }
+    router.replace("/confirm-email");
   };
 
   return (
@@ -136,8 +134,6 @@ export default function SignUp() {
           />
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          {notice ? <Text style={styles.noticeText}>{notice}</Text> : null}
-
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={handleSubmit}
@@ -202,10 +198,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "#E83B4D",
-    fontSize: 14,
-  },
-  noticeText: {
-    color: "#6B7280",
     fontSize: 14,
   },
   primaryButton: {
