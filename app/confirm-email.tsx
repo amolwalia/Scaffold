@@ -8,7 +8,6 @@ import {
   View,
 } from "react-native";
 import { Image } from "expo-image";
-import { Ionicons } from "@expo/vector-icons";
 
 export default function ConfirmEmail() {
   const router = useRouter();
