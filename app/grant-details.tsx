@@ -401,6 +401,7 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.orange,
     borderRadius: Theme.radius.button,
     ...Theme.padding.buttonLg,
+      marginTop: 10,
   },
   ctaText: {
     ...Theme.typography.button,

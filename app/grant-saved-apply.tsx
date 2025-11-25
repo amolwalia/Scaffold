@@ -234,7 +234,7 @@ export default function GrantSavedApplyScreen() {
                     >
                       <Ionicons name="checkmark" size={16} color="white" />
                     </View>
-                    <View>
+                    <View style={styles.progressCardText}>
                       <Text style={styles.stepText}>Step 1</Text>
                       <Text style={styles.stepTitle}>Check eligibility</Text>
                     </View>
@@ -262,7 +262,7 @@ export default function GrantSavedApplyScreen() {
                             onPress={() => toggleCheckbox(key)}
                           >
                             <View
-                              className="w-[20px] h-[20px] border-[1px] mr-[38px] items-center justify-center"
+                              className="w-[20px] h-[20px] border-[1px] mr-[20px] items-center justify-center"
                               style={{
                                 backgroundColor: checkedItems[key]
                                   ? Theme.colors.purple
@@ -278,7 +278,9 @@ export default function GrantSavedApplyScreen() {
                                 />
                               )}
                             </View>
-                            <Text style={styles.progressCheckText}>{label}</Text>
+                            <View style={styles.progressCheckLabel}>
+                              <Text style={styles.progressCheckText}>{label}</Text>
+                            </View>
                           </TouchableOpacity>
                         );
                       })}
@@ -322,7 +324,7 @@ export default function GrantSavedApplyScreen() {
                     >
                       <Ionicons name="checkmark" size={16} color="white" />
                     </View>
-                    <View>
+                    <View style={styles.progressCardText}>
                       <Text style={styles.stepText}>Step 2</Text>
                       <Text style={styles.stepTitle}>Gather documents</Text>
                     </View>
@@ -350,7 +352,7 @@ export default function GrantSavedApplyScreen() {
                             onPress={() => toggleCheckbox(key)}
                           >
                             <View
-                              className="w-[20px] h-[20px] border-[1px] mr-[38px] items-center justify-center"
+                              className="w-[20px] h-[20px] border-[1px] mr-[20px] items-center justify-center"
                               style={{
                                 backgroundColor: checkedItems[key]
                                   ? Theme.colors.purple
@@ -366,7 +368,9 @@ export default function GrantSavedApplyScreen() {
                                 />
                               )}
                             </View>
-                            <Text style={styles.progressCheckText}>{label}</Text>
+                            <View style={styles.progressCheckLabel}>
+                              <Text style={styles.progressCheckText}>{label}</Text>
+                            </View>
                           </TouchableOpacity>
                         );
                       })}
@@ -389,14 +393,14 @@ export default function GrantSavedApplyScreen() {
                         borderRadius: 50,
                         width: 25,
                         height: 25,
-                        marginRight: 36,
+                        marginRight: 20,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
                       <Ionicons name="checkmark" size={16} color="white" />
                     </View>
-                    <View>
+                    <View style={styles.progressCardText}>
                       <Text style={styles.stepText}>Step 3</Text>
                       <Text style={styles.stepTitle}>Submit application</Text>
                     </View>
@@ -462,14 +466,14 @@ export default function GrantSavedApplyScreen() {
                         borderRadius: 50,
                         width: 25,
                         height: 25,
-                        marginRight: 36,
+                        marginRight: 20,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
                       <Ionicons name="checkmark" size={16} color="white" />
                     </View>
-                    <View>
+                    <View style={styles.progressCardText}>
                       <Text style={styles.stepText}>Step 4</Text>
                       <Text style={styles.stepTitle}>Wait for results</Text>
                     </View>
@@ -598,7 +602,7 @@ const styles = StyleSheet.create({
   },
   progressCardItem: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
     paddingTop: 15,
     paddingLeft: 21,
@@ -607,14 +611,22 @@ const styles = StyleSheet.create({
   },
   progressCardItemContent: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
+    flexGrow: 1,
+    flexShrink: 1,
+    minWidth: 0,
+  },
+  progressCardText: {
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
   },
   checkIcon: {
     backgroundColor: Theme.colors.purple,
     borderRadius: 50,
     width: 25,
     height: 25,
-    marginRight: 36,
+    marginRight: 20,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -644,5 +656,10 @@ const styles = StyleSheet.create({
   progressCheckItem: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  progressCheckLabel: {
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
   },
 });
