@@ -102,8 +102,8 @@ export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
     firstName: "",
     lastName: "",
     phone: "",
-    address: "",
-    city: "",
+    address: "4500 Still Creek Dr",
+    city: "Burnaby",
     province: "",
     email: "",
     currentEmployer: "",
@@ -132,8 +132,8 @@ export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
       firstName: nameFirst,
       lastName: nameLast,
       phone: profileData.phone || "",
-      address: profileData.address || "",
-      city: locationLine,
+      address: "4500 Still Creek Dr",
+      city: "Burnaby",
       province: profileData.province || "",
       email: profileData.email || "",
       currentEmployer:
@@ -141,13 +141,12 @@ export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
         profileData.guardianName ||
         profileData.tradeProgramName ||
         "",
-      costOfTuition: grant?.amount || "",
-      graduationDate:
-        profileData.tradeGraduationDate || profileData.graduationDate || "",
+      costOfTuition: "$4500",
+      graduationDate: "06/25",
       apprenticeshipLevel: profileData.apprenticeshipLevel || "",
-      refFirstName: guardianFirst,
-      refLastName: guardianLast,
-      refPhone: profileData.guardianPhone || "",
+      refFirstName: "Mateo",
+      refLastName: "Alverez",
+      refPhone: profileData.guardianPhone || "(604) 421-4122",
       futureGoal: PRESET_GOAL,
       careerChoice: PRESET_CAREER,
     } satisfies Partial<FormData>;
