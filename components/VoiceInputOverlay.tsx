@@ -254,7 +254,7 @@ export default function VoiceInputOverlay({
             <Ionicons name="close" size={24} color="#B0B0B0" />
           </TouchableOpacity>
 
-          {renderWaveform()}
+          <View style={{ marginBottom: 36 }}>{renderWaveform()}</View>
 
           {phase === "idle" && (
             <>
@@ -355,8 +355,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     borderRadius: 16,
     width: "85%",
-    paddingVertical: 40,
-    paddingHorizontal: 24,
+    paddingVertical: 38,
+    paddingHorizontal: 28,
     alignItems: "center",
   },
   close: { position: "absolute", top: 20, left: 20 },
@@ -364,15 +364,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#7C3AED",
     fontWeight: "600",
-    marginBottom: 24,
+    marginBottom: 26,
   },
   subHeading: {
     fontSize: 15,
     color: "#7C3AED",
-    marginBottom: 16,
+    marginBottom: 24,
     textAlign: "center",
   },
-  scroll: { maxHeight: 140, marginBottom: 24 },
+  scroll: { maxHeight: 140, marginBottom: 32 },
   transcript: { textAlign: "center", fontSize: 14, color: "#000" },
   startButton: {
     flexDirection: "row",
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "70%",
+    width: "80%",
   },
   circleLight: {
     backgroundColor: "#E9D5FF",
