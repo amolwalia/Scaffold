@@ -6,6 +6,7 @@ import * as Clipboard from "expo-clipboard";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,7 +20,7 @@ import SavePDFButton from "./SavePDFButton";
 import SparkleIcon from "./SparkleIcon";
 
 const PRESET_GOAL =
-  "My future goal is to become a certified journeyperson and eventually lead my own crew on complex builds. I want to keep learning advanced techniques so I can mentor other apprentices.";
+  "My future goal is to become a certified journey person and eventually lead my own crew on complex builds. I want to keep learning advanced techniques so I can mentor other apprentices.";
 const PRESET_CAREER =
   "I chose this trade because I enjoy building tangible projects, solving problems with my hands, and seeing the impact our work has on communities.";
 
@@ -166,11 +167,22 @@ export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
   const applyUrl = grant?.apply.portal.url;
 
   const handleApplyPress = () => {
-    if (applyUrl) {
-      Linking.openURL(applyUrl).catch((err) =>
-        console.log("Unable to open portal URL", err)
-      );
+    if (!applyUrl) {
+      return;
     }
+
+    if (Platform.OS === "web" && typeof window !== "undefined") {
+      window.open(
+        applyUrl,
+        "_blank",
+        "noopener,noreferrer,width=1200,height=900"
+      );
+      return;
+    }
+
+    Linking.openURL(applyUrl).catch((err) =>
+      console.log("Unable to open portal URL", err)
+    );
   };
 
   return (
