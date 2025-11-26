@@ -157,6 +157,12 @@ export default function GrantsScreen() {
         break;
     }
 
+    if (selectedTab === "All") {
+      const eligibleItems = finalResult.filter((g) => g.eligible);
+      const otherItems = finalResult.filter((g) => !g.eligible);
+      finalResult = [...eligibleItems, ...otherItems];
+    }
+
     return finalResult;
   }, [
     grantsWithEligibility,

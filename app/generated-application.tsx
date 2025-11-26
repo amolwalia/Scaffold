@@ -5,9 +5,10 @@ import { Theme } from "@/constants/theme";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Linking,
+  LayoutChangeEvent,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -21,6 +22,7 @@ const PRESET_GOAL =
   "My future goal is to become a certified journeyperson and eventually lead my own crew on complex builds. I want to keep learning advanced techniques so I can mentor other apprentices.";
 const PRESET_CAREER =
   "I chose this trade because I enjoy building tangible projects, solving problems with my hands, and seeing the impact our work has on communities.";
+const MIN_WRITTEN_ANSWER_HEIGHT = 80;
 
 export default function GeneratedApplicationScreen() {
   const router = useRouter();
@@ -31,8 +33,41 @@ export default function GeneratedApplicationScreen() {
     goal: "",
     career: "",
   });
-  const [goalAnswerHeight, setGoalAnswerHeight] = useState(80);
-  const [careerAnswerHeight, setCareerAnswerHeight] = useState(80);
+  const [goalAnswerHeight, setGoalAnswerHeight] = useState(
+    MIN_WRITTEN_ANSWER_HEIGHT
+  );
+  const [careerAnswerHeight, setCareerAnswerHeight] = useState(
+    MIN_WRITTEN_ANSWER_HEIGHT
+  );
+  const handleGoalMirrorLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const height = event.nativeEvent.layout.height;
+      if (!height) return;
+      setGoalAnswerHeight((prev) => {
+        const next = Math.max(
+          MIN_WRITTEN_ANSWER_HEIGHT,
+          Math.ceil(height)
+        );
+        return Math.abs(prev - next) < 0.5 ? prev : next;
+      });
+    },
+    []
+  );
+
+  const handleCareerMirrorLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const height = event.nativeEvent.layout.height;
+      if (!height) return;
+      setCareerAnswerHeight((prev) => {
+        const next = Math.max(
+          MIN_WRITTEN_ANSWER_HEIGHT,
+          Math.ceil(height)
+        );
+        return Math.abs(prev - next) < 0.5 ? prev : next;
+      });
+    },
+    []
+  );
 
   const autoFilledProfile = useMemo(
     () => ({
@@ -321,30 +356,31 @@ export default function GeneratedApplicationScreen() {
                   </TouchableOpacity>
                 </View>
 
-                <TextInput
-                  style={{
-                    backgroundColor: Theme.colors.white,
-                    borderRadius: Theme.radius.card,
-                    padding: Theme.spacing.md,
-                    minHeight: 80,
-                    height: goalAnswerHeight,
-                    marginBottom: Theme.spacing.sm,
-                    ...Theme.typography.body,
-                  }}
-                  placeholderTextColor={Theme.colors.grey}
-                  placeholder="Enter your response here..."
-                  value={writtenAnswers.goal}
-                  onChangeText={(text) =>
-                    setWrittenAnswers((prev) => ({ ...prev, goal: text }))
-                  }
-                  multiline
-                  textAlignVertical="top"
-                  onContentSizeChange={(event) =>
-                    setGoalAnswerHeight(
-                      Math.max(80, event.nativeEvent.contentSize.height)
-                    )
-                  }
-                />
+                <View style={{ marginBottom: Theme.spacing.sm }}>
+                  <View style={styles.answerInputWrap}>
+                    <TextInput
+                      style={[
+                        styles.answerInput,
+                        { height: goalAnswerHeight },
+                      ]}
+                      placeholderTextColor={Theme.colors.grey}
+                      placeholder="Enter your response here..."
+                      value={writtenAnswers.goal}
+                      onChangeText={(text) =>
+                        setWrittenAnswers((prev) => ({ ...prev, goal: text }))
+                      }
+                      multiline
+                      scrollEnabled={false}
+                      textAlignVertical="top"
+                    />
+                    <Text
+                      style={[styles.answerInput, styles.answerMirror]}
+                      onLayout={handleGoalMirrorLayout}
+                    >
+                      {writtenAnswers.goal || " "}
+                    </Text>
+                  </View>
+                </View>
               </View>
 
               <View>
@@ -370,30 +406,31 @@ export default function GeneratedApplicationScreen() {
                 >
                   <SparkleIcon />
                 </TouchableOpacity>
-                <TextInput
-                  style={{
-                    backgroundColor: Theme.colors.white,
-                    borderRadius: Theme.radius.card,
-                    padding: Theme.spacing.md,
-                    minHeight: 80,
-                    height: careerAnswerHeight,
-                    marginBottom: Theme.spacing.sm,
-                    ...Theme.typography.body,
-                  }}
-                  placeholderTextColor={Theme.colors.grey}
-                  placeholder="Enter your response here..."
-                  value={writtenAnswers.career}
-                  onChangeText={(text) =>
-                    setWrittenAnswers((prev) => ({ ...prev, career: text }))
-                  }
-                  multiline
-                  textAlignVertical="top"
-                  onContentSizeChange={(event) =>
-                    setCareerAnswerHeight(
-                      Math.max(80, event.nativeEvent.contentSize.height)
-                    )
-                  }
-                />
+                <View style={{ marginBottom: Theme.spacing.sm }}>
+                  <View style={styles.answerInputWrap}>
+                    <TextInput
+                      style={[
+                        styles.answerInput,
+                        { height: careerAnswerHeight },
+                      ]}
+                      placeholderTextColor={Theme.colors.grey}
+                      placeholder="Enter your response here..."
+                      value={writtenAnswers.career}
+                      onChangeText={(text) =>
+                        setWrittenAnswers((prev) => ({ ...prev, career: text }))
+                      }
+                      multiline
+                      scrollEnabled={false}
+                      textAlignVertical="top"
+                    />
+                    <Text
+                      style={[styles.answerInput, styles.answerMirror]}
+                      onLayout={handleCareerMirrorLayout}
+                    >
+                      {writtenAnswers.career || " "}
+                    </Text>
+                  </View>
+                </View>
               </View>
             </View>
           </View>
@@ -506,5 +543,26 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     flex: 1,
     alignSelf: 'flex-start',
+  },
+  answerInput: {
+    backgroundColor: Theme.colors.white,
+    borderRadius: Theme.radius.card,
+    padding: Theme.spacing.md,
+    minHeight: 80,
+    ...Theme.typography.body,
+    width: "100%",
+  },
+  answerInputWrap: {
+    width: "100%",
+    position: "relative",
+  },
+  answerMirror: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    opacity: 0,
+    zIndex: -1,
+    pointerEvents: "none",
   },
 });
