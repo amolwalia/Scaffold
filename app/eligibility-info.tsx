@@ -1,3 +1,4 @@
+import { Theme } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { Stack, useRouter } from "expo-router";
@@ -97,20 +98,14 @@ const styles = StyleSheet.create({
     height: 260,
   },
   primaryButton: {
-    backgroundColor: "#FF890C",
-    borderRadius: 999,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#FF890C",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.22,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: Theme.colors.orange,
+    borderRadius: Theme.radius.button,
+    ...Theme.padding.buttonLg,
+    marginTop: 10,
   },
   primaryButtonText: {
-    color: "#0F172A",
-    fontSize: 18,
-    fontWeight: "700",
+    ...Theme.typography.button,
+    color: Theme.colors.black,
+    textAlign: "center",
   },
 });

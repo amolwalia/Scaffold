@@ -1,4 +1,5 @@
 import ProfileExitModal from "@/components/ProfileExitModal";
+import { Theme } from "@/constants/theme";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -182,14 +183,14 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   continueButton: {
-    backgroundColor: "#F59E0B",
-    paddingVertical: 16,
-    borderRadius: 12,
     alignItems: "center",
+    backgroundColor: Theme.colors.orange,
+    borderRadius: Theme.radius.button,
+    ...Theme.padding.buttonLg,
   },
   continueButtonText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#FFFFFF",
+    ...Theme.typography.button,
+    color: Theme.colors.black,
+    textAlign: "center",
   },
 });

@@ -1,3 +1,4 @@
+import { Theme } from "@/constants/theme";
 import VoiceInputOverlay, {
   VoiceResultExtras,
 } from "@/components/VoiceInputOverlay";
@@ -188,14 +189,14 @@ const styles = StyleSheet.create({
     transform: [{ translateY: -9 }],
   },
   nextButton: {
-    backgroundColor: "#FF8A00",
-    borderRadius: 25,
-    paddingVertical: 14,
+    backgroundColor: Theme.colors.orange,
+    borderRadius: Theme.radius.button,
+    ...Theme.padding.buttonLg,
     marginTop: 40,
   },
   nextButtonText: {
+    ...Theme.typography.button,
+    color: Theme.colors.black,
     textAlign: "center",
-    fontWeight: "600",
-    color: "#000",
   },
 });

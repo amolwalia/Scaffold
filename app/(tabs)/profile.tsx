@@ -1,5 +1,6 @@
 import ProfileProgressCard from "@/components/ProfileProgressCard";
 import ProfileSectionCard from "@/components/ProfileSectionCard";
+import { Theme } from "@/constants/theme";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -1013,27 +1014,27 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   continueButton: {
-    backgroundColor: "#F59E0B",
+    backgroundColor: Theme.colors.orange,
     marginHorizontal: 20,
     marginTop: 24,
     marginBottom: 12,
-    paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: Theme.radius.button,
+    ...Theme.padding.buttonLg,
     alignItems: "center",
   },
   logoutButton: {
-    backgroundColor: "#F59E0B",
+    backgroundColor: Theme.colors.orange,
     marginHorizontal: 20,
     marginTop: 8,
     marginBottom: 32,
-    paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: Theme.radius.button,
+    ...Theme.padding.buttonLg,
     alignItems: "center",
   },
   continueButtonText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#FFFFFF",
+    ...Theme.typography.button,
+    color: Theme.colors.black,
+    textAlign: "center",
   },
   processingOverlay: {
     position: "absolute",

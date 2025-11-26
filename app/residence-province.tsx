@@ -1,4 +1,5 @@
 import ProfileExitModal from "@/components/ProfileExitModal";
+import { Theme } from "@/constants/theme";
 import VoiceInputOverlay from "@/utilities/useVoiceToText";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -246,17 +247,17 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     flex: 1,
-    backgroundColor: "#F59E0B",
-    paddingVertical: 16,
-    borderRadius: 12,
     alignItems: "center",
+    backgroundColor: Theme.colors.orange,
+    borderRadius: Theme.radius.button,
+    ...Theme.padding.buttonLg,
   },
   nextButtonDisabled: {
     opacity: 0.5,
   },
   nextButtonText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#FFFFFF",
+    ...Theme.typography.button,
+    color: Theme.colors.black,
+    textAlign: "center",
   },
 });
