@@ -1,6 +1,8 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { Fonts } from "@/constants/theme";
+
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -89,7 +91,7 @@ export default function SignUp() {
         <View style={styles.logoBlock}>
           <Image
             source={require("../assets/images/scaf logo.svg")}
-            style={{ width: 120, height: 120 }}
+            style={{ width: 82, height: 82 }}
             contentFit="contain"
             accessibilityLabel="Scaffold icon"
           />
@@ -177,55 +179,54 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     textAlign: "center",
-    marginTop: 16,
+    marginTop: 27,
     color: "#7260CC",
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 16,
     lineHeight: 22,
+    fontFamily: Fonts.bold,
+    maxWidth: 220,
   },
   form: {
-    gap: 14,
+    gap: 10,
   },
   input: {
     backgroundColor: "#FFFFFF",
-    borderColor: "#D6D6DE",
+    borderColor: "#C9C9D2",
     borderWidth: 1.2,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    fontSize: 14,
     color: "#0F172A",
+    fontFamily: Fonts.medium,
   },
   errorText: {
     color: "#E83B4D",
     fontSize: 14,
+    fontFamily: Fonts.medium,
   },
   primaryButton: {
     backgroundColor: "#FF890C",
     borderRadius: 999,
     paddingVertical: 16,
+    marginTop: 36, 
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 4,
-    shadowColor: "#FF890C",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.22,
-    shadowRadius: 8,
-    elevation: 4,
   },
   primaryButtonText: {
     color: "#0F172A",
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 15,
+    fontFamily: Fonts.medium,
   },
   switchText: {
     textAlign: "center",
-    marginTop: 12,
-    fontSize: 16,
+    marginTop: 27,
+    fontSize: 14,
     color: "#1F2937",
+    fontFamily: Fonts.medium
   },
   linkText: {
     textDecorationLine: "underline",
-    fontWeight: "700",
+    fontFamily: Fonts.bold
   },
 });
