@@ -142,7 +142,7 @@ const grantLogos: Record<string, ImageSourcePropType> = {
   masonry: require("../assets/images/Masonry.png"),
   soroptimist: require("../assets/images/logo-soroptimist.svg"),
   cfbc: require("../assets/images/cfbc-logo.svg"),
-
+  nwic: require("../assets/images/NWIC-logo.png"),
 };
 
 export const grantCatalog: GrantDefinition[] = [
@@ -763,89 +763,113 @@ export const grantCatalog: GrantDefinition[] = [
     ],
   },
   {
-    id: "indigenous-skills-bridge",
-    title: "Indigenous Skills Bridge Fund",
-    organization: "First Peoples' Development",
-    amount: "Up to $5,000",
+    id: "project-iset",
+    title: "Project ISET – Indigenous Skills & Employment Training",
+    organization: "Northwest Indigenous Council (CAP Affiliate)",
+    amount: "Up to $10,000",
     deadline: "Rolling",
     category: "Training",
     summary:
-      "Flexible funding for Indigenous apprentices to cover relocation, tools, or living expenses during training.",
+      "Funding for Indigenous individuals who cannot access support from their Band, Métis Nation, or Inuit organizations. Covers tuition, books, equipment, and essential living supports.",
     description:
-      "Supports Indigenous trades learners with wrap-around costs not covered by standard tuition grants.",
+      "Supports Indigenous learners entering the labour market, especially non-Status, Eastern Métis, and Southern Inuit individuals, by covering training costs and reducing financial barriers.",
     fullDescription: defaultFullDescription(
-      "Supports Indigenous trades learners with wrap-around costs not covered by standard tuition grants."
+      "Supports Indigenous learners entering the labour market, especially non-Status, Eastern Métis, and Southern Inuit individuals, by covering training costs and reducing financial barriers."
     ),
     active: true,
-    tags: ["indigenous", "living costs", "travel"],
-    imageUrl: grantLogos.workbc,
+    tags: ["indigenous", "training", "tuition", "equipment", "living expenses"],
+    imageUrl: grantLogos.nwic,
+  
     detailFacts: [
       {
         id: "funding",
-        label: "Up to $5,000",
+        label: "Training & Living Supports",
         icon: "cash-outline",
         bg: "#22C55E",
-        details: ["Use the fund for relocation, childcare, food security, or equipment."],
+        details: [
+          "Covers tuition, books, fees, equipment/supplies.",
+          "May include relocation or essential living supports if tied to training."
+        ],
       },
       {
         id: "date",
-        label: "Rolling intake",
+        label: "Rolling Intake",
         icon: "calendar-outline",
         bg: "#34D399",
-        details: ["Requests are reviewed weekly until the annual allocation is exhausted."],
+        details: ["Applications accepted year-round; funding subject to availability."],
       },
       {
-        id: "location",
-        label: "Nation/Community info",
+        id: "priority",
+        label: "Funding Priority",
         icon: "flag-outline",
         bg: "#F97316",
-        details: ["Provide your Nation, community, or Indigenous training partner details."],
+        details: [
+          "High priority: Non-status Indians, Eastern Métis, Southern Inuit, individuals with no other funding sources.",
+          "Low priority: People with past training funding, university graduates, or significant work experience."
+        ],
       },
       {
         id: "notes",
-        label: "Living supports",
-        icon: "leaf-outline",
+        label: "Important Notes",
+        icon: "alert-circle-outline",
         bg: "#A3E635",
-        details: ["Funding prioritizes essential supports that keep you enrolled."],
+        details: [
+          "Ineligible: Status First Nations living on-reserve, individuals recently funded by CAP, Master's/PhD programs, employed upskilling unless job loss risk.",
+        ],
       },
     ],
+  
     notes: [
-      "Funding can be combined with post-secondary Indigenous awards.",
-      "Prioritize requests tied to essential safety or relocation needs.",
+      "Applicants **must** apply to their Band/Métis Nation first. If denied, the denial letter must be included.",
+      "Funding is only provided if no other Indigenous organization can support you.",
+      "Low-priority applicants may be placed on a waitlist."
     ],
+  
     apply: {
       eligibilityChecks: [
-        "Self-identify as Indigenous, Métis, or Inuit",
-        "Provide proof of acceptance or current enrollment",
-        "Outline how funds reduce a barrier to training",
+        "Self-identify as Indigenous (non-status, Eastern Métis, Southern Inuit are priority).",
+        "Not eligible for Band/Métis Nation/Inuit training funding.",
+        "Training must support entering the labour market.",
+        "Provide all required supporting documents."
       ],
       requiredDocuments: [
-        "Letter of support from Nation or Indigenous training provider",
-        "Budget detailing expenses",
-        "Confirmation of enrollment",
+        "Proof of Indigenous ancestry (or contact CAP if unavailable).",
+        "Resume.",
+        "Letter of acceptance (training), OR job offer/letter of intent (employment programs).",
+        "One-page essay describing career situation and goals.",
+        "Cost breakdown from training institution.",
+        "Letter from Band/organization showing denial of funding (if applicable)."
       ],
       portal: {
-        label: "Indigenous Skills portal",
-        instructions: "Submit forms through your Indigenous Skills navigator or upload directly.",
+        label: "Project ISET Application",
+        instructions:
+          "Submit completed forms by email, fax, or mail to the CAP ISET department. Digital uploads accepted.",
+        url: "https://www.nwindigenous.org/project-iset/",
+
       },
     },
+  
     requirements: [
       {
         id: "citizenship",
-        label: "Indigenous identity noted",
+        label: "Indigenous identity confirmed",
         field: "citizenshipStatus",
         check: (profile) =>
           includesAny(profile.citizenshipStatus, [
+            "non-status",
             "indigenous",
             "indigenous citizen",
+            "Indigenous Citizen",
             "first nations",
             "metis",
             "inuit",
+            "eastern metis",
+            "southern inuit",
           ]),
       },
       {
         id: "address",
-        label: "Home address completed",
+        label: "Address provided",
         field: "address",
         check: (profile) => !!profile.address.trim(),
       },
@@ -856,185 +880,7 @@ export const grantCatalog: GrantDefinition[] = [
         check: (profile) => !!profile.tradeProgramName.trim(),
       },
     ],
-  },
-  {
-    id: "green-building-innovation",
-    title: "Green Building Innovation Grant",
-    organization: "CleanBC",
-    amount: "Up to $4,000",
-    deadline: "Oct 30",
-    category: "Innovation",
-    summary:
-      "Helps apprentices earn sustainability-focused add-ons like blower-door testing or heat pump installation tickets.",
-    description:
-      "Offsets the cost of specialized certifications tied to energy-efficient construction projects.",
-    fullDescription: defaultFullDescription(
-      "Offsets the cost of specialized certifications tied to energy-efficient construction projects."
-    ),
-    active: true,
-    tags: ["green building", "certifications", "energy"],
-    imageUrl: grantLogos.workbc,
-    detailFacts: [
-      {
-        id: "funding",
-        label: "Up to $4,000",
-        icon: "cash-outline",
-        bg: "#22C55E",
-        details: ["Covers tuition plus exam fees for sustainability add-on courses."],
-      },
-      {
-        id: "date",
-        label: "Apply by Oct 30",
-        icon: "calendar-outline",
-        bg: "#F59E0B",
-        details: ["Applications reviewed monthly until the fall deadline."],
-      },
-      {
-        id: "notes",
-        label: "Energy upgrades",
-        icon: "flash-outline",
-        bg: "#38BDF8",
-        details: ["Eligible training includes heat pump, blower-door, and passive house courses."],
-      },
-      {
-        id: "location",
-        label: "BC projects",
-        icon: "home-outline",
-        bg: "#0EA5E9",
-        details: ["Employer must deliver projects in British Columbia."],
-      },
-    ],
-    notes: [
-      "Approved courses include passive house, net-zero builder, and mechanical system upgrades.",
-      "Employers must sign off on how the training will be applied on-site.",
-    ],
-    apply: {
-      eligibilityChecks: [
-        "Employer delivers projects in BC",
-        "Course is on the CleanBC approved list",
-        "You have outlined how the training advances your role",
-      ],
-      requiredDocuments: [
-        "Employer commitment letter",
-        "Course outline or brochure",
-        "Short training plan (1-2 paragraphs)",
-      ],
-      portal: {
-        label: "CleanBC forms",
-        instructions: "Upload documents to the CleanBC partner portal or email the program inbox.",
-        url: "https://cleanbc.gov.bc.ca/",
-      },
-    },
-    requirements: [
-      {
-        id: "province",
-        label: "BC-based work",
-        field: "province",
-        check: (profile) => isBritishColumbia(profile.province),
-      },
-      {
-        id: "trade",
-        label: "Trade selected",
-        field: "trade",
-        check: (profile) => !!profile.trade.trim(),
-      },
-      {
-        id: "employer",
-        label: "Current employer on file",
-        field: "guardianName",
-        check: (profile) => !!profile.guardianName.trim(),
-      },
-    ],
-  },
-  {
-    id: "northern-relocation-support",
-    title: "Northern Community Relocation Grant",
-    organization: "Province of BC",
-    amount: "Up to $6,500",
-    deadline: "Rolling",
-    category: "Mobility",
-    summary:
-      "Covers relocation, travel, and housing when apprentices temporarily move to take training unavailable in their community.",
-    description:
-      "Supports rural and remote apprentices who travel to approved training institutions for block release.",
-    fullDescription: defaultFullDescription(
-      "Supports rural and remote apprentices who travel to approved training institutions for block release."
-    ),
-    active: true,
-    tags: ["relocation", "northern bc", "living costs"],
-    imageUrl: grantLogos.workbc,
-    detailFacts: [
-      {
-        id: "funding",
-        label: "Up to $6,500",
-        icon: "cash-outline",
-        bg: "#22C55E",
-        details: ["Covers travel, per diem, and temporary housing costs."],
-      },
-      {
-        id: "date",
-        label: "Apply once per intake",
-        icon: "calendar-outline",
-        bg: "#F59E0B",
-        details: ["One application per training block; submit 30 days before travel."],
-      },
-      {
-        id: "location",
-        label: "Proof of rural address",
-        icon: "navigate-outline",
-        bg: "#A855F7",
-        details: ["Postal code must be located 200km or more from the training campus."],
-      },
-      {
-        id: "notes",
-        label: "Travel + rent",
-        icon: "car-outline",
-        bg: "#FB7185",
-        details: ["Attach estimates for mileage, airfare, and rental housing."],
-      },
-    ],
-    notes: [
-      "Expenses covered include mileage, temporary housing, and per diem.",
-      "You must live at least 200km from the training campus.",
-    ],
-    apply: {
-      eligibilityChecks: [
-        "Live in a rural or northern postal code",
-        "Travelling 200km+ for training",
-        "Provide cost estimates for travel and housing",
-      ],
-      requiredDocuments: [
-        "Proof of address (utility bill or lease)",
-        "Training acceptance letter",
-        "Travel and accommodation budget",
-      ],
-      portal: {
-        label: "Apprenticeship travel portal",
-        instructions: "Upload receipts and budget prior to travel for pre-approval.",
-      },
-    },
-    requirements: [
-      {
-        id: "postal",
-        label: "Rural BC postal code",
-        field: "postalCode",
-        description: "Only rural or northern postal codes starting with V0 qualify.",
-        check: (profile) => isRuralBCPostalCode(profile.postalCode),
-      },
-      {
-        id: "address",
-        label: "Home address on file",
-        field: "address",
-        check: (profile) => !!profile.address.trim(),
-      },
-      {
-        id: "province",
-        label: "Based in BC",
-        field: "province",
-        check: (profile) => isBritishColumbia(profile.province),
-      },
-    ],
-  },
+  },  
 ];
 
 export const grantMap = grantCatalog.reduce<Record<string, GrantDefinition>>(
