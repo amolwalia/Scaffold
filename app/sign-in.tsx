@@ -2,6 +2,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { Fonts } from "@/constants/theme";
+
 import {
   ActivityIndicator,
   Alert,
@@ -89,7 +91,7 @@ export default function SignIn() {
         <View style={styles.logoWrapper}>
           <Image
             source={require("../assets/images/scaffold logo.svg")}
-            style={{ width: 220, height: 220 }}
+            style={{ width: 133, height: 156 }}
             contentFit="contain"
             accessibilityLabel="Scaffold logo"
           />
@@ -160,20 +162,21 @@ const styles = StyleSheet.create({
   },
   logoWrapper: {
     alignItems: "center",
-    marginBottom: 36,
+    marginBottom: 67,
   },
   form: {
-    gap: 16,
+    gap: 10,
   },
   input: {
     backgroundColor: "#FFFFFF",
     borderColor: "#C9C9D2",
     borderWidth: 1.2,
-    borderRadius: 16,
+    borderRadius: 10,
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
+    paddingVertical: 20,
+    fontSize: 14,
     color: "#0F172A",
+    fontFamily: Fonts.medium,
   },
   passwordRow: {
     gap: 8,
@@ -183,40 +186,40 @@ const styles = StyleSheet.create({
   },
   forgotText: {
     alignSelf: "flex-end",
-    marginTop: -4,
+    marginTop: -2,
     color: "#9696A1",
     fontSize: 14,
     textDecorationLine: "underline",
+    fontFamily: Fonts.medium,
   },
   errorText: {
     color: "#E83B4D",
     fontSize: 14,
+    fontFamily: Fonts.medium,
   },
   primaryButton: {
     backgroundColor: "#FF890C",
     borderRadius: 999,
     paddingVertical: 16,
+    marginTop: 36, 
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#FF890C",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.22,
-    shadowRadius: 8,
-    elevation: 4,
   },
   primaryButtonText: {
     color: "#0F172A",
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 15,
+    fontFamily: Fonts.medium,
   },
   switchText: {
     textAlign: "center",
-    marginTop: 12,
-    fontSize: 16,
+    marginTop: 27,
+    fontSize: 14,
     color: "#1F2937",
+    fontFamily: Fonts.medium,
   },
   linkText: {
     textDecorationLine: "underline",
     fontWeight: "700",
+    fontFamily: Fonts.bold,
   },
 });
