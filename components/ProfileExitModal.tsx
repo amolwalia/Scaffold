@@ -1,11 +1,6 @@
-import React from "react";
-import {
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Theme } from '@/constants/theme';
+import React from 'react';
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface ProfileExitModalProps {
   visible: boolean;
@@ -22,7 +17,9 @@ export default function ProfileExitModal({
     <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.overlay}>
         <View style={styles.card}>
-          <Text style={styles.title}>Do you want to stop profile creation?</Text>
+          <Text style={styles.title}>
+            Do you want to stop profile creation?
+          </Text>
           <Text style={styles.subtitle}>
             The profile helps you to create the eligibility check and
             application form.
@@ -48,67 +45,63 @@ export default function ProfileExitModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   card: {
-    backgroundColor: "#FFF",
-    borderRadius: 20,
-    paddingVertical: 32,
-    paddingHorizontal: 28,
-    width: "100%",
+    backgroundColor: '#FFF',
+    borderRadius: Theme.radius.card,
+    paddingVertical: 25,
+    paddingHorizontal: 23,
+    width: '100%',
   },
   title: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#1F1F2B",
-    textAlign: "center",
+    ...Theme.typography.h3,
+    color: Theme.colors.black,
+    textAlign: 'center',
     marginBottom: 12,
   },
   subtitle: {
-    fontSize: 15,
-    color: "#6B7280",
-    textAlign: "center",
+    ...Theme.typography.body,
+    color: Theme.colors.darkGrey,
+    textAlign: 'center',
     marginBottom: 10,
   },
   highlight: {
-    fontSize: 15,
-    color: "#8B5CF6",
-    fontWeight: "600",
-    textAlign: "center",
+    ...Theme.typography.bodyBold,
+    color: Theme.colors.brightPurple,
+    textAlign: 'center',
     marginBottom: 24,
   },
   actions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 5,
   },
   cancel: {
     flex: 1,
     borderWidth: 2,
-    borderColor: "#7DD321",
-    borderRadius: 999,
+    borderColor: Theme.colors.green,
+    borderRadius: Theme.radius.button,
     paddingVertical: 14,
-    alignItems: "center",
+    alignItems: 'center',
   },
   cancelText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#3EB208",
+    ...Theme.typography.button,
+    color: Theme.colors.green,
   },
   exit: {
     flex: 1,
-    backgroundColor: "#FF8A00",
-    borderRadius: 999,
+    backgroundColor: Theme.colors.orange,
+    borderRadius: Theme.radius.button,
     paddingVertical: 14,
-    alignItems: "center",
+    alignItems: 'center',
   },
   exitText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#1F1F2B",
+    ...Theme.typography.button,
+    color: Theme.colors.black,
   },
 });

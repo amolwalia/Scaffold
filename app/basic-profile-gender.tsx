@@ -1,18 +1,13 @@
-import ProfileExitModal from "@/components/ProfileExitModal";
-import { Theme } from "@/constants/theme";
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
-import { useProfile } from "@/contexts/ProfileContext";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import ProfileExitModal from '@/components/ProfileExitModal';
+import { Theme, Typography } from '@/constants/theme';
+import { useProfile } from '@/contexts/ProfileContext';
+import VoiceInputOverlay from '@/utilities/useVoiceToText';
+import { Ionicons } from '@expo/vector-icons';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const GENDERS = ["Male", "Female", "Non-Binary", "Prefer Not to Say"];
+const GENDERS = ['Male', 'Female', 'Non-Binary', 'Prefer Not to Say'];
 
 export default function BasicProfileGender() {
   const router = useRouter();
@@ -20,19 +15,22 @@ export default function BasicProfileGender() {
     mode?: string;
     returnTo?: string;
   }>();
-  const editingMode = typeof mode === "string" ? mode : undefined;
+  const editingMode = typeof mode === 'string' ? mode : undefined;
   const returnToPath =
-    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
-  const isEditingBasic = editingMode === "edit-basic";
+    typeof returnTo === 'string' ? returnTo : '/(tabs)/profile';
+  const isEditingBasic = editingMode === 'edit-basic';
   const { profileData, updateProfileData } = useProfile();
-  const [selectedGender, setSelectedGender] = useState(profileData.gender || "");
+  const [selectedGender, setSelectedGender] = useState(
+    profileData.gender || ''
+  );
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
 
   const handleVoiceResult = (text: string) => {
     const lowerText = text.toLowerCase();
     const match = GENDERS.find(
-      (g) => g.toLowerCase() === lowerText || lowerText.includes(g.toLowerCase())
+      (g) =>
+        g.toLowerCase() === lowerText || lowerText.includes(g.toLowerCase())
     );
     if (match) {
       setSelectedGender(match);
@@ -55,7 +53,7 @@ export default function BasicProfileGender() {
   const handleNext = () => {
     if (selectedGender) {
       updateProfileData({ gender: selectedGender });
-      navigateForward("/basic-profile-contact");
+      navigateForward('/basic-profile-contact');
     }
   };
 
@@ -69,7 +67,10 @@ export default function BasicProfileGender() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.headerButton}
+        >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Basic Profile</Text>
@@ -83,7 +84,7 @@ export default function BasicProfileGender() {
 
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: "25%" }]} />
+          <View style={[styles.progressFill, { width: '25%' }]} />
         </View>
       </View>
 
@@ -121,11 +122,14 @@ export default function BasicProfileGender() {
           style={styles.voiceButton}
           onPress={() => setShowVoiceOverlay(true)}
         >
-          <Ionicons name="mic" size={24} color="#8B5CF6" />
+          <Ionicons name="mic" size={24} color={Theme.colors.purple} />
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.nextButton, !selectedGender && styles.nextButtonDisabled]}
+          style={[
+            styles.nextButton,
+            !selectedGender && styles.nextButtonDisabled,
+          ]}
           onPress={handleNext}
           disabled={!selectedGender}
         >
@@ -152,23 +156,22 @@ export default function BasicProfileGender() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 80,
     paddingBottom: 16,
   },
   headerButton: {
     padding: 8,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#0B0B0F",
+    ...Theme.typography.h3,
+    color: Theme.colors.black,
   },
   progressContainer: {
     paddingHorizontal: 20,
@@ -176,73 +179,78 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Theme.colors.lightGrey,
     borderRadius: 2,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   progressFill: {
-    height: "100%",
-    backgroundColor: "#8B5CF6",
+    height: '100%',
+    backgroundColor: Theme.colors.purple,
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   instruction: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#0B0B0F",
-    textAlign: "center",
-    marginBottom: 32,
+    ...Typography.h2,
+    fontFamily: Theme.fonts.bold,
+    color: Theme.colors.black,
+    textAlign: 'center',
+    marginBottom: 60,
   },
   genderContainer: {
-    gap: 16,
+    gap: 10,
   },
   genderButton: {
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 8,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    backgroundColor: "#FFFFFF",
+    borderColor: Theme.colors.grey,
+    borderRadius: Theme.radius.card,
+    paddingVertical: 12,
+    paddingHorizontal: 26,
+    backgroundColor: Theme.colors.white,
+    width: 330,
+    height: 55,
+    alignSelf: 'center',
+    justifyContent: 'center',
   },
   genderButtonSelected: {
-    borderColor: "#8B5CF6",
-    backgroundColor: "#F3F2FF",
+    borderColor: Theme.colors.brightPurple,
+    backgroundColor: Theme.colors.lightPurple,
   },
   genderText: {
-    fontSize: 16,
-    color: "#9CA3AF",
-    textAlign: "center",
+    ...Typography.body,
+    color: Theme.colors.grey,
+    textAlign: 'center',
   },
   genderTextSelected: {
-    color: "#8B5CF6",
-    fontWeight: "600",
+    color: Theme.colors.brightPurple,
+    ...Typography.bodyBold,
   },
   footer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    gap: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 52,
+    paddingBottom: 120,
+    gap: 10,
   },
   voiceButton: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: 28,
     borderWidth: 2,
-    borderColor: "#8B5CF6",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    borderColor: Theme.colors.purple,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Theme.colors.white,
   },
   nextButton: {
-    flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: Theme.colors.orange,
     borderRadius: Theme.radius.button,
     ...Theme.padding.buttonLg,
+    width: 234,
+    height: 48,
   },
   nextButtonDisabled: {
     opacity: 0.5,
@@ -250,6 +258,6 @@ const styles = StyleSheet.create({
   nextButtonText: {
     ...Theme.typography.button,
     color: Theme.colors.black,
-    textAlign: "center",
+    textAlign: 'center',
   },
 });

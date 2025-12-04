@@ -1,9 +1,9 @@
-import BottomNavigation from "@/components/BottomNavigation";
-import { getGrantById } from "@/constants/grants";
-import { Theme } from "@/constants/theme";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import BottomNavigation from '@/components/BottomNavigation';
+import { getGrantById } from '@/constants/grants';
+import { Theme } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
   Linking,
   SafeAreaView,
@@ -12,7 +12,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 const buildKey = (prefix: string, index: number) => `${prefix}-${index}`;
 
@@ -37,10 +37,14 @@ export default function GrantSavedApplyScreen() {
 
   const isStep1Complete =
     eligibilityChecks.length > 0 &&
-    eligibilityChecks.every((_, index) => checkedItems[buildKey("eligibility", index)]);
+    eligibilityChecks.every(
+      (_, index) => checkedItems[buildKey('eligibility', index)]
+    );
   const isStep2Complete =
     requiredDocuments.length > 0 &&
-    requiredDocuments.every((_, index) => checkedItems[buildKey("document", index)]);
+    requiredDocuments.every(
+      (_, index) => checkedItems[buildKey('document', index)]
+    );
 
   const toggleStepExpansion = (stepKey: string) => {
     setExpandedSteps((prev) => ({ ...prev, [stepKey]: !prev[stepKey] }));
@@ -51,23 +55,23 @@ export default function GrantSavedApplyScreen() {
   };
 
   const handleApplicationResult = (
-    result: "approved" | "pending" | "rejected"
+    result: 'approved' | 'pending' | 'rejected'
   ) => {
-    console.log("Application result:", result);
+    console.log('Application result:', result);
   };
 
   const handlePortalPress = () => {
     const url = grant?.apply.portal.url;
     if (url) {
       Linking.openURL(url).catch(() => {
-        console.log("Unable to open portal URL");
+        console.log('Unable to open portal URL');
       });
     }
   };
 
   if (!grant) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
         <ScrollView
           contentContainerStyle={{
             paddingHorizontal: 20,
@@ -106,7 +110,7 @@ export default function GrantSavedApplyScreen() {
     : grant.description;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -164,13 +168,13 @@ export default function GrantSavedApplyScreen() {
                       { color: Theme.colors.grey, marginRight: 5 },
                     ]}
                   >
-                    {isDescriptionExpanded ? "Show less" : "Show more"}
+                    {isDescriptionExpanded ? 'Show less' : 'Show more'}
                   </Text>
                   <Ionicons
                     name={
                       isDescriptionExpanded
-                        ? "chevron-up-outline"
-                        : "chevron-down-outline"
+                        ? 'chevron-up-outline'
+                        : 'chevron-down-outline'
                     }
                     size={16}
                     color={Theme.colors.grey}
@@ -189,7 +193,7 @@ export default function GrantSavedApplyScreen() {
               }}
               onPress={() =>
                 router.push({
-                  pathname: "/generated-application",
+                  pathname: '/generated-application',
                   params: { id: grant.id },
                 })
               }
@@ -197,7 +201,7 @@ export default function GrantSavedApplyScreen() {
               <Text
                 style={[
                   Theme.typography.button,
-                  { color: Theme.colors.black, textAlign: "center" },
+                  { color: Theme.colors.black, textAlign: 'center' },
                 ]}
               >
                 Generate my application
@@ -219,7 +223,7 @@ export default function GrantSavedApplyScreen() {
               <View style={styles.progressCard}>
                 <TouchableOpacity
                   style={styles.progressCardItem}
-                  onPress={() => toggleStepExpansion("step1")}
+                  onPress={() => toggleStepExpansion('step1')}
                 >
                   <View style={styles.progressCardItemContent}>
                     <View
@@ -239,22 +243,24 @@ export default function GrantSavedApplyScreen() {
                       <Text style={styles.stepTitle}>Check eligibility</Text>
                     </View>
                   </View>
-                  <Ionicons
-                    name={
-                      expandedSteps.step1
-                        ? "chevron-up-outline"
-                        : "chevron-down-outline"
-                    }
-                    size={16}
-                    color={Theme.colors.black}
-                  />
+                  <View style={styles.chevronContainer}>
+                    <Ionicons
+                      name={
+                        expandedSteps.step1
+                          ? 'chevron-up-outline'
+                          : 'chevron-down-outline'
+                      }
+                      size={16}
+                      color={Theme.colors.black}
+                    />
+                  </View>
                 </TouchableOpacity>
 
                 {expandedSteps.step1 && (
                   <View>
                     <View style={styles.progressCheckContent}>
                       {eligibilityChecks.map((label, index) => {
-                        const key = buildKey("eligibility", index);
+                        const key = buildKey('eligibility', index);
                         return (
                           <TouchableOpacity
                             key={key}
@@ -266,7 +272,7 @@ export default function GrantSavedApplyScreen() {
                               style={{
                                 backgroundColor: checkedItems[key]
                                   ? Theme.colors.purple
-                                  : "transparent",
+                                  : 'transparent',
                                 borderColor: Theme.colors.purple,
                               }}
                             >
@@ -279,7 +285,9 @@ export default function GrantSavedApplyScreen() {
                               )}
                             </View>
                             <View style={styles.progressCheckLabel}>
-                              <Text style={styles.progressCheckText}>{label}</Text>
+                              <Text style={styles.progressCheckText}>
+                                {label}
+                              </Text>
                             </View>
                           </TouchableOpacity>
                         );
@@ -309,7 +317,7 @@ export default function GrantSavedApplyScreen() {
               <View style={styles.progressCard}>
                 <TouchableOpacity
                   style={styles.progressCardItem}
-                  onPress={() => toggleStepExpansion("step2")}
+                  onPress={() => toggleStepExpansion('step2')}
                 >
                   <View style={styles.progressCardItemContent}>
                     <View
@@ -329,22 +337,24 @@ export default function GrantSavedApplyScreen() {
                       <Text style={styles.stepTitle}>Gather documents</Text>
                     </View>
                   </View>
-                  <Ionicons
-                    name={
-                      expandedSteps.step2
-                        ? "chevron-up-outline"
-                        : "chevron-down-outline"
-                    }
-                    size={16}
-                    color={Theme.colors.black}
-                  />
+                  <View style={styles.chevronContainer}>
+                    <Ionicons
+                      name={
+                        expandedSteps.step2
+                          ? 'chevron-up-outline'
+                          : 'chevron-down-outline'
+                      }
+                      size={16}
+                      color={Theme.colors.black}
+                    />
+                  </View>
                 </TouchableOpacity>
 
                 {expandedSteps.step2 && (
                   <View>
                     <View style={styles.progressCheckContent}>
                       {requiredDocuments.map((label, index) => {
-                        const key = buildKey("document", index);
+                        const key = buildKey('document', index);
                         return (
                           <TouchableOpacity
                             key={key}
@@ -356,7 +366,7 @@ export default function GrantSavedApplyScreen() {
                               style={{
                                 backgroundColor: checkedItems[key]
                                   ? Theme.colors.purple
-                                  : "transparent",
+                                  : 'transparent',
                                 borderColor: Theme.colors.purple,
                               }}
                             >
@@ -369,7 +379,9 @@ export default function GrantSavedApplyScreen() {
                               )}
                             </View>
                             <View style={styles.progressCheckLabel}>
-                              <Text style={styles.progressCheckText}>{label}</Text>
+                              <Text style={styles.progressCheckText}>
+                                {label}
+                              </Text>
                             </View>
                           </TouchableOpacity>
                         );
@@ -384,7 +396,7 @@ export default function GrantSavedApplyScreen() {
               <View style={styles.progressCard}>
                 <TouchableOpacity
                   style={styles.progressCardItem}
-                  onPress={() => toggleStepExpansion("step3")}
+                  onPress={() => toggleStepExpansion('step3')}
                 >
                   <View style={styles.progressCardItemContent}>
                     <View
@@ -394,8 +406,9 @@ export default function GrantSavedApplyScreen() {
                         width: 25,
                         height: 25,
                         marginRight: 20,
-                        alignItems: "center",
-                        justifyContent: "center",
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        alignSelf: 'center',
                       }}
                     >
                       <Ionicons name="checkmark" size={16} color="white" />
@@ -405,15 +418,17 @@ export default function GrantSavedApplyScreen() {
                       <Text style={styles.stepTitle}>Submit application</Text>
                     </View>
                   </View>
-                  <Ionicons
-                    name={
-                      expandedSteps.step3
-                        ? "chevron-up-outline"
-                        : "chevron-down-outline"
-                    }
-                    size={16}
-                    color={Theme.colors.black}
-                  />
+                  <View style={styles.chevronContainer}>
+                    <Ionicons
+                      name={
+                        expandedSteps.step3
+                          ? 'chevron-up-outline'
+                          : 'chevron-down-outline'
+                      }
+                      size={16}
+                      color={Theme.colors.black}
+                    />
+                  </View>
                 </TouchableOpacity>
 
                 {expandedSteps.step3 && (
@@ -430,9 +445,9 @@ export default function GrantSavedApplyScreen() {
                           paddingBottom: 25,
                           paddingLeft: 16,
                           paddingRight: 16,
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                           marginTop: 10,
                         }}
                         onPress={handlePortalPress}
@@ -443,7 +458,7 @@ export default function GrantSavedApplyScreen() {
                             { color: Theme.colors.black },
                           ]}
                         >
-                          {grant.apply.portal.label || "Apply here"}
+                          {grant.apply.portal.label || 'Apply here'}
                         </Text>
                         <Ionicons name="open-outline" size={20} color="black" />
                       </TouchableOpacity>
@@ -457,7 +472,7 @@ export default function GrantSavedApplyScreen() {
               <View style={styles.progressCard}>
                 <TouchableOpacity
                   style={styles.progressCardItem}
-                  onPress={() => toggleStepExpansion("step4")}
+                  onPress={() => toggleStepExpansion('step4')}
                 >
                   <View style={styles.progressCardItemContent}>
                     <View
@@ -467,8 +482,9 @@ export default function GrantSavedApplyScreen() {
                         width: 25,
                         height: 25,
                         marginRight: 20,
-                        alignItems: "center",
-                        justifyContent: "center",
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        alignSelf: 'center',
                       }}
                     >
                       <Ionicons name="checkmark" size={16} color="white" />
@@ -478,15 +494,17 @@ export default function GrantSavedApplyScreen() {
                       <Text style={styles.stepTitle}>Wait for results</Text>
                     </View>
                   </View>
-                  <Ionicons
-                    name={
-                      expandedSteps.step4
-                        ? "chevron-up-outline"
-                        : "chevron-down-outline"
-                    }
-                    size={16}
-                    color={Theme.colors.black}
-                  />
+                  <View style={styles.chevronContainer}>
+                    <Ionicons
+                      name={
+                        expandedSteps.step4
+                          ? 'chevron-up-outline'
+                          : 'chevron-down-outline'
+                      }
+                      size={16}
+                      color={Theme.colors.black}
+                    />
+                  </View>
                 </TouchableOpacity>
 
                 {expandedSteps.step4 && (
@@ -497,7 +515,7 @@ export default function GrantSavedApplyScreen() {
                       </Text>
                       <View
                         style={{
-                          flexDirection: "column",
+                          flexDirection: 'column',
                           gap: Theme.spacing.md,
                           paddingLeft: 80,
                           paddingRight: 80,
@@ -511,14 +529,14 @@ export default function GrantSavedApplyScreen() {
                             flex: 1,
                             ...Theme.padding.buttonSm,
                           }}
-                          onPress={() => handleApplicationResult("approved")}
+                          onPress={() => handleApplicationResult('approved')}
                         >
                           <Text
                             style={[
                               Theme.typography.button,
                               {
                                 color: Theme.colors.black,
-                                textAlign: "center",
+                                textAlign: 'center',
                               },
                             ]}
                           >
@@ -532,14 +550,14 @@ export default function GrantSavedApplyScreen() {
                             flex: 1,
                             ...Theme.padding.buttonSm,
                           }}
-                          onPress={() => handleApplicationResult("pending")}
+                          onPress={() => handleApplicationResult('pending')}
                         >
                           <Text
                             style={[
                               Theme.typography.button,
                               {
                                 color: Theme.colors.black,
-                                textAlign: "center",
+                                textAlign: 'center',
                               },
                             ]}
                           >
@@ -553,14 +571,14 @@ export default function GrantSavedApplyScreen() {
                             flex: 1,
                             ...Theme.padding.buttonSm,
                           }}
-                          onPress={() => handleApplicationResult("rejected")}
+                          onPress={() => handleApplicationResult('rejected')}
                         >
                           <Text
                             style={[
                               Theme.typography.button,
                               {
                                 color: Theme.colors.black,
-                                textAlign: "center",
+                                textAlign: 'center',
                               },
                             ]}
                           >
@@ -588,30 +606,30 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.white,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 12,
   },
   progressCard: {
     borderColor: Theme.colors.purpleStroke,
     borderWidth: 0.5,
     borderRadius: Theme.radius.card,
-    overflow: "hidden",
+    overflow: 'hidden',
     ...Theme.shadow.cardShadow,
   },
   progressCardItem: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
     paddingTop: 15,
     paddingLeft: 21,
     paddingRight: 21,
     paddingBottom: 13,
   },
   progressCardItemContent: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     flexGrow: 1,
     flexShrink: 1,
     minWidth: 0,
@@ -627,8 +645,9 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     marginRight: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
   stepText: {
     color: Theme.colors.black,
@@ -641,8 +660,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   progressCheckContent: {
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
     gap: 12,
     paddingTop: 13,
     paddingLeft: 24,
@@ -654,12 +673,15 @@ const styles = StyleSheet.create({
     ...Theme.typography.body,
   },
   progressCheckItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   progressCheckLabel: {
     flex: 1,
     flexShrink: 1,
     minWidth: 0,
+  },
+  chevronContainer: {
+    alignSelf: 'center',
   },
 });

@@ -1,8 +1,9 @@
-import { transcribeAndCleanAudio } from "@/utilities/voiceTranscription";
-import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
-import * as FileSystem from "expo-file-system";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Theme } from '@/constants/theme';
+import { transcribeAndCleanAudio } from '@/utilities/voiceTranscription';
+import { Ionicons } from '@expo/vector-icons';
+import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -14,7 +15,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 export interface VoiceResultExtras {
   rawText: string;
@@ -42,15 +43,16 @@ export default function VoiceInputOverlay({
   contextPrompt,
 }: VoiceInputOverlayProps) {
   const [phase, setPhase] = useState<
-    "idle" | "listening" | "processing" | "review"
-  >("idle");
-  const [recognizedText, setRecognizedText] = useState("");
-  const [rawTranscript, setRawTranscript] = useState("");
+    'idle' | 'listening' | 'processing' | 'review'
+  >('idle');
+  const [recognizedText, setRecognizedText] = useState('');
+  const [rawTranscript, setRawTranscript] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [structuredData, setStructuredData] = useState<
-    Record<string, string> | null
-  >(null);
+  const [structuredData, setStructuredData] = useState<Record<
+    string,
+    string
+  > | null>(null);
   const recordingRef = useRef<Audio.Recording | null>(null);
 
   const bars = useRef(
@@ -83,9 +85,9 @@ export default function VoiceInputOverlay({
   }, [bars, isListening]);
 
   const resetState = () => {
-    setPhase("idle");
-    setRecognizedText("");
-    setRawTranscript("");
+    setPhase('idle');
+    setRecognizedText('');
+    setRawTranscript('');
     setIsListening(false);
     setErrorMessage(null);
     setStructuredData(null);
@@ -121,14 +123,14 @@ export default function VoiceInputOverlay({
 
   const startListening = async () => {
     try {
-      if (Platform.OS === "web") {
-        alert("Voice recording works best on a device or emulator.");
+      if (Platform.OS === 'web') {
+        alert('Voice recording works best on a device or emulator.');
         return;
       }
 
       const permission = await Audio.requestPermissionsAsync();
-      if (permission.status !== "granted") {
-        alert("Microphone access is required for voice input.");
+      if (permission.status !== 'granted') {
+        alert('Microphone access is required for voice input.');
         return;
       }
 
@@ -147,41 +149,41 @@ export default function VoiceInputOverlay({
       await recording.startAsync();
 
       recordingRef.current = recording;
-      setPhase("listening");
+      setPhase('listening');
       setIsListening(true);
-      setRecognizedText("");
-      setRawTranscript("");
+      setRecognizedText('');
+      setRawTranscript('');
       setErrorMessage(null);
     } catch (e) {
-      console.error("Speech start failed:", e);
-      setErrorMessage("Unable to start recording. Please try again.");
+      console.error('Speech start failed:', e);
+      setErrorMessage('Unable to start recording. Please try again.');
     }
   };
 
   const stopListening = async () => {
     if (!recordingRef.current) {
-      setPhase("review");
+      setPhase('review');
       return;
     }
 
     setIsListening(false);
-    setPhase("processing");
+    setPhase('processing');
     setErrorMessage(null);
-    setRecognizedText("Transcribing your response...");
+    setRecognizedText('Transcribing your response...');
 
     let uri: string | null = null;
     try {
       await recordingRef.current.stopAndUnloadAsync();
       uri = recordingRef.current.getURI();
     } catch (error) {
-      console.error("Unable to stop recording:", error);
+      console.error('Unable to stop recording:', error);
     } finally {
       recordingRef.current = null;
     }
 
     if (!uri) {
-      setErrorMessage("Recording file unavailable. Please try again.");
-      setPhase("review");
+      setErrorMessage('Recording file unavailable. Please try again.');
+      setPhase('review');
       return;
     }
 
@@ -194,19 +196,19 @@ export default function VoiceInputOverlay({
           promptOverride: contextPrompt,
         });
       setRawTranscript(rawText);
-      setRecognizedText(cleanedText || rawText || "");
+      setRecognizedText(cleanedText || rawText || '');
       setStructuredData(structuredData || null);
     } catch (error) {
-      console.error("Transcription failed:", error);
-      setRawTranscript("");
-      setRecognizedText("");
+      console.error('Transcription failed:', error);
+      setRawTranscript('');
+      setRecognizedText('');
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : "Unable to transcribe. Please try again."
+          : 'Unable to transcribe. Please try again.'
       );
     } finally {
-      setPhase("review");
+      setPhase('review');
       try {
         await FileSystem.deleteAsync(uri, { idempotent: true });
       } catch {
@@ -227,7 +229,10 @@ export default function VoiceInputOverlay({
     onResult(
       recognizedText.trim(),
       rawTranscript
-        ? { rawText: rawTranscript, structuredData: structuredData || undefined }
+        ? {
+            rawText: rawTranscript,
+            structuredData: structuredData || undefined,
+          }
         : undefined
     );
     resetState();
@@ -244,68 +249,78 @@ export default function VoiceInputOverlay({
     </View>
   );
 
-  const isProcessing = phase === "processing";
+  const isProcessing = phase === 'processing';
 
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <TouchableOpacity onPress={handleClosePress} style={styles.close}>
-            <Ionicons name="close" size={24} color="#B0B0B0" />
+            <Ionicons name="close" size={24} color={Theme.colors.grey} />
           </TouchableOpacity>
 
           <View style={{ marginBottom: 36 }}>{renderWaveform()}</View>
 
-          {phase === "idle" && (
+          {phase === 'idle' && (
             <>
               <Text style={styles.heading}>Go ahead, I&apos;m listening!</Text>
               <TouchableOpacity
-                style={[styles.startButton, isProcessing && styles.disabledButton]}
+                style={[
+                  styles.startButton,
+                  isProcessing && styles.disabledButton,
+                ]}
                 onPress={startListening}
                 disabled={isProcessing}
               >
-                <Ionicons name="mic-outline" size={22} color="#8B5CF6" />
+                <Ionicons
+                  name="mic-outline"
+                  size={22}
+                  color={Theme.colors.brightPurple}
+                />
                 <Text style={styles.startText}>Start</Text>
               </TouchableOpacity>
             </>
           )}
 
-          {phase === "listening" && (
+          {phase === 'listening' && (
             <>
               <ScrollView style={styles.scroll}>
                 <Text style={styles.transcript}>
-                  {recognizedText || "Listening... speak now"}
+                  {recognizedText || 'Listening... speak now'}
                 </Text>
               </ScrollView>
-              <TouchableOpacity style={styles.stopButton} onPress={handleStopPress}>
-                <Ionicons name="pause" size={26} color="#FFF" />
+              <TouchableOpacity
+                style={styles.stopButton}
+                onPress={handleStopPress}
+              >
+                <Ionicons name="pause" size={26} color={Theme.colors.white} />
                 <Text style={styles.stopText}>Stop</Text>
               </TouchableOpacity>
             </>
           )}
 
-          {phase === "processing" && (
+          {phase === 'processing' && (
             <>
               <ScrollView style={styles.scroll}>
                 <Text style={styles.transcript}>
-                  {recognizedText || "Transcribing your response..."}
+                  {recognizedText || 'Transcribing your response...'}
                 </Text>
               </ScrollView>
               <View style={styles.processingButton}>
-                <ActivityIndicator color="#FFF" />
+                <ActivityIndicator color={Theme.colors.white} />
                 <Text style={styles.stopText}>Processing</Text>
               </View>
             </>
           )}
 
-          {phase === "review" && (
+          {phase === 'review' && (
             <>
               <Text style={styles.subHeading}>
                 Got it. Should I go ahead with this?
               </Text>
               <ScrollView style={styles.scroll}>
                 <Text style={styles.transcript}>
-                  {recognizedText || "No transcript available."}
+                  {recognizedText || 'No transcript available.'}
                 </Text>
               </ScrollView>
               {errorMessage && (
@@ -316,24 +331,37 @@ export default function VoiceInputOverlay({
                   style={styles.circleLight}
                   onPress={handleRetry}
                 >
-                  <Ionicons name="refresh" size={22} color="#8B5CF6" />
+                  <Ionicons
+                    name="refresh"
+                    size={22}
+                    color={Theme.colors.brightPurple}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.circleOutline}
                   onPress={startListening}
                   disabled={isProcessing}
                 >
-                  <Ionicons name="mic-outline" size={22} color="#8B5CF6" />
+                  <Ionicons
+                    name="mic-outline"
+                    size={22}
+                    color={Theme.colors.brightPurple}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
                     styles.circleConfirm,
-                    (!recognizedText || !!errorMessage) && styles.disabledConfirm,
+                    (!recognizedText || !!errorMessage) &&
+                      styles.disabledConfirm,
                   ]}
                   onPress={handleConfirm}
                   disabled={!recognizedText || !!errorMessage}
                 >
-                  <Ionicons name="checkmark" size={22} color="#FFF" />
+                  <Ionicons
+                    name="checkmark"
+                    size={22}
+                    color={Theme.colors.white}
+                  />
                 </TouchableOpacity>
               </View>
             </>
@@ -347,79 +375,91 @@ export default function VoiceInputOverlay({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modal: {
-    backgroundColor: "#FFF",
+    backgroundColor: Theme.colors.white,
     borderRadius: 16,
-    width: "85%",
+    width: '85%',
     paddingVertical: 38,
     paddingHorizontal: 28,
-    alignItems: "center",
+    alignItems: 'center',
   },
-  close: { position: "absolute", top: 20, left: 20 },
+  close: { position: 'absolute', top: 20, left: 20 },
   heading: {
     fontSize: 16,
-    color: "#7C3AED",
-    fontWeight: "600",
+    color: Theme.colors.brightPurple,
+    fontFamily: Theme.fonts.bold,
     marginBottom: 26,
   },
   subHeading: {
     fontSize: 15,
-    color: "#7C3AED",
+    color: Theme.colors.brightPurple,
     marginBottom: 24,
-    textAlign: "center",
+    textAlign: 'center',
   },
   scroll: { maxHeight: 140, marginBottom: 32 },
-  transcript: { textAlign: "center", fontSize: 14, color: "#000" },
+  transcript: {
+    textAlign: 'center',
+    ...Theme.typography.body,
+    color: Theme.colors.black,
+  },
   startButton: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
     borderWidth: 2,
-    borderColor: "#8B5CF6",
+    borderColor: Theme.colors.brightPurple,
     borderRadius: 30,
     paddingVertical: 10,
     paddingHorizontal: 20,
   },
-  startText: { fontSize: 15, fontWeight: "600", color: "#8B5CF6" },
+  startText: {
+    ...Theme.typography.button,
+    fontFamily: Theme.fonts.bold,
+    color: Theme.colors.brightPurple,
+  },
   stopButton: {
-    alignItems: "center",
-    backgroundColor: "#8B5CF6",
+    alignItems: 'center',
+    backgroundColor: Theme.colors.brightPurple,
     borderRadius: 50,
     paddingVertical: 14,
     paddingHorizontal: 28,
   },
   processingButton: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
-    backgroundColor: "#A78BFA",
+    backgroundColor: Theme.colors.brightPurple,
     borderRadius: 50,
     paddingVertical: 14,
     paddingHorizontal: 28,
   },
-  stopText: { color: "#FFF", fontWeight: "600", marginTop: 6 },
+  stopText: {
+    color: Theme.colors.white,
+    ...Theme.typography.button,
+    marginTop: 6,
+  },
   actions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "80%",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
   },
   circleLight: {
-    backgroundColor: "#E9D5FF",
+    backgroundColor: Theme.colors.lightPurple,
     borderRadius: 50,
     padding: 14,
   },
   circleOutline: {
     borderWidth: 2,
-    borderColor: "#8B5CF6",
+    borderColor: Theme.colors.brightPurple,
     borderRadius: 50,
     padding: 14,
   },
   circleConfirm: {
-    backgroundColor: "#FF8A00",
+    backgroundColor: Theme.colors.orange,
     borderRadius: 50,
     padding: 14,
   },
@@ -430,9 +470,9 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   waveformContainer: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
     marginBottom: 16,
     height: BAR_BASE_HEIGHT * 2,
   },
@@ -441,11 +481,11 @@ const styles = StyleSheet.create({
     height: BAR_BASE_HEIGHT,
     marginHorizontal: 3,
     borderRadius: 3,
-    backgroundColor: "#8B5CF6",
+    backgroundColor: Theme.colors.brightPurple,
   },
   errorText: {
-    color: "#DC2626",
-    textAlign: "center",
+    color: Theme.colors.red,
+    textAlign: 'center',
     marginBottom: 12,
   },
 });

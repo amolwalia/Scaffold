@@ -1,11 +1,12 @@
-import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Theme } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface ProfileSectionCardProps {
   title: string;
   completed: boolean;
-  completionCount: string; 
+  completionCount: string;
   children: React.ReactNode;
   showEditButton?: boolean;
   onEdit?: () => void;
@@ -23,7 +24,6 @@ export default function ProfileSectionCard({
 
   return (
     <View style={styles.card}>
-
       <TouchableOpacity
         style={styles.header}
         onPress={() => setIsExpanded(!isExpanded)}
@@ -31,24 +31,25 @@ export default function ProfileSectionCard({
       >
         <View style={styles.headerLeft}>
           <Ionicons
-            name={completed ? "checkmark-circle" : "checkmark-circle-outline"}
-            size={24}
-            color={completed ? "#8B5CF6" : "#9CA3AF"}
+            name={completed ? 'checkmark-circle' : 'checkmark-circle-outline'}
+            size={30}
+            color={completed ? Theme.colors.purple : Theme.colors.grey}
           />
           <Text style={styles.title}>{title}</Text>
           <Text
             style={[
               styles.completionCount,
-              { color: completed ? "#8B5CF6" : "#9CA3AF" },
+              { color: completed ? Theme.colors.purple : Theme.colors.grey },
             ]}
           >
             {completionCount}
           </Text>
         </View>
         <Ionicons
-          name={isExpanded ? "chevron-up" : "chevron-down"}
+          name={isExpanded ? 'chevron-up-outline' : 'chevron-down-outline'}
           size={20}
-          color="#9CA3AF"
+          color={Theme.colors.grey}
+          style={styles.iconArrow}
         />
       </TouchableOpacity>
 
@@ -72,55 +73,56 @@ export default function ProfileSectionCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
+    backgroundColor: Theme.colors.white,
+    borderRadius: Theme.radius.card,
     marginBottom: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    ...Theme.shadow.cardShadow,
+    borderColor: Theme.colors.purpleStroke,
+    borderWidth: 0.5,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 22,
   },
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
     gap: 12,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#0B0B0F",
+    ...Theme.typography.subhead1,
+    color: Theme.colors.black,
     flex: 1,
   },
   completionCount: {
-    fontSize: 14,
-    fontWeight: "500",
+    ...Theme.typography.body,
+    color: Theme.colors.darkGrey,
   },
   content: {
-    padding: 16,
-    paddingTop: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
   },
   editButton: {
-    borderWidth: 2,
-    borderColor: "#7CD23E",
-    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: Theme.colors.green,
+    borderRadius: Theme.radius.button,
     paddingVertical: 10,
     paddingHorizontal: 32,
-    alignSelf: "stretch",
-    alignItems: "center",
-    justifyContent: "center",
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 16,
+    height: 48,
   },
   editButtonText: {
-    color: "#3EB208",
-    fontSize: 16,
-    fontWeight: "600",
+    color: Theme.colors.green,
+    ...Theme.typography.button,
+  },
+  iconArrow: {
+    marginLeft: 10,
   },
 });

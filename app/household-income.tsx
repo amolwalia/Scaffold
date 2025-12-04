@@ -1,17 +1,17 @@
-import ProfileExitModal from "@/components/ProfileExitModal";
-import { Theme } from "@/constants/theme";
-import VoiceInputOverlay from "@/utilities/useVoiceToText";
-import { useProfile } from "@/contexts/ProfileContext";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import ProfileExitModal from '@/components/ProfileExitModal';
+import { Theme, Typography } from '@/constants/theme';
+import { useProfile } from '@/contexts/ProfileContext';
+import VoiceInputOverlay from '@/utilities/useVoiceToText';
+import { Ionicons } from '@expo/vector-icons';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 export default function HouseholdIncome() {
   const router = useRouter();
@@ -19,12 +19,12 @@ export default function HouseholdIncome() {
     mode?: string;
     returnTo?: string;
   }>();
-  const editingMode = typeof mode === "string" ? mode : undefined;
+  const editingMode = typeof mode === 'string' ? mode : undefined;
   const returnToPath =
-    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
-  const isEditingHousehold = editingMode === "edit-household";
+    typeof returnTo === 'string' ? returnTo : '/(tabs)/profile';
+  const isEditingHousehold = editingMode === 'edit-household';
   const { profileData, updateProfileData } = useProfile();
-  const [income, setIncome] = useState(profileData.annualFamilyNetIncome || "");
+  const [income, setIncome] = useState(profileData.annualFamilyNetIncome || '');
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
 
@@ -38,11 +38,11 @@ export default function HouseholdIncome() {
     updateProfileData({ annualFamilyNetIncome: income });
     if (isEditingHousehold && editingMode) {
       router.push({
-        pathname: "/household-guardian",
+        pathname: '/household-guardian',
         params: { mode: editingMode, returnTo: returnToPath },
       });
     } else {
-      router.push("/household-guardian");
+      router.push('/household-guardian');
     }
   };
 
@@ -51,7 +51,10 @@ export default function HouseholdIncome() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.headerButton}
+        >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Household information</Text>
@@ -65,7 +68,7 @@ export default function HouseholdIncome() {
 
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: "75%" }]} />
+          <View style={[styles.progressFill, { width: '75%' }]} />
         </View>
       </View>
 
@@ -90,7 +93,7 @@ export default function HouseholdIncome() {
           style={styles.voiceButton}
           onPress={() => setShowVoiceOverlay(true)}
         >
-          <Ionicons name="mic" size={24} color="#8B5CF6" />
+          <Ionicons name="mic" size={24} color={Theme.colors.purple} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
@@ -120,23 +123,22 @@ export default function HouseholdIncome() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Theme.colors.white,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 80,
     paddingBottom: 16,
   },
   headerButton: {
     padding: 8,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#0B0B0F",
+    ...Theme.typography.h3,
+    color: Theme.colors.black,
   },
   progressContainer: {
     paddingHorizontal: 20,
@@ -144,63 +146,70 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Theme.colors.lightGrey,
     borderRadius: 2,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   progressFill: {
-    height: "100%",
-    backgroundColor: "#8B5CF6",
+    height: '100%',
+    backgroundColor: Theme.colors.purple,
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 40,
+    justifyContent: 'center',
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#0B0B0F",
-    marginBottom: 24,
+    ...Typography.h2,
+    fontFamily: Theme.fonts.bold,
+    color: Theme.colors.black,
+    textAlign: 'center',
+    marginBottom: 60,
   },
   input: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Theme.colors.white,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 8,
+    borderColor: Theme.colors.grey,
+    borderRadius: Theme.radius.card,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    fontSize: 16,
-    color: "#0B0B0F",
-    marginBottom: 16,
+    width: 330,
+    height: 60,
+    ...Typography.body,
+    color: Theme.colors.black,
+    marginBottom: 10,
+    alignSelf: 'center',
   },
   footer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    gap: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 52,
+    paddingBottom: 120,
+    gap: 10,
   },
   voiceButton: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: 28,
     borderWidth: 2,
-    borderColor: "#8B5CF6",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    borderColor: Theme.colors.purple,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Theme.colors.white,
   },
   nextButton: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: Theme.colors.orange,
     borderRadius: Theme.radius.button,
     ...Theme.padding.buttonLg,
+    width: 234,
+    height: 48,
+    alignSelf: 'center',
   },
   nextButtonText: {
     ...Theme.typography.button,
     color: Theme.colors.black,
-    textAlign: "center",
+    textAlign: 'center',
   },
 });

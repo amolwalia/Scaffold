@@ -1,13 +1,13 @@
-import ProfileProgressCard from "@/components/ProfileProgressCard";
-import ProfileSectionCard from "@/components/ProfileSectionCard";
-import { Theme } from "@/constants/theme";
-import { useAuth } from "@/contexts/AuthContext";
-import { useProfile } from "@/contexts/ProfileContext";
-import { Ionicons } from "@expo/vector-icons";
-import * as DocumentPicker from "expo-document-picker";
-import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import ProfileProgressCard from '@/components/ProfileProgressCard';
+import ProfileSectionCard from '@/components/ProfileSectionCard';
+import { Fonts, Theme } from '@/constants/theme';
+import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/contexts/ProfileContext';
+import { Ionicons } from '@expo/vector-icons';
+import * as DocumentPicker from 'expo-document-picker';
+import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
@@ -18,11 +18,11 @@ import {
   TouchableOpacity,
   View,
   useWindowDimensions,
-} from "react-native";
+} from 'react-native';
 
-import { SvgXml } from "react-native-svg";
-import { RetrieveResponse } from "roughlyai";
-const LOADING_WHEEL = require("@/assets/images/loading-wheel.png");
+import { SvgXml } from 'react-native-svg';
+import { RetrieveResponse } from 'roughlyai';
+const LOADING_WHEEL = require('@/assets/images/loading-wheel.png');
 const LOADING_CHARACTER_SVG = `<svg width="93" height="93" viewBox="0 0 93 93" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g filter="url(#filter0_dii_2088_5100)">
 <g filter="url(#filter1_iii_2088_5100)">
@@ -125,7 +125,7 @@ interface ProfileFieldProps {
 }
 
 function ProfileField({ label, value }: ProfileFieldProps) {
-  const isEmpty = value === "Empty...";
+  const isEmpty = value === 'Empty...';
   return (
     <View style={styles.fieldContainer}>
       <Text style={styles.fieldLabel}>{label}</Text>
@@ -150,7 +150,7 @@ export default function Profile() {
   const spinnerAnimation = useRef<Animated.CompositeAnimation | null>(null);
   const spin = rotation.interpolate({
     inputRange: [0, 1],
-    outputRange: ["0deg", "3600deg"],
+    outputRange: ['0deg', '3600deg'],
   });
 
   useEffect(() => {
@@ -176,19 +176,19 @@ export default function Profile() {
     };
   }, [isProcessing, rotation]);
 
-  const displayValue = (value: string) => value || "Empty...";
+  const displayValue = (value: string) => value || 'Empty...';
   const { width } = useWindowDimensions();
   const stackHeaderButtons = width < 480;
 
   const pickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: "*/*", // any file type
+        type: '*/*', // any file type
         copyToCacheDirectory: true,
       });
 
       if (result.canceled) {
-        console.log("User canceled document picker");
+        console.log('User canceled document picker');
 
         return;
       }
@@ -197,14 +197,14 @@ export default function Profile() {
       setIsProcessing(true);
 
       //upload documents
-      console.log("Selected file:", file);
+      console.log('Selected file:', file);
       const _resp = await fetch(
-        "https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/",
+        'https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/',
         {
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({
-            type: "upload",
-            project_name: "Scaffold",
+            type: 'upload',
+            project_name: 'Scaffold',
             filename: file.name.toLocaleLowerCase(),
           }),
         }
@@ -214,7 +214,7 @@ export default function Profile() {
       }
 
       const uploadUrl: any = JSON.parse(await _resp.json());
-      console.log("what is url", uploadUrl);
+      console.log('what is url', uploadUrl);
       if (!uploadUrl?.url[0]) {
         throw new Error(`Invalid presigned URL.`);
       }
@@ -225,14 +225,14 @@ export default function Profile() {
       const resp = await fetch(fileUri);
       const fileBlob = await resp.blob();
 
-      console.log("what is happening", uploadUrl.url[0]);
+      console.log('what is happening', uploadUrl.url[0]);
       const uploadResponse = await fetch(uploadUrl.url[0], {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type":
+          'Content-Type':
             file.mimeType ||
             (file.mimeType as string) ||
-            "application/octet-stream",
+            'application/octet-stream',
         },
         body: fileBlob,
       });
@@ -243,12 +243,12 @@ export default function Profile() {
 
       //training documents
       const _resp_train = await fetch(
-        "https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/",
+        'https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/',
         {
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({
-            type: "train",
-            project_name: "Scaffold",
+            type: 'train',
+            project_name: 'Scaffold',
           }),
         }
       );
@@ -258,7 +258,7 @@ export default function Profile() {
       }
 
       const trainUrl: any = JSON.parse(await _resp_train.json());
-      console.log("what is train url", trainUrl.url);
+      console.log('what is train url', trainUrl.url);
       if (!trainUrl?.url) {
         throw new Error(`Invalid presigned URL.`);
       }
@@ -271,11 +271,11 @@ export default function Profile() {
 
       //prompting documents
       const _prompt = await fetch(
-        "https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/",
+        'https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/',
         {
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({
-            project_name: "Scaffold",
+            project_name: 'Scaffold',
             prompt: `From the document "${file.name}", extract every detail that can populate the profile. Respond ONLY with JSON (no prose) that matches {"first_name":string,"last_name":string,"email":string,"phone":string,"address":string,"postal_code":string,"province":string,"date_of_birth":string,"gender":string,"citizenship_status":string,"household_size":string,"family_composition":string,"annual_family_net_income":string,"guardian_name":string,"guardian_phone":string,"guardian_email":string,"highest_education":string,"school_name":string,"graduation_date":string,"trade_school_name":string,"trade_program_name":string,"trade_graduation_date":string,"trade":string,"apprenticeship_level":string}. When identifying apprenticeship_level, return the exact level label mentioned (e.g., "Level 1", "Level 2", "Level 3", "Level 4", or "Red Seal"). Use empty strings when a value cannot be found.`,
           }),
         }
@@ -286,7 +286,7 @@ export default function Profile() {
       }
 
       const _promptUrl: any = JSON.parse(await _prompt.json());
-      console.log("what is prompt url", _promptUrl.url);
+      console.log('what is prompt url', _promptUrl.url);
 
       if (!_promptUrl?.url) {
         throw new Error(`Invalid presigned URL.`);
@@ -297,59 +297,59 @@ export default function Profile() {
       const answerRaw = _prompt_response?.answer;
       let parsedAnswer: Record<string, string> | null = null;
       try {
-        if (typeof answerRaw === "string") {
+        if (typeof answerRaw === 'string') {
           parsedAnswer = JSON.parse(answerRaw);
-        } else if (answerRaw && typeof answerRaw === "object") {
+        } else if (answerRaw && typeof answerRaw === 'object') {
           parsedAnswer = answerRaw;
         }
       } catch (parseError) {
-        console.error("Failed to parse extracted profile info", parseError);
+        console.error('Failed to parse extracted profile info', parseError);
       }
 
       if (parsedAnswer) {
         const pickValue = (...values: unknown[]) => {
           for (const value of values) {
             if (value !== undefined && value !== null) {
-              return typeof value === "string"
+              return typeof value === 'string'
                 ? value.trim()
                 : String(value).trim();
             }
           }
-          return "";
+          return '';
         };
         const normalizeApprenticeshipLevel = (value: string) => {
           const lower = value.toLowerCase();
-          if (!lower) return "";
-          if (lower.includes("journeyman") || lower.includes("red seal")) {
-            return "Journeyman";
+          if (!lower) return '';
+          if (lower.includes('journeyman') || lower.includes('red seal')) {
+            return 'Journeyman';
           }
           if (
-            lower.includes("fourth") ||
-            lower.includes("level 4") ||
-            lower.includes("4th")
+            lower.includes('fourth') ||
+            lower.includes('level 4') ||
+            lower.includes('4th')
           ) {
-            return "Fourth Year Apprentice";
+            return 'Fourth Year Apprentice';
           }
           if (
-            lower.includes("third") ||
-            lower.includes("level 3") ||
-            lower.includes("3rd")
+            lower.includes('third') ||
+            lower.includes('level 3') ||
+            lower.includes('3rd')
           ) {
-            return "Third Year Apprentice";
+            return 'Third Year Apprentice';
           }
           if (
-            lower.includes("second") ||
-            lower.includes("level 2") ||
-            lower.includes("2nd")
+            lower.includes('second') ||
+            lower.includes('level 2') ||
+            lower.includes('2nd')
           ) {
-            return "Second Year Apprentice";
+            return 'Second Year Apprentice';
           }
           if (
-            lower.includes("first") ||
-            lower.includes("level 1") ||
-            lower.includes("1st")
+            lower.includes('first') ||
+            lower.includes('level 1') ||
+            lower.includes('1st')
           ) {
-            return "First Year Apprentice";
+            return 'First Year Apprentice';
           }
           return value;
         };
@@ -450,7 +450,7 @@ export default function Profile() {
         );
 
         const updates: Record<string, string> = {};
-        const fullName = [first, last].filter(Boolean).join(" ").trim();
+        const fullName = [first, last].filter(Boolean).join(' ').trim();
         if (fullName) updates.name = fullName;
         if (school) updates.highSchoolName = school;
         if (email) updates.email = email;
@@ -484,9 +484,9 @@ export default function Profile() {
 
       // You can now handle the file (upload, display name, etc.)
     } catch (error) {
-      console.error("Error picking document:", error);
+      console.error('Error picking document:', error);
       Alert.alert(
-        "Upload failed",
+        'Upload failed',
         "We couldn't process that document. Please try again."
       );
     } finally {
@@ -496,12 +496,12 @@ export default function Profile() {
 
   const startEditingField = (field: ProfileFieldKey) => {
     setEditingField(field);
-    setDraftValue(profileData[field] ?? "");
+    setDraftValue(profileData[field] ?? '');
   };
 
   const cancelEditing = () => {
     setEditingField(null);
-    setDraftValue("");
+    setDraftValue('');
   };
 
   const saveEditingField = (field: ProfileFieldKey) => {
@@ -581,45 +581,45 @@ export default function Profile() {
   ]);
 
   const startSectionEdit = (
-    section: "basic" | "residence" | "household" | "education"
+    section: 'basic' | 'residence' | 'household' | 'education'
   ) => {
     const sectionRoutes: Record<typeof section, string> = {
-      basic: "/basic-profile-name",
-      residence: "/residence-address",
-      household: "/household-size",
-      education: "/education-background",
+      basic: '/basic-profile-name',
+      residence: '/residence-address',
+      household: '/household-size',
+      education: '/education-background',
     };
     router.push({
       pathname: sectionRoutes[section],
-      params: { mode: `edit-${section}`, returnTo: "/(tabs)/profile" },
+      params: { mode: `edit-${section}`, returnTo: '/(tabs)/profile' },
     });
   };
 
-  const handleEditBasicProfile = () => startSectionEdit("basic");
-  const handleEditResidence = () => startSectionEdit("residence");
-  const handleEditHousehold = () => startSectionEdit("household");
-  const handleEditEducation = () => startSectionEdit("education");
+  const handleEditBasicProfile = () => startSectionEdit('basic');
+  const handleEditResidence = () => startSectionEdit('residence');
+  const handleEditHousehold = () => startSectionEdit('household');
+  const handleEditEducation = () => startSectionEdit('education');
 
   const openProfilePicture = () => {
-    router.push("/profile-picture?source=profile");
+    router.push('/profile-picture?source=profile');
   };
 
   const handleContinue = () => {
-    router.push("/basic-profile-name");
+    router.push('/basic-profile-name');
   };
 
   const handleLogout = async () => {
     await signOut();
-    router.replace("/sign-in");
+    router.replace('/sign-in');
   };
 
   const handleBuildProfilePress = () => {
     Alert.alert(
-      "Build profile",
-      "Upload your resume to build your profile in one click.",
+      'Build profile',
+      'Upload your resume to build your profile in one click.',
       [
-        { text: "Not now", style: "cancel" },
-        { text: "Upload", onPress: () => pickDocument() },
+        { text: 'Not now', style: 'cancel' },
+        { text: 'Upload', onPress: () => pickDocument() },
       ]
     );
   };
@@ -662,7 +662,7 @@ export default function Profile() {
               profileData.name && styles.profileNameFilled,
             ]}
           >
-            {profileData.name || "User Name"}
+            {profileData.name || 'User Name'}
           </Text>
 
           {/* Buttons */}
@@ -690,7 +690,7 @@ export default function Profile() {
                 styles.documentsButton,
                 stackHeaderButtons && styles.documentsButtonFullWidth,
               ]}
-              onPress={() => router.push("../education-experience-two")}
+              onPress={() => router.push('../education-experience-two')}
               activeOpacity={0.7}
             >
               <Ionicons
@@ -887,73 +887,72 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
   },
   scrollView: {
     flex: 1,
   },
   header: {
-    alignItems: "center",
-    paddingTop: 60,
+    alignItems: 'center',
+    paddingTop: 80,
     paddingBottom: 24,
     paddingHorizontal: 20,
   },
   profilePictureWrapper: {
-    position: "relative",
+    position: 'relative',
     marginBottom: 12,
   },
   profilePictureContainer: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: "#E9D5FF",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: Theme.colors.lightPurple,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 2,
-    borderColor: "#FFFFFF",
-    overflow: "hidden",
+    borderColor: Theme.colors.white,
+    overflow: 'hidden',
   },
   profilePicture: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   cameraIcon: {
-    position: "absolute",
+    position: 'absolute',
     top: 65,
     right: -4,
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: Theme.colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 2,
-    borderColor: "#E9D5FF",
-    shadowColor: "#00000040",
+    borderColor: Theme.colors.brightPurple,
+    shadowColor: '#00000040',
     shadowOpacity: 0.2,
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 1 },
     elevation: 3,
   },
   profileName: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#0B0B0F",
-    marginBottom: 16,
+    ...Theme.typography.h2,
+    color: Theme.colors.black,
+    marginBottom: 30,
   },
   profileNameFilled: {
-    color: "#8B5CF6",
+    color: Theme.colors.brightPurple,
   },
   documentsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     gap: 10,
-    flexWrap: "wrap",
+    flexWrap: 'wrap',
   },
   documentsButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#DAD2FF",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#DAD2FF',
     paddingHorizontal: 20,
     paddingVertical: 20,
     borderRadius: 14,
@@ -962,16 +961,16 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   documentsButtonFullWidth: {
-    width: "100%",
-    flexBasis: "100%",
+    width: '100%',
+    flexBasis: '100%',
   },
   documentsButtonIcon: {
     marginRight: 4,
   },
   documentsButtonText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#27252F",
+    fontWeight: '600',
+    color: '#27252F',
     flex: 1,
   },
   progressSection: {
@@ -979,95 +978,94 @@ const styles = StyleSheet.create({
   },
   sectionsContainer: {
     paddingHorizontal: 20,
-    paddingTop: 8,
+    paddingTop: 12,
   },
   fieldContainer: {
-    marginBottom: 12,
+    marginBottom: 15,
   },
   fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#4B5563",
+    fontFamily: Fonts.semibold,
+    fontSize: 16,
+    lineHeight: 20,
+    color: Theme.colors.black,
     marginBottom: 4,
   },
-  fieldValue: {
-    fontSize: 16,
-  },
+  fieldValue: { ...Theme.typography.bodyBold },
   emptyValue: {
-    color: "#9CA3AF",
-    fontStyle: "italic",
+    ...Theme.typography.label,
+    fontStyle: 'italic',
+    color: Theme.colors.grey,
   },
   filledValue: {
-    color: "#8B5CF6",
-    fontWeight: "600",
+    color: Theme.colors.brightPurple,
   },
   subsection: {
-    marginTop: 8,
+    marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: "#F3F4F6",
+    borderTopColor: Theme.colors.grey,
   },
   subsectionTitle: {
+    fontFamily: Fonts.semibold,
     fontSize: 14,
-    fontWeight: "600",
-    color: "#4B5563",
-    marginBottom: 8,
+    lineHeight: 18,
+    color: Theme.colors.darkGrey,
+    marginBottom: 15,
   },
   continueButton: {
     backgroundColor: Theme.colors.orange,
     marginHorizontal: 20,
     marginTop: 24,
-    marginBottom: 12,
+    marginBottom: 10,
     borderRadius: Theme.radius.button,
     ...Theme.padding.buttonLg,
-    alignItems: "center",
+    alignItems: 'center',
   },
   logoutButton: {
     backgroundColor: Theme.colors.orange,
     marginHorizontal: 20,
-    marginTop: 8,
     marginBottom: 32,
     borderRadius: Theme.radius.button,
     ...Theme.padding.buttonLg,
-    alignItems: "center",
+    alignItems: 'center',
   },
   continueButtonText: {
     ...Theme.typography.button,
     color: Theme.colors.black,
-    textAlign: "center",
+    textAlign: 'center',
   },
   processingOverlay: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   processingText: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#7C3AED",
-    textAlign: "center",
+    fontWeight: '700',
+    color: '#7C3AED',
+    textAlign: 'center',
     marginBottom: 32,
   },
   loadingArt: {
     width: 190,
     height: 190,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loadingRing: {
     width: 190,
     height: 190,
   },
   loadingCharacter: {
-    position: "absolute",
+    position: 'absolute',
     width: 110,
     height: 110,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
