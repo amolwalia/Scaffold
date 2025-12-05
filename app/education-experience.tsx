@@ -1,12 +1,12 @@
-import ProfileExitModal from "@/components/ProfileExitModal";
-import { Theme } from "@/constants/theme";
+import ProfileExitModal from '@/components/ProfileExitModal';
+import { Theme, Typography } from '@/constants/theme';
+import { useProfile } from '@/contexts/ProfileContext';
 import VoiceInputOverlay, {
   VoiceResultExtras,
-} from "@/utilities/useVoiceToText";
-import { useProfile } from "@/contexts/ProfileContext";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+} from '@/utilities/useVoiceToText';
+import { Ionicons } from '@expo/vector-icons';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -14,7 +14,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 export default function EducationExperience() {
   const router = useRouter();
@@ -22,23 +22,23 @@ export default function EducationExperience() {
     mode?: string;
     returnTo?: string;
   }>();
-  const editingMode = typeof mode === "string" ? mode : undefined;
+  const editingMode = typeof mode === 'string' ? mode : undefined;
   const returnToPath =
-    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
-  const isEditingEducation = editingMode === "edit-education";
+    typeof returnTo === 'string' ? returnTo : '/(tabs)/profile';
+  const isEditingEducation = editingMode === 'edit-education';
   const { profileData, updateProfileData } = useProfile();
   const [tradeSchoolName, setTradeSchoolName] = useState(
-    profileData.tradeSchoolName || ""
+    profileData.tradeSchoolName || ''
   );
   const [tradeProgramName, setTradeProgramName] = useState(
-    profileData.tradeProgramName || ""
+    profileData.tradeProgramName || ''
   );
   const [graduationDate, setGraduationDate] = useState(
-    profileData.tradeGraduationDate || ""
+    profileData.tradeGraduationDate || ''
   );
-  const [trade, setTrade] = useState(profileData.trade || "");
+  const [trade, setTrade] = useState(profileData.trade || '');
   const [apprenticeshipLevel, setApprenticeshipLevel] = useState(
-    profileData.apprenticeshipLevel || ""
+    profileData.apprenticeshipLevel || ''
   );
   const [showApprenticeshipPicker, setShowApprenticeshipPicker] =
     useState(false);
@@ -46,11 +46,11 @@ export default function EducationExperience() {
   const [showExitModal, setShowExitModal] = useState(false);
 
   const APPRENTICESHIP_LEVELS = [
-    "First Year Apprentice",
-    "Second Year Apprentice",
-    "Third Year Apprentice",
-    "Fourth Year Apprentice",
-    "Journeyman",
+    'First Year Apprentice',
+    'Second Year Apprentice',
+    'Third Year Apprentice',
+    'Fourth Year Apprentice',
+    'Journeyman',
   ];
 
   const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
@@ -105,13 +105,13 @@ export default function EducationExperience() {
     });
     // Use a typed push object to avoid TypeScript route literal restrictions
     router.push({
-      pathname: "/profile-picture",
-      params: { source: "onboarding" },
+      pathname: '/profile-picture',
+      params: { source: 'onboarding' },
     } as any);
     if (isEditingEducation) {
       router.replace(returnToPath as any);
     } else {
-      router.push("/(tabs)/profile");
+      router.push('/(tabs)/profile');
     }
   };
 
@@ -137,17 +137,21 @@ export default function EducationExperience() {
 
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: "85%" }]} />
+          <View style={[styles.progressFill, { width: '85%' }]} />
         </View>
       </View>
 
       <ScrollView
         style={styles.scrollView}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'center',
+        }}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.sectionTitle}>Trade-Specific Education</Text>
+        <View style={styles.content}>
+          <Text style={styles.sectionTitle}>Trade-Specific Education</Text>
 
-        <View style={styles.formContainer}>
           <TextInput
             style={styles.input}
             placeholder="Trade School / Vocational School Name..."
@@ -203,10 +207,10 @@ export default function EducationExperience() {
                 apprenticeshipLevel ? styles.inputText : styles.placeholderText
               }
             >
-              {apprenticeshipLevel || "Apprenticeship Level / Year..."}
+              {apprenticeshipLevel || 'Apprenticeship Level / Year...'}
             </Text>
             <Ionicons
-              name={showApprenticeshipPicker ? "chevron-up" : "chevron-down"}
+              name={showApprenticeshipPicker ? 'chevron-up' : 'chevron-down'}
               size={18}
               color="#9CA3AF"
             />
@@ -241,12 +245,12 @@ export default function EducationExperience() {
           style={styles.voiceButton}
           onPress={() => setShowVoiceOverlay(true)}
         >
-          <Ionicons name="mic" size={24} color="#8B5CF6" />
+          <Ionicons name="mic" size={24} color={Theme.colors.purple} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextButtonText}>
-            {isEditingEducation ? "Save & Close" : "Next"}
+            {isEditingEducation ? 'Save & Close' : 'Next'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -257,11 +261,11 @@ export default function EducationExperience() {
           setShowVoiceOverlay(false);
         }}
         contextFields={[
-          "tradeSchoolName",
-          "tradeProgramName",
-          "graduationDate",
-          "trade",
-          "apprenticeshipLevel",
+          'tradeSchoolName',
+          'tradeProgramName',
+          'graduationDate',
+          'trade',
+          'apprenticeshipLevel',
         ]}
         onResult={handleVoiceResult}
       />
@@ -281,23 +285,22 @@ export default function EducationExperience() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Theme.colors.white,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 80,
     paddingBottom: 16,
   },
   headerButton: {
     padding: 8,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#0B0B0F",
+    ...Theme.typography.h3,
+    color: Theme.colors.black,
   },
   progressContainer: {
     paddingHorizontal: 20,
@@ -305,110 +308,120 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Theme.colors.lightGrey,
     borderRadius: 2,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   progressFill: {
-    height: "100%",
-    backgroundColor: "#8B5CF6",
+    height: '100%',
+    backgroundColor: Theme.colors.purple,
   },
   scrollView: {
     flex: 1,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#0B0B0F",
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    textAlign: "center",
+    ...Typography.h2,
+    fontFamily: Theme.fonts.bold,
+    color: Theme.colors.black,
+    textAlign: 'center',
+    marginBottom: 60,
   },
-  formContainer: {
+  content: {
     paddingHorizontal: 20,
   },
   input: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.2,
-    borderColor: "#DCD6E5",
-    borderRadius: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: Theme.colors.white,
+    borderWidth: 1,
+    borderColor: Theme.colors.grey,
+    borderRadius: Theme.radius.card,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    fontSize: 16,
-    color: "#0B0B0F",
-    marginBottom: 16,
+    width: '100%',
+    height: 60,
+    ...Typography.body,
+    color: Theme.colors.black,
+    marginBottom: 10,
+    alignSelf: 'center',
   },
   dropdownButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.2,
-    borderColor: "#DCD6E5",
-    borderRadius: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: Theme.colors.white,
+    borderWidth: 1,
+    borderColor: Theme.colors.grey,
+    borderRadius: Theme.radius.card,
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 12,
+    paddingVertical: 12,
+    width: '100%',
+    height: 60,
+    ...Typography.body,
+    color: Theme.colors.black,
+    marginBottom: 10,
+    alignSelf: 'center',
   },
   inputText: {
-    fontSize: 16,
-    color: "#0B0B0F",
+    ...Typography.body,
+    color: Theme.colors.black,
   },
   placeholderText: {
-    fontSize: 16,
-    color: "#9CA3AF",
+    ...Typography.body,
+    color: Theme.colors.grey,
   },
   picker: {
     borderWidth: 1.2,
-    borderColor: "#DCD6E5",
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    borderColor: Theme.colors.grey,
+    borderRadius: Theme.radius.card,
+    backgroundColor: Theme.colors.white,
     marginBottom: 24,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   pickerOption: {
     paddingVertical: 18,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.08)",
+    borderBottomColor: 'rgba(0,0,0,0.08)',
   },
   pickerOptionLast: {
     borderBottomWidth: 0,
   },
   pickerOptionText: {
-    fontSize: 16,
-    color: "#0B0B0F",
+    ...Typography.body,
+    color: Theme.colors.black,
   },
   footer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    gap: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 52,
+    paddingBottom: 120,
+    gap: 10,
   },
   voiceButton: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: 28,
     borderWidth: 2,
-    borderColor: "#8B5CF6",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    borderColor: Theme.colors.purple,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Theme.colors.white,
   },
   nextButton: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: Theme.colors.orange,
     borderRadius: Theme.radius.button,
     ...Theme.padding.buttonLg,
+    width: 234,
+    height: 48,
+    alignSelf: 'center',
   },
   nextButtonText: {
     ...Theme.typography.button,
     color: Theme.colors.black,
-    textAlign: "center",
+    textAlign: 'center',
   },
 });

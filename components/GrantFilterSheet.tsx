@@ -1,6 +1,6 @@
-import { Theme } from "@/constants/theme";
-import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import { Theme } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
 import {
   Modal,
   Pressable,
@@ -8,15 +8,15 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 export type GrantSortId =
-  | "all"
-  | "amountHigh"
-  | "amountLow"
-  | "active"
-  | "newest"
-  | "oldest";
+  | 'all'
+  | 'amountHigh'
+  | 'amountLow'
+  | 'active'
+  | 'newest'
+  | 'oldest';
 
 export interface GrantSortOption {
   id: GrantSortId;
@@ -24,12 +24,12 @@ export interface GrantSortOption {
 }
 
 export const GRANT_SORT_OPTIONS: GrantSortOption[] = [
-  { id: "all", label: "All" },
-  { id: "amountHigh", label: "Amount highest to lowest" },
-  { id: "amountLow", label: "Amount lowest to highest" },
-  { id: "active", label: "Active grants" },
-  { id: "newest", label: "Newest to oldest" },
-  { id: "oldest", label: "Oldest to newest" },
+  { id: 'all', label: 'All' },
+  { id: 'amountHigh', label: 'Amount highest to lowest' },
+  { id: 'amountLow', label: 'Amount lowest to highest' },
+  { id: 'active', label: 'Active grants' },
+  { id: 'newest', label: 'Newest to oldest' },
+  { id: 'oldest', label: 'Oldest to newest' },
 ];
 
 type Props = {
@@ -55,7 +55,9 @@ export default function GrantFilterSheet({
       <Pressable style={styles.overlay} onPress={onClose}>
         <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={styles.header}>
-            <Text style={[Theme.typography.subhead1, { color: Theme.colors.black }]}>
+            <Text
+              style={[Theme.typography.subhead1, { color: Theme.colors.black }]}
+            >
               Sort by
             </Text>
             <TouchableOpacity onPress={onClose} hitSlop={12}>
@@ -76,7 +78,9 @@ export default function GrantFilterSheet({
                   onClose();
                 }}
               >
-                <Text style={[Theme.typography.body, { color: Theme.colors.black }]}>
+                <Text
+                  style={[Theme.typography.body, { color: Theme.colors.black }]}
+                >
                   {option.label}
                 </Text>
                 <View
@@ -99,8 +103,8 @@ export default function GrantFilterSheet({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
-    justifyContent: "flex-end",
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'flex-end',
   },
   sheet: {
     backgroundColor: Theme.colors.white,
@@ -110,17 +114,17 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: Theme.spacing.xl,
-    paddingVertical: Theme.spacing.md,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    paddingVertical: Theme.spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   option: {
     paddingHorizontal: Theme.spacing.xl,
     paddingVertical: Theme.spacing.md,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 
   radioOuter: {
@@ -129,8 +133,8 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     borderWidth: 1.5,
     borderColor: Theme.colors.grey,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   radioInner: {
     width: 10,

@@ -1,9 +1,10 @@
-import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import Theme from '@/constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 interface ProfileProgressCardProps {
-  percent: number; 
+  percent: number;
 }
 
 export default function ProfileProgressCard({
@@ -15,13 +16,13 @@ export default function ProfileProgressCard({
     <View style={styles.container}>
       <Text style={styles.title}>Finish your profile!</Text>
       <Text style={styles.description}>
-        Your profile is {pct}% complete. Fill out the rest of questions to save
-        time on future applications.
+        Your profile is <Text style={styles.pctValue}>{pct}%</Text> complete.
+        Fill out the rest of questions to save time on future applications.{' '}
       </Text>
       <View style={styles.progressBarContainer}>
         <View style={[styles.progressBarFill, { width: `${pct}%` }]}>
           <LinearGradient
-            colors={["#F59E0B", "#8B5CF6"]}
+            colors={[Theme.colors.lightOrange, Theme.colors.lightPurple]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.gradient}
@@ -34,32 +35,34 @@ export default function ProfileProgressCard({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    marginBottom: 16,
+    paddingTop: 14,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#0B0B0F",
+    ...Theme.typography.h2,
+    color: Theme.colors.black,
     marginBottom: 8,
   },
   description: {
-    fontSize: 14,
-    color: "#4B5563",
-    lineHeight: 20,
-    marginBottom: 12,
+    ...Theme.typography.body,
+    color: Theme.colors.black,
+    marginBottom: 20,
+  },
+  pctValue: {
+    ...Theme.typography.bodyBold,
+    color: Theme.colors.orange,
   },
   progressBarContainer: {
-    height: 8,
-    backgroundColor: "#F3F4F6",
-    borderRadius: 4,
-    overflow: "hidden",
+    width: '100%',
+    height: 14,
+    backgroundColor: Theme.colors.lightGrey,
+    borderRadius: 7,
+    overflow: 'hidden',
+    marginBottom: 20,
   },
   progressBarFill: {
-    height: "100%",
+    height: '100%',
   },
   gradient: {
     flex: 1,
   },
 });
-

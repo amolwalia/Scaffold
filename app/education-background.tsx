@@ -1,12 +1,12 @@
-import ProfileExitModal from "@/components/ProfileExitModal";
-import { Theme } from "@/constants/theme";
-import { useProfile } from "@/contexts/ProfileContext";
+import ProfileExitModal from '@/components/ProfileExitModal';
+import { Theme, Typography } from '@/constants/theme';
+import { useProfile } from '@/contexts/ProfileContext';
 import VoiceInputOverlay, {
   VoiceResultExtras,
-} from "@/utilities/useVoiceToText";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+} from '@/utilities/useVoiceToText';
+import { Ionicons } from '@expo/vector-icons';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -14,7 +14,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
 export default function EducationBackground() {
   const router = useRouter();
@@ -22,25 +22,31 @@ export default function EducationBackground() {
     mode?: string;
     returnTo?: string;
   }>();
-  const editingMode = typeof mode === "string" ? mode : undefined;
+  const editingMode = typeof mode === 'string' ? mode : undefined;
   const returnToPath =
-    typeof returnTo === "string" ? returnTo : "/(tabs)/profile";
-  const isEditingEducation = editingMode === "edit-education";
+    typeof returnTo === 'string' ? returnTo : '/(tabs)/profile';
+  const isEditingEducation = editingMode === 'edit-education';
   const { profileData, updateProfileData } = useProfile();
-  const [highestEducation, setHighestEducation] = useState(profileData.highestEducation || "");
-  const [highSchoolName, setHighSchoolName] = useState(profileData.highSchoolName || "");
-  const [graduationDate, setGraduationDate] = useState(profileData.graduationDate || "");
+  const [highestEducation, setHighestEducation] = useState(
+    profileData.highestEducation || ''
+  );
+  const [highSchoolName, setHighSchoolName] = useState(
+    profileData.highSchoolName || ''
+  );
+  const [graduationDate, setGraduationDate] = useState(
+    profileData.graduationDate || ''
+  );
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
   const [showEducationPicker, setShowEducationPicker] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
 
   const EDUCATION_LEVELS = [
-    "High School",
-    "Some College",
-    "Associate Degree",
+    'High School',
+    'Some College',
+    'Associate Degree',
     "Bachelor's Degree",
     "Master's Degree",
-    "Doctorate",
+    'Doctorate',
   ];
 
   const handleVoiceResult = (text: string, extras?: VoiceResultExtras) => {
@@ -81,11 +87,11 @@ export default function EducationBackground() {
     });
     if (isEditingEducation && editingMode) {
       router.push({
-        pathname: "/education-experience",
+        pathname: '/education-experience',
         params: { mode: editingMode, returnTo: returnToPath },
       });
     } else {
-      router.push("/education-experience");
+      router.push('/education-experience');
     }
   };
 
@@ -94,7 +100,10 @@ export default function EducationBackground() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.headerButton}
+        >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Education/Experience</Text>
@@ -108,7 +117,7 @@ export default function EducationBackground() {
 
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: "85%" }]} />
+          <View style={[styles.progressFill, { width: '85%' }]} />
         </View>
       </View>
 
@@ -119,8 +128,10 @@ export default function EducationBackground() {
           style={styles.input}
           onPress={() => setShowEducationPicker(!showEducationPicker)}
         >
-          <Text style={highestEducation ? styles.inputText : styles.placeholderText}>
-            {highestEducation || "Highest level of education"}
+          <Text
+            style={highestEducation ? styles.inputText : styles.placeholderText}
+          >
+            {highestEducation || 'Highest level of education'}
           </Text>
           <Ionicons name="chevron-down" size={20} color="#9CA3AF" />
         </TouchableOpacity>
@@ -177,7 +188,7 @@ export default function EducationBackground() {
           style={styles.voiceButton}
           onPress={() => setShowVoiceOverlay(true)}
         >
-          <Ionicons name="mic" size={24} color="#8B5CF6" />
+          <Ionicons name="mic" size={24} color={Theme.colors.purple} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
@@ -190,7 +201,7 @@ export default function EducationBackground() {
         onClose={() => {
           setShowVoiceOverlay(false);
         }}
-        contextFields={["highestEducation", "highSchoolName", "graduationDate"]}
+        contextFields={['highestEducation', 'highSchoolName', 'graduationDate']}
         onResult={handleVoiceResult}
       />
 
@@ -209,23 +220,22 @@ export default function EducationBackground() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Theme.colors.white,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 80,
     paddingBottom: 16,
   },
   headerButton: {
     padding: 8,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#0B0B0F",
+    ...Theme.typography.h3,
+    color: Theme.colors.black,
   },
   progressContainer: {
     paddingHorizontal: 20,
@@ -233,94 +243,100 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Theme.colors.lightGrey,
     borderRadius: 2,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   progressFill: {
-    height: "100%",
-    backgroundColor: "#8B5CF6",
+    height: '100%',
+    backgroundColor: Theme.colors.purple,
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 40,
+    justifyContent: 'center',
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#0B0B0F",
-    marginBottom: 24,
-    textAlign: "center",
+    ...Typography.h2,
+    fontFamily: Theme.fonts.bold,
+    color: Theme.colors.black,
+    textAlign: 'center',
+    marginBottom: 60,
   },
   input: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: Theme.colors.white,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 8,
+    borderColor: Theme.colors.grey,
+    borderRadius: Theme.radius.card,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    fontSize: 16,
-    color: "#0B0B0F",
-    marginBottom: 16,
+    width: '100%',
+    height: 60,
+    ...Typography.body,
+    color: Theme.colors.black,
+    marginBottom: 10,
+    alignSelf: 'center',
   },
   inputText: {
-    fontSize: 16,
-    color: "#0B0B0F",
+    ...Typography.body,
+    color: Theme.colors.black,
   },
   placeholderText: {
-    fontSize: 16,
-    color: "#9CA3AF",
+    ...Typography.body,
+    color: Theme.colors.grey,
   },
   picker: {
-    marginTop: -16,
+    marginTop: -5,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 8,
+    borderColor: Theme.colors.grey,
+    borderRadius: Theme.radius.card,
     maxHeight: 220,
-    backgroundColor: "#FFFFFF",
-    overflow: "hidden",
+    backgroundColor: Theme.colors.white,
+    overflow: 'hidden',
   },
   pickerOption: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderBottomColor: Theme.colors.grey,
   },
   pickerOptionText: {
-    fontSize: 16,
-    color: "#0B0B0F",
+    ...Typography.body,
+    color: Theme.colors.black,
   },
   footer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    gap: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 52,
+    paddingBottom: 120,
+    gap: 10,
   },
   voiceButton: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: 28,
     borderWidth: 2,
-    borderColor: "#8B5CF6",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    borderColor: Theme.colors.purple,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Theme.colors.white,
   },
   nextButton: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: Theme.colors.orange,
     borderRadius: Theme.radius.button,
     ...Theme.padding.buttonLg,
+    width: 234,
+    height: 48,
+    alignSelf: 'center',
   },
   nextButtonText: {
     ...Theme.typography.button,
     color: Theme.colors.black,
-    textAlign: "center",
+    textAlign: 'center',
   },
 });
