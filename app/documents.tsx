@@ -1,14 +1,13 @@
-import { useProfile } from "@/contexts/ProfileContext";
 import { Theme } from "@/constants/theme";
+import DocumentStatusOverlay from "@/components/DocumentStatusOverlay";
+import { useProfile } from "@/contexts/ProfileContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
-import { Image } from "expo-image";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
-  Animated,
   Linking,
   ScrollView,
   StyleSheet,
@@ -36,10 +35,6 @@ export default function Documents() {
   const [documents, setDocuments] = useState<StoredDocument[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const dotOffsets = useRef(
-    Array.from({ length: 3 }, () => new Animated.Value(0))
-  ).current;
-  const [activeDot, setActiveDot] = useState(0);
 
   const persistDocuments = async (next: StoredDocument[]) => {
     try {
@@ -77,39 +72,6 @@ export default function Documents() {
       }
     })();
   }, []);
-
-  useEffect(() => {
-    if (!isProcessing) {
-      dotOffsets.forEach((val) => val.setValue(0));
-      return;
-    }
-
-    const animateDot = (index: number) => {
-      Animated.sequence([
-        Animated.timing(dotOffsets[index], {
-          toValue: -6,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(dotOffsets[index], {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    };
-
-    animateDot(0);
-    const interval = setInterval(() => {
-      setActiveDot((prev) => {
-        const next = (prev + 1) % dotOffsets.length;
-        animateDot(next);
-        return next;
-      });
-    }, 420);
-
-    return () => clearInterval(interval);
-  }, [isProcessing, dotOffsets]);
 
   const handleUpload = async () => {
     const result = await DocumentPicker.getDocumentAsync({
@@ -509,47 +471,19 @@ export default function Documents() {
           )}
         </View>
       </ScrollView>
-      {isProcessing && (
-        <View style={styles.processingOverlay} pointerEvents="auto">
-          <Text style={styles.processingTitle}>Your document is processing</Text>
-          <Image source={SMIGGS} style={styles.smiggs} contentFit="contain" />
-          <View style={styles.dotsRow}>
-            {dotOffsets.map((offset, index) => (
-              <Animated.View
-                key={index}
-                style={[
-                  styles.dot,
-                  {
-                    transform: [{ translateY: offset }],
-                    backgroundColor:
-                      index === activeDot ? Theme.colors.orange : "#CFCBFF",
-                  },
-                ]}
-              />
-            ))}
-          </View>
-        </View>
-      )}
-      {isComplete && !isProcessing && (
-        <View style={styles.completeOverlay} pointerEvents="auto">
-          <Text style={styles.completeTitle}>Complete!</Text>
-          <Image
-            source={SMIGGS_DONE}
-            style={styles.completeImage}
-            contentFit="contain"
-          />
-          <TouchableOpacity
-            style={styles.completeButton}
-            activeOpacity={0.85}
-            onPress={() => {
-              setIsComplete(false);
-              router.push("/(tabs)/profile");
-            }}
-          >
-            <Text style={styles.completeButtonText}>Go to Profile</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      <DocumentStatusOverlay
+        showProcessing={isProcessing}
+        showComplete={isComplete}
+        processingTitle="Your document is processing"
+        completeTitle="Complete!"
+        completeButtonLabel="Go to Profile"
+        processingImageSource={SMIGGS}
+        completeImageSource={SMIGGS_DONE}
+        onCompletePress={() => {
+          setIsComplete(false);
+          router.push("/(tabs)/profile");
+        }}
+      />
     </View>
   );
 }
@@ -654,72 +588,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6B7280",
     paddingVertical: 12,
-  },
-  processingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(255,255,255,0.8)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  processingTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: Theme.colors.orange,
-    textAlign: "center",
-    marginBottom: 24,
-  },
-  smiggs: {
-    width: 150,
-    height: 150,
-    marginBottom: 10,
-  },
-  dotsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  dot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: "#CFCBFF",
-  },
-  completeOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
-  },
-  completeTitle: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: Theme.colors.purple,
-    marginBottom: 28,
-  },
-  completeImage: {
-    width: 220,
-    height: 260,
-    marginBottom: 36,
-  },
-  completeButton: {
-    backgroundColor: Theme.colors.orange,
-    borderRadius: 40,
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    width: "80%",
-    alignItems: "center",
-  },
-  completeButtonText: {
-    ...Theme.typography.button,
-    color: Theme.colors.black,
   },
 });

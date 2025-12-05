@@ -1,154 +1,28 @@
+import DocumentStatusOverlay from "@/components/DocumentStatusOverlay";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { Image } from "expo-image";
 import { Stack, useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   Alert,
-  Animated,
-  Easing,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SvgXml } from "react-native-svg";
 import { RetrieveResponse } from "roughlyai";
 
 const AI_ICON = require("../assets/images/Ai-icon.png");
 const ADD_FILE = require("../assets/images/add-file.png");
-const LOADING_WHEEL = require("@/assets/images/loading-wheel.png");
-const LOADING_CHARACTER_SVG = `<svg width="93" height="93" viewBox="0 0 93 93" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g filter="url(#filter0_dii_2088_5100)">
-<g filter="url(#filter1_iii_2088_5100)">
-<path d="M2 42.5C2 20.1325 20.1325 2 42.5 2V2C64.8675 2 83 20.1325 83 42.5V42.5C83 64.8675 64.8675 83 42.5 83H17C8.71573 83 2 76.2843 2 68V42.5Z" fill="url(#paint0_linear_2088_5100)"/>
-</g>
-<g style="mix-blend-mode:soft-light">
-<path d="M2 42.5C2 20.1325 20.1325 2 42.5 2V2C64.8675 2 83 20.1325 83 42.5V42.5C83 64.8675 64.8675 83 42.5 83H17C8.71573 83 2 76.2843 2 68V42.5Z" fill="url(#paint1_linear_2088_5100)" fill-opacity="0.3"/>
-</g>
-<path d="M2 42.5C2 20.1325 20.1325 2 42.5 2V2C64.8675 2 83 20.1325 83 42.5V42.5C83 64.8675 64.8675 83 42.5 83H17C8.71573 83 2 76.2843 2 68V42.5Z" fill="white" fill-opacity="0.1"/>
-<g filter="url(#filter2_dii_2088_5100)">
-<circle cx="22.2512" cy="42.5002" r="3.55" fill="white" stroke="white"/>
-<path d="M27.1406 34.581C27.1406 34.581 25.3096 32.75 22.4458 32.75C19.582 32.75 17.751 34.581 17.751 34.581" stroke="white" stroke-width="2" stroke-linecap="round"/>
-<circle cx="4.05" cy="4.05" r="3.55" transform="matrix(-1 0 0 1 66.8008 38.4502)" fill="white" stroke="white"/>
-<path d="M58.25 34.581C58.25 34.581 60.081 32.75 62.9448 32.75C65.8086 32.75 67.6396 34.581 67.6396 34.581" stroke="white" stroke-width="2" stroke-linecap="round"/>
-<path d="M38.4492 54.6497C38.4492 60.0497 46.5492 60.0497 46.5492 54.6497" stroke="white" stroke-width="2" stroke-linecap="round"/>
-</g>
-</g>
-<defs>
-<filter id="filter0_dii_2088_5100" x="0" y="0" width="93" height="93" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="4" dy="4"/>
-<feGaussianBlur stdDeviation="3"/>
-<feComposite in2="hardAlpha" operator="out"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2088_5100"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2088_5100" result="shape"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="0.2" dy="0.2"/>
-<feGaussianBlur stdDeviation="0.1"/>
-<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
-<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.4 0"/>
-<feBlend mode="normal" in2="shape" result="effect2_innerShadow_2088_5100"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="-0.2" dy="-0.2"/>
-<feGaussianBlur stdDeviation="0.1"/>
-<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.4 0"/>
-<feBlend mode="normal" in2="effect2_innerShadow_2088_5100" result="effect3_innerShadow_2088_5100"/>
-</filter>
-<filter id="filter1_iii_2088_5100" x="0" y="0" width="84" height="85" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="-2" dy="-2"/>
-<feGaussianBlur stdDeviation="3.5"/>
-<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0.556863 0 0 0 0 0.470588 0 0 0 0 1 0 0 0 0.7 0"/>
-<feBlend mode="normal" in2="shape" result="effect1_innerShadow_2088_5100"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dy="2"/>
-<feGaussianBlur stdDeviation="1"/>
-<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
-<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.7 0"/>
-<feBlend mode="normal" in2="effect1_innerShadow_2088_5100" result="effect2_innerShadow_2088_5100"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="2"/>
-<feGaussianBlur stdDeviation="0.5"/>
-<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
-<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0"/>
-<feBlend mode="normal" in2="effect2_innerShadow_2088_5100" result="effect3_innerShadow_2088_5100"/>
-</filter>
-<filter id="filter2_dii_2088_5100" x="16.552" y="31.35" width="52.8867" height="28.7497" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="0.4"/>
-<feGaussianBlur stdDeviation="0.2"/>
-<feComposite in2="hardAlpha" operator="out"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2088_5100"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2088_5100" result="shape"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="-0.2" dy="-0.2"/>
-<feGaussianBlur stdDeviation="0.1"/>
-<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
-<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.984314 0 0 0 0 0.886275 0 0 0 0.4 0"/>
-<feBlend mode="normal" in2="shape" result="effect2_innerShadow_2088_5100"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="0.2" dy="0.2"/>
-<feGaussianBlur stdDeviation="0.1"/>
-<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
-<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/>
-<feBlend mode="normal" in2="effect2_innerShadow_2088_5100" result="effect3_innerShadow_2088_5100"/>
-</filter>
-<linearGradient id="paint0_linear_2088_5100" x1="66.8" y1="10.1" x2="2" y2="83" gradientUnits="userSpaceOnUse">
-<stop offset="0.389423" stop-color="#8E78FF"/>
-<stop offset="0.75" stop-color="#A89BFF"/>
-<stop offset="1" stop-color="#CCCCFF"/>
-</linearGradient>
-<linearGradient id="paint1_linear_2088_5100" x1="-8.63063" y1="1.20467" x2="32.3288" y2="37.3921" gradientUnits="userSpaceOnUse">
-<stop stop-color="white"/>
-<stop offset="1" stop-color="white" stop-opacity="0"/>
-</linearGradient>
-</defs>
-</svg>`;
 
 export default function UploadResume() {
   const router = useRouter();
   const { updateProfileData } = useProfile();
   const [isProcessing, setIsProcessing] = useState(false);
-  const rotation = useRef(new Animated.Value(0)).current;
-  const spinnerAnimation = useRef<Animated.CompositeAnimation | null>(null);
-  const spin = rotation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "3600deg"],
-  });
-
-  useEffect(() => {
-    if (isProcessing) {
-      spinnerAnimation.current?.stop();
-      rotation.setValue(0);
-      spinnerAnimation.current = Animated.loop(
-        Animated.timing(rotation, {
-          toValue: 1,
-          duration: 12000,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        })
-      );
-      spinnerAnimation.current.start();
-    } else {
-      spinnerAnimation.current?.stop();
-      rotation.stopAnimation(() => rotation.setValue(0));
-    }
-
-    return () => {
-      spinnerAnimation.current?.stop();
-    };
-  }, [isProcessing, rotation]);
+  const [isComplete, setIsComplete] = useState(false);
 
   const pickDocument = async () => {
     try {
@@ -343,7 +217,8 @@ export default function UploadResume() {
           ),
         });
 
-        router.replace("/(tabs)");
+        setIsComplete(true);
+        setIsProcessing(false);
         return;
       } else {
         Alert.alert(
@@ -415,22 +290,17 @@ export default function UploadResume() {
         </TouchableOpacity>
       </View>
 
-      {isProcessing && (
-        <View style={styles.processingOverlay} pointerEvents="auto">
-          <Text style={styles.processingText}>
-            Your file is being processed, please wait...
-          </Text>
-          <View style={styles.loadingArt}>
-            <Animated.Image
-              source={LOADING_WHEEL}
-              style={[styles.loadingRing, { transform: [{ rotate: spin }] }]}
-            />
-            <View style={styles.loadingCharacter}>
-              <SvgXml xml={LOADING_CHARACTER_SVG} width={90} height={90} />
-            </View>
-          </View>
-        </View>
-      )}
+      <DocumentStatusOverlay
+        showProcessing={isProcessing}
+        showComplete={isComplete}
+        processingTitle="Your file is being processed, please wait..."
+        completeTitle="Complete!"
+        completeButtonLabel="Go to Profile"
+        onCompletePress={() => {
+          setIsComplete(false);
+          router.replace("/(tabs)");
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -505,39 +375,5 @@ const styles = StyleSheet.create({
     color: "#0F172A",
     fontSize: 18,
     fontWeight: "700",
-  },
-  processingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  processingText: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#7C3AED",
-    textAlign: "center",
-    marginBottom: 32,
-  },
-  loadingArt: {
-    width: 190,
-    height: 190,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  loadingRing: {
-    width: 190,
-    height: 190,
-  },
-  loadingCharacter: {
-    position: "absolute",
-    width: 110,
-    height: 110,
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
