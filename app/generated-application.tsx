@@ -9,6 +9,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import {
   Linking,
   LayoutChangeEvent,
+  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -16,13 +17,11 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 
-const PRESET_GOAL =
-  "My future goal is to become a certified journeyperson and eventually lead my own crew on complex builds. I want to keep learning advanced techniques so I can mentor other apprentices.";
-const PRESET_CAREER =
-  "I chose this trade because I enjoy building tangible projects, solving problems with my hands, and seeing the impact our work has on communities.";
 const MIN_WRITTEN_ANSWER_HEIGHT = 80;
+const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 
 export default function GeneratedApplicationScreen() {
   const router = useRouter();
@@ -32,6 +31,10 @@ export default function GeneratedApplicationScreen() {
   const [writtenAnswers, setWrittenAnswers] = useState({
     goal: "",
     career: "",
+  });
+  const [isGenerating, setIsGenerating] = useState({
+    goal: false,
+    career: false,
   });
   const [goalAnswerHeight, setGoalAnswerHeight] = useState(
     MIN_WRITTEN_ANSWER_HEIGHT
@@ -82,12 +85,121 @@ export default function GeneratedApplicationScreen() {
         profileData.tradeSchoolName ||
         profileData.guardianName ||
         "Add your current employer or school",
-      tuitionCost: grant?.amount || "Add your tuition estimate",
+      tuitionCost: "$4500" || "Add your tuition estimate",
       apprenticeshipLevel:
         profileData.apprenticeshipLevel || "Add your apprenticeship level",
     }),
     [profileData, grant]
   );
+
+  const profileContext = useMemo(
+    () =>
+      [
+        `Name: ${profileData.name || "Unknown"}`,
+        `Email: ${profileData.email || "Unknown"}`,
+        `Phone: ${profileData.phone || "Unknown"}`,
+        `Address: ${profileData.address || "Unknown"}`,
+        `Province: ${profileData.province || "Unknown"}`,
+        `Postal Code: ${profileData.postalCode || "Unknown"}`,
+        `Trade: ${profileData.trade || "Unknown"}`,
+        `Apprenticeship Level: ${profileData.apprenticeshipLevel || "Unknown"}`,
+        `Highest education: ${profileData.highestEducation || "Unknown"}`,
+        `School: ${profileData.highSchoolName || profileData.tradeSchoolName || "Unknown"}`,
+        `Graduation date: ${
+          profileData.graduationDate ||
+          profileData.tradeGraduationDate ||
+          "Unknown"
+        }`,
+        `Household: ${profileData.familyComposition || "Unknown"}, size ${
+          profileData.householdSize || "Unknown"
+        }, income ${profileData.annualFamilyNetIncome || "Unknown"}`,
+        `Citizenship status: ${profileData.citizenshipStatus || "Unknown"}`,
+      ].join("\n"),
+    [profileData]
+  );
+
+  const grantContext = useMemo(() => {
+    if (!grant) return "No grant selected.";
+    const facts =
+      grant.detailFacts?.map((fact) => `${fact.label}: ${fact.details?.join("; ") || ""}`) ||
+      [];
+    return [
+      `Title: ${grant.title}`,
+      `Organization: ${grant.organization}`,
+      `Summary: ${grant.summary}`,
+      `Amount: ${grant.amount}`,
+      `Deadline: ${grant.deadline}`,
+      `Notes: ${grant.notes.join(" | ")}`,
+      `Apply instructions: ${grant.apply.portal.instructions || grant.apply.portal.label}`,
+      `Tags: ${grant.tags.join(", ")}`,
+      `Facts: ${facts.join(" | ")}`,
+    ].join("\n");
+  }, [grant]);
+
+  const questions = {
+    goal: "What is your future goal in your trade?",
+    career: "Why have you chosen this career path?",
+  } as const;
+
+  const generateAnswer = async (field: keyof typeof questions) => {
+    if (!OPENAI_API_KEY) {
+      Alert.alert(
+        "Missing API key",
+        "Add EXPO_PUBLIC_OPENAI_API_KEY to generate answers."
+      );
+      return;
+    }
+    setIsGenerating((prev) => ({ ...prev, [field]: true }));
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You draft concise, authentic grant application answers in first person for a trades applicant. Use the profile and grant context provided. Stay truthful; avoid inventing specifics that are not present. Aim for 120-170 words. Show alignment with what the grant supports.",
+            },
+            {
+              role: "user",
+              content: [
+                `Grant details:\n${grantContext}`,
+                `Applicant profile:\n${profileContext}`,
+                `Question: ${questions[field]}`,
+                "Write a single cohesive paragraph. Keep tone genuine and professional.",
+              ].join("\n\n"),
+            },
+          ],
+          temperature: 0.5,
+          max_tokens: 320,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`OpenAI error ${response.status}`);
+      }
+
+      const data = await response.json();
+      const next =
+        data?.choices?.[0]?.message?.content?.trim() ||
+        "Unable to generate an answer right now.";
+
+      setWrittenAnswers((prev) => ({ ...prev, [field]: next }));
+    } catch (error) {
+      console.error("Failed to generate answer", error);
+      Alert.alert(
+        "Generation failed",
+        "We couldn't generate an answer right now. Please try again."
+      );
+    } finally {
+      setIsGenerating((prev) => ({ ...prev, [field]: false }));
+    }
+  };
 
   const docList = grant?.apply.requiredDocuments ?? [
     "Unofficial transcript (high school or post-secondary)",
@@ -347,12 +459,17 @@ export default function GeneratedApplicationScreen() {
 
                   <TouchableOpacity
                     style={{ position: "absolute", right: 0, top: 0 }}
-                    onPress={insertPresetGoal}
+                    onPress={() => generateAnswer("goal")}
+                    disabled={isGenerating.goal}
                     hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
                     accessibilityRole="button"
                     accessibilityLabel="Insert suggested answer"
                   >
-                    <SparkleIcon />
+                    {isGenerating.goal ? (
+                      <ActivityIndicator size="small" color={Theme.colors.purple} />
+                    ) : (
+                      <SparkleIcon />
+                    )}
                   </TouchableOpacity>
                 </View>
 
@@ -399,12 +516,17 @@ export default function GeneratedApplicationScreen() {
                 </Text>
                 <TouchableOpacity
                   style={{ position: "absolute", right: 0, top: 0 }}
-                  onPress={insertPresetCareer}
+                  onPress={() => generateAnswer("career")}
+                  disabled={isGenerating.career}
                   hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
                   accessibilityRole="button"
                   accessibilityLabel="Insert suggested answer"
                 >
-                  <SparkleIcon />
+                  {isGenerating.career ? (
+                    <ActivityIndicator size="small" color={Theme.colors.purple} />
+                  ) : (
+                    <SparkleIcon />
+                  )}
                 </TouchableOpacity>
                 <View style={{ marginBottom: Theme.spacing.sm }}>
                   <View style={styles.answerInputWrap}>
