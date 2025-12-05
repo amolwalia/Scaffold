@@ -872,7 +872,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   fieldLabel: {
-    fontFamily: Fonts.semibold,
+    fontFamily: Theme.fonts.semibold,
     fontSize: 16,
     lineHeight: 20,
     color: Theme.colors.black,
@@ -894,7 +894,7 @@ const styles = StyleSheet.create({
     borderTopColor: Theme.colors.grey,
   },
   subsectionTitle: {
-    fontFamily: Fonts.semibold,
+    fontFamily: Theme.fonts.semibold,
     fontSize: 14,
     lineHeight: 18,
     color: Theme.colors.darkGrey,

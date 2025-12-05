@@ -1,10 +1,11 @@
-import DocumentStatusOverlay from "@/components/DocumentStatusOverlay";
-import { useProfile } from "@/contexts/ProfileContext";
-import { Ionicons } from "@expo/vector-icons";
-import * as DocumentPicker from "expo-document-picker";
-import { Image } from "expo-image";
-import { Stack, useRouter } from "expo-router";
-import React, { useState } from "react";
+import DocumentStatusOverlay from '@/components/DocumentStatusOverlay';
+import { Theme } from '@/constants/theme';
+import { useProfile } from '@/contexts/ProfileContext';
+import { Ionicons } from '@expo/vector-icons';
+import * as DocumentPicker from 'expo-document-picker';
+import { Image } from 'expo-image';
+import { Stack, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
   Alert,
   SafeAreaView,
@@ -12,11 +13,11 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
-import { RetrieveResponse } from "roughlyai";
+} from 'react-native';
+import { RetrieveResponse } from 'roughlyai';
 
-const AI_ICON = require("../assets/images/Ai-icon.png");
-const ADD_FILE = require("../assets/images/add-file.png");
+const AI_ICON = require('../assets/images/Ai-icon.png');
+const ADD_FILE = require('../assets/images/add-file.png');
 
 export default function UploadResume() {
   const router = useRouter();
@@ -298,7 +299,7 @@ export default function UploadResume() {
         completeButtonLabel="Go to Profile"
         onCompletePress={() => {
           setIsComplete(false);
-          router.replace("/(tabs)");
+          router.replace('/(tabs)');
         }}
       />
     </SafeAreaView>
