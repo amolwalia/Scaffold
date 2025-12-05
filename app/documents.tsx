@@ -1,10 +1,10 @@
-import DocumentStatusOverlay from "@/components/DocumentStatusOverlay";
-import { useProfile } from "@/contexts/ProfileContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
-import * as DocumentPicker from "expo-document-picker";
-import React, { useEffect, useState } from "react";
+import DocumentStatusOverlay from '@/components/DocumentStatusOverlay';
+import { useProfile } from '@/contexts/ProfileContext';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as DocumentPicker from 'expo-document-picker';
+import { Stack, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Linking,
@@ -13,10 +13,10 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
-import { RetrieveResponse } from "roughlyai";
-const SMIGGS = require("@/assets/images/smiggs.png");
-const SMIGGS_DONE = require("@/assets/images/smiggs-done.png");
+} from 'react-native';
+import { RetrieveResponse } from 'roughlyai';
+const SMIGGS = require('@/assets/images/smiggs.png');
+const SMIGGS_DONE = require('@/assets/images/smiggs-done.png');
 
 type StoredDocument = {
   id: string;
@@ -26,7 +26,7 @@ type StoredDocument = {
   size?: number | null;
 };
 
-const STORAGE_KEY = "@scaffold-documents";
+const STORAGE_KEY = '@scaffold-documents';
 
 export default function Documents() {
   const router = useRouter();
@@ -39,7 +39,7 @@ export default function Documents() {
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch (error) {
-      console.warn("Failed to persist documents", error);
+      console.warn('Failed to persist documents', error);
     }
   };
 
@@ -67,14 +67,14 @@ export default function Documents() {
           setDocuments(JSON.parse(raw));
         }
       } catch (error) {
-        console.warn("Failed to load documents", error);
+        console.warn('Failed to load documents', error);
       }
     })();
   }, []);
 
   const handleUpload = async () => {
     const result = await DocumentPicker.getDocumentAsync({
-      type: "*/*",
+      type: '*/*',
       copyToCacheDirectory: true,
     });
 
@@ -89,7 +89,7 @@ export default function Documents() {
   const handleBuildProfile = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: "*/*",
+        type: '*/*',
         copyToCacheDirectory: true,
       });
 
@@ -102,12 +102,12 @@ export default function Documents() {
       addDocumentToList(file);
 
       const _resp = await fetch(
-        "https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/",
+        'https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/',
         {
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({
-            type: "upload",
-            project_name: "Scaffold",
+            type: 'upload',
+            project_name: 'Scaffold',
             filename: file.name.toLocaleLowerCase(),
           }),
         }
@@ -126,12 +126,12 @@ export default function Documents() {
       const fileBlob = await resp.blob();
 
       const uploadResponse = await fetch(uploadUrl.url[0], {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type":
+          'Content-Type':
             file.mimeType ||
             (file.mimeType as string) ||
-            "application/octet-stream",
+            'application/octet-stream',
         },
         body: fileBlob,
       });
@@ -141,12 +141,12 @@ export default function Documents() {
       }
 
       const _resp_train = await fetch(
-        "https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/",
+        'https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/',
         {
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({
-            type: "train",
-            project_name: "Scaffold",
+            type: 'train',
+            project_name: 'Scaffold',
           }),
         }
       );
@@ -166,11 +166,11 @@ export default function Documents() {
       }
 
       const _prompt = await fetch(
-        "https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/",
+        'https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/',
         {
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({
-            project_name: "Scaffold",
+            project_name: 'Scaffold',
             prompt: `From the document "${file.name}", extract every detail that can populate the profile. Respond ONLY with JSON (no prose) that matches {"first_name":string,"last_name":string,"email":string,"phone":string,"address":string,"postal_code":string,"province":string,"date_of_birth":string,"gender":string,"citizenship_status":string,"household_size":string,"family_composition":string,"annual_family_net_income":string,"guardian_name":string,"guardian_phone":string,"guardian_email":string,"highest_education":string,"school_name":string,"graduation_date":string,"trade_school_name":string,"trade_program_name":string,"trade_graduation_date":string,"trade":string,"apprenticeship_level":string}. When identifying apprenticeship_level, return the exact level label mentioned (e.g., "Level 1", "Level 2", "Level 3", "Level 4", or "Red Seal"). Use empty strings when a value cannot be found.`,
           }),
         }
@@ -190,59 +190,59 @@ export default function Documents() {
       let parsedAnswer: Record<string, string> | null = null;
 
       try {
-        if (typeof answerRaw === "string") {
+        if (typeof answerRaw === 'string') {
           parsedAnswer = JSON.parse(answerRaw);
-        } else if (answerRaw && typeof answerRaw === "object") {
+        } else if (answerRaw && typeof answerRaw === 'object') {
           parsedAnswer = answerRaw;
         }
       } catch (parseError) {
-        console.error("Failed to parse extracted profile info", parseError);
+        console.error('Failed to parse extracted profile info', parseError);
       }
 
       if (parsedAnswer) {
         const pickValue = (...values: unknown[]) => {
           for (const value of values) {
             if (value !== undefined && value !== null) {
-              return typeof value === "string"
+              return typeof value === 'string'
                 ? value.trim()
                 : String(value).trim();
             }
           }
-          return "";
+          return '';
         };
         const normalizeApprenticeshipLevel = (value: string) => {
           const lower = value.toLowerCase();
-          if (!lower) return "";
-          if (lower.includes("journeyman") || lower.includes("red seal")) {
-            return "Journeyman";
+          if (!lower) return '';
+          if (lower.includes('journeyman') || lower.includes('red seal')) {
+            return 'Journeyman';
           }
           if (
-            lower.includes("fourth") ||
-            lower.includes("level 4") ||
-            lower.includes("4th")
+            lower.includes('fourth') ||
+            lower.includes('level 4') ||
+            lower.includes('4th')
           ) {
-            return "Fourth Year Apprentice";
+            return 'Fourth Year Apprentice';
           }
           if (
-            lower.includes("third") ||
-            lower.includes("level 3") ||
-            lower.includes("3rd")
+            lower.includes('third') ||
+            lower.includes('level 3') ||
+            lower.includes('3rd')
           ) {
-            return "Third Year Apprentice";
+            return 'Third Year Apprentice';
           }
           if (
-            lower.includes("second") ||
-            lower.includes("level 2") ||
-            lower.includes("2nd")
+            lower.includes('second') ||
+            lower.includes('level 2') ||
+            lower.includes('2nd')
           ) {
-            return "Second Year Apprentice";
+            return 'Second Year Apprentice';
           }
           if (
-            lower.includes("first") ||
-            lower.includes("level 1") ||
-            lower.includes("1st")
+            lower.includes('first') ||
+            lower.includes('level 1') ||
+            lower.includes('1st')
           ) {
-            return "First Year Apprentice";
+            return 'First Year Apprentice';
           }
           return value;
         };
@@ -343,7 +343,7 @@ export default function Documents() {
         );
 
         const updates: Record<string, string> = {};
-        const fullName = [first, last].filter(Boolean).join(" ").trim();
+        const fullName = [first, last].filter(Boolean).join(' ').trim();
         if (fullName) updates.name = fullName;
         if (school) updates.highSchoolName = school;
         if (email) updates.email = email;
@@ -377,9 +377,9 @@ export default function Documents() {
 
       setIsComplete(true);
     } catch (error) {
-      console.error("Error building profile:", error);
+      console.error('Error building profile:', error);
       Alert.alert(
-        "Upload failed",
+        'Upload failed',
         "We couldn't process that document. Please try again."
       );
     } finally {
@@ -391,9 +391,9 @@ export default function Documents() {
     try {
       await Linking.openURL(doc.uri);
     } catch (error) {
-      console.warn("Failed to open document", error);
+      console.warn('Failed to open document', error);
       Alert.alert(
-        "Unable to open file",
+        'Unable to open file',
         "We couldn't open this document on your device."
       );
     }
@@ -476,14 +476,14 @@ export default function Documents() {
       <DocumentStatusOverlay
         showProcessing={isProcessing}
         showComplete={isComplete}
-        processingTitle="Your document is processing"
+        processingTitle="We are building your profile"
         completeTitle="Complete!"
         completeButtonLabel="Go to Profile"
         processingImageSource={SMIGGS}
         completeImageSource={SMIGGS_DONE}
         onCompletePress={() => {
           setIsComplete(false);
-          router.push("/(tabs)/profile");
+          router.push('/(tabs)/profile');
         }}
       />
     </View>
@@ -493,7 +493,7 @@ export default function Documents() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
   },
   content: {
     paddingHorizontal: 20,
@@ -504,25 +504,25 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 20,
   },
   title: {
     fontSize: 24,
-    fontWeight: "700",
-    color: "#0B0B0F",
+    fontWeight: '700',
+    color: '#0B0B0F',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    fontWeight: "400",
-    color: "#4B5563",
+    fontWeight: '400',
+    color: '#4B5563',
     lineHeight: 20,
     marginBottom: 28,
   },
   buildButton: {
-    backgroundColor: "#E5E0FF",
+    backgroundColor: '#E5E0FF',
     borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 18,
@@ -530,50 +530,50 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   buildRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
   },
   buildText: {
     fontSize: 16,
-    fontWeight: "700",
-    color: "#3E3B6E",
+    fontWeight: '700',
+    color: '#3E3B6E',
     flex: 1,
   },
   buildSubtext: {
     fontSize: 13,
-    color: "#4B5563",
+    color: '#4B5563',
   },
   uploadCard: {
-    backgroundColor: "#CEC9FF",
+    backgroundColor: '#CEC9FF',
     borderRadius: 14,
     paddingVertical: 20,
     paddingHorizontal: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 32,
   },
   uploadText: {
     fontSize: 16,
-    fontWeight: "700",
-    color: "#3E3B6E",
+    fontWeight: '700',
+    color: '#3E3B6E',
   },
   filesSection: {
     marginTop: 8,
   },
   filesTitle: {
     fontSize: 16,
-    fontWeight: "700",
-    color: "#111827",
+    fontWeight: '700',
+    color: '#111827',
     marginBottom: 12,
   },
   fileRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
+    borderBottomColor: '#E5E7EB',
   },
   fileRowLast: {
     borderBottomWidth: 0,
@@ -583,12 +583,12 @@ const styles = StyleSheet.create({
   },
   fileName: {
     fontSize: 15,
-    fontWeight: "500",
-    color: "#1F2937",
+    fontWeight: '500',
+    color: '#1F2937',
   },
   emptyState: {
     fontSize: 14,
-    color: "#6B7280",
+    color: '#6B7280',
     paddingVertical: 12,
   },
 });

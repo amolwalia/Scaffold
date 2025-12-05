@@ -294,7 +294,7 @@ export default function UploadResume() {
       <DocumentStatusOverlay
         showProcessing={isProcessing}
         showComplete={isComplete}
-        processingTitle="Your file is being processed, please wait..."
+        processingTitle="We are building your profile"
         completeTitle="Complete!"
         completeButtonLabel="Go to Profile"
         onCompletePress={() => {
