@@ -1,4 +1,3 @@
-import { Theme } from "@/constants/theme";
 import DocumentStatusOverlay from "@/components/DocumentStatusOverlay";
 import { useProfile } from "@/contexts/ProfileContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -248,7 +247,10 @@ export default function Documents() {
           return value;
         };
 
-        const first = pickValue(parsedAnswer.first_name, parsedAnswer.firstName);
+        const first = pickValue(
+          parsedAnswer.first_name,
+          parsedAnswer.firstName
+        );
         const last = pickValue(parsedAnswer.last_name, parsedAnswer.lastName);
         const school = pickValue(
           parsedAnswer.school_name,

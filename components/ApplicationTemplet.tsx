@@ -7,6 +7,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Linking,
   Platform,
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,6 +24,7 @@ const PRESET_GOAL =
   "My future goal is to become a certified journey person and eventually lead my own crew on complex builds. I want to keep learning advanced techniques so I can mentor other apprentices.";
 const PRESET_CAREER =
   "I chose this trade because I enjoy building tangible projects, solving problems with my hands, and seeing the impact our work has on communities.";
+const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 
 type FormData = {
   // Basic Profile
@@ -147,8 +149,8 @@ export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
       refFirstName: "Mateo",
       refLastName: "Alverez",
       refPhone: profileData.guardianPhone || "(604) 421-4122",
-      futureGoal: PRESET_GOAL,
-      careerChoice: PRESET_CAREER,
+      futureGoal: "",
+      careerChoice: "",
     } satisfies Partial<FormData>;
   }, [profileData, grant]);
 
@@ -158,6 +160,120 @@ export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
       ...autoFilledValues,
     }));
   }, [autoFilledValues]);
+
+  const [isGenerating, setIsGenerating] = useState({
+    futureGoal: false,
+    careerChoice: false,
+  });
+
+  const profileContext = useMemo(
+    () =>
+      [
+        `Name: ${profileData.name || "Unknown"}`,
+        `Email: ${profileData.email || "Unknown"}`,
+        `Phone: ${profileData.phone || "Unknown"}`,
+        `Address: ${profileData.address || "Unknown"}`,
+        `Province: ${profileData.province || "Unknown"}`,
+        `Postal Code: ${profileData.postalCode || "Unknown"}`,
+        `Trade: ${profileData.trade || "Unknown"}`,
+        `Apprenticeship Level: ${profileData.apprenticeshipLevel || "Unknown"}`,
+        `Highest education: ${profileData.highestEducation || "Unknown"}`,
+        `School: ${profileData.highSchoolName || profileData.tradeSchoolName || "Unknown"}`,
+        `Graduation date: ${
+          profileData.graduationDate ||
+          profileData.tradeGraduationDate ||
+          "Unknown"
+        }`,
+        `Household: ${profileData.familyComposition || "Unknown"}, size ${
+          profileData.householdSize || "Unknown"
+        }, income ${profileData.annualFamilyNetIncome || "Unknown"}`,
+        `Citizenship status: ${profileData.citizenshipStatus || "Unknown"}`,
+      ].join("\n"),
+    [profileData]
+  );
+
+  const grantContext = useMemo(() => {
+    if (!grant) return "No grant selected.";
+    const facts =
+      grant.detailFacts?.map((fact) => `${fact.label}: ${fact.details?.join("; ") || ""}`) ||
+      [];
+    return [
+      `Title: ${grant.title}`,
+      `Organization: ${grant.organization}`,
+      `Summary: ${grant.summary}`,
+      `Amount: ${grant.amount}`,
+      `Deadline: ${grant.deadline}`,
+      `Notes: ${grant.notes.join(" | ")}`,
+      `Apply instructions: ${grant.apply.portal.instructions || grant.apply.portal.label}`,
+      `Tags: ${grant.tags.join(", ")}`,
+      `Facts: ${facts.join(" | ")}`,
+    ].join("\n");
+  }, [grant]);
+
+  const questions = {
+    futureGoal: "What is your future goal as a mason?",
+    careerChoice: "Why have you chosen a career in masonry?",
+  } as const;
+
+  const generateAnswer = async (field: keyof typeof questions) => {
+    if (!OPENAI_API_KEY) {
+      Alert.alert(
+        "Missing API key",
+        "Add EXPO_PUBLIC_OPENAI_API_KEY to generate answers."
+      );
+      return;
+    }
+    setIsGenerating((prev) => ({ ...prev, [field]: true }));
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You draft concise, authentic grant application answers in first person for a trades applicant. Use the profile and grant context provided. Stay truthful; avoid inventing specifics that are not present. Aim for 120-170 words. Show alignment with what the grant supports.",
+            },
+            {
+              role: "user",
+              content: [
+                `Grant details:\n${grantContext}`,
+                `Applicant profile:\n${profileContext}`,
+                `Question: ${questions[field]}`,
+                "Write a single cohesive paragraph. Keep tone genuine and professional.",
+              ].join("\n\n"),
+            },
+          ],
+          temperature: 0.5,
+          max_tokens: 320,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`OpenAI error ${response.status}`);
+      }
+
+      const data = await response.json();
+      const next =
+        data?.choices?.[0]?.message?.content?.trim() ||
+        "Unable to generate an answer right now.";
+
+      setFormData((prev) => ({ ...prev, [field]: next }));
+    } catch (error) {
+      console.error("Failed to generate answer", error);
+      Alert.alert(
+        "Generation failed",
+        "We couldn't generate an answer right now. Please try again."
+      );
+    } finally {
+      setIsGenerating((prev) => ({ ...prev, [field]: false }));
+    }
+  };
 
   const handleChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -365,9 +481,24 @@ export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
 
           <View style={styles.writtenAnswersContent}>
             <View style={styles.writtenAnswersColumn}>
-              <Text style={styles.questionLabel}>
-                What is your future goal as a mason?
-              </Text>
+              <View style={styles.questionRow}>
+                <Text style={styles.questionLabel}>
+                  What is your future goal as a mason?
+                </Text>
+                <TouchableOpacity
+                  onPress={() => generateAnswer("futureGoal")}
+                  disabled={isGenerating.futureGoal}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Generate answer with AI"
+                >
+                  {isGenerating.futureGoal ? (
+                    <ActivityIndicator size="small" color={Theme.colors.purple} />
+                  ) : (
+                    <SparkleIcon size={18} />
+                  )}
+                </TouchableOpacity>
+              </View>
               <CopyableInput
                 value={formData.futureGoal}
                 onChangeText={(text) => handleChange("futureGoal", text)}
@@ -377,9 +508,24 @@ export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
             </View>
 
             <View style={styles.writtenAnswersColumn}>
-              <Text style={styles.questionLabel}>
-                Why have you chosen a career in masonry?
-              </Text>
+              <View style={styles.questionRow}>
+                <Text style={styles.questionLabel}>
+                  Why have you chosen a career in masonry?
+                </Text>
+                <TouchableOpacity
+                  onPress={() => generateAnswer("careerChoice")}
+                  disabled={isGenerating.careerChoice}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Generate answer with AI"
+                >
+                  {isGenerating.careerChoice ? (
+                    <ActivityIndicator size="small" color={Theme.colors.purple} />
+                  ) : (
+                    <SparkleIcon size={18} />
+                  )}
+                </TouchableOpacity>
+              </View>
               <CopyableInput
                 value={formData.careerChoice}
                 onChangeText={(text) => handleChange("careerChoice", text)}
@@ -464,6 +610,12 @@ const styles = StyleSheet.create({
   inputWrapper: {
     position: "relative",
     justifyContent: "center",
+  },
+  questionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: Theme.spacing.sm,
   },
   copyButton: {
     position: "absolute",
