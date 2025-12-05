@@ -7,10 +7,12 @@ import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Animated,
+  DevSettings,
   ScrollView,
   StyleSheet,
   Text,
@@ -516,14 +518,19 @@ export default function Profile() {
     router.push("/profile-picture?source=profile");
   };
 
-  const handleContinue = () => {
-    router.push("/basic-profile-name");
-  };
-
   const handleLogout = async () => {
-    await AsyncStorage.clear();
-    await signOut();
-    router.replace("/sign-in");
+    try {
+      await AsyncStorage.clear();
+      await signOut();
+      if (DevSettings.reload) {
+        DevSettings.reload();
+      } else {
+        router.replace("/sign-in");
+      }
+    } catch (error) {
+      console.error("Logout failed to reload app", error);
+      router.replace("/sign-in");
+    }
   };
 
   return (
@@ -732,14 +739,6 @@ export default function Profile() {
           </ProfileSectionCard>
         </View>
 
-        {/* Continue Button */}
-        <TouchableOpacity
-          style={styles.continueButton}
-          onPress={handleContinue}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.continueButtonText}>Continue...</Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={styles.logoutButton}
           onPress={handleLogout}
@@ -902,15 +901,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#4B5563",
     marginBottom: 8,
-  },
-  continueButton: {
-    backgroundColor: Theme.colors.orange,
-    marginHorizontal: 20,
-    marginTop: 24,
-    marginBottom: 12,
-    borderRadius: Theme.radius.button,
-    ...Theme.padding.buttonLg,
-    alignItems: "center",
   },
   logoutButton: {
     backgroundColor: Theme.colors.orange,
