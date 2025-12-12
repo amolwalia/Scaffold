@@ -8,6 +8,7 @@ const OPENAI_API_KEY =
 const DEFAULT_SYSTEM_PROMPT =
   "You clean speech transcripts for form inputs. Respond with the most concise value, remove filler words, and leave the field empty if nothing relevant was spoken.";
 
+// Small, field-specific prompts keep Whisper output tightly formatted for each input.
 const FIELD_PROMPTS: Record<string, string> = {
   name: "Return only the full name. Remove filler words and honorifics.",
   firstName: "Return only the first name (one or two short words).",
@@ -91,6 +92,7 @@ const assertApiKey = () => {
 const transcribeAudioFile = async (uri: string): Promise<string> => {
   assertApiKey();
 
+  // Whisper-style endpoint that returns plain text for the recorded file.
   const extension = uri.split(".").pop() || "m4a";
   const formData = new FormData();
   formData.append("model", "gpt-4o-mini-transcribe");
@@ -133,6 +135,7 @@ const cleanTranscriptSingleField = async (
 ): Promise<string> => {
   assertApiKey();
 
+  // One-off clean up for a single field (cheapest path).
   const prompt = instructions || "Return the concise cleaned text.";
 
   const response = await fetch(`${OPENAI_API_BASE}/chat/completions`, {
@@ -184,6 +187,7 @@ const cleanTranscriptMultiField = async (
 ): Promise<Record<string, string>> => {
   assertApiKey();
 
+  // Multi-field extraction to JSON so we can hydrate several inputs at once.
   const fieldPrompt = fields
     .map((key) => {
       const instructions =
@@ -263,6 +267,7 @@ export const transcribeAndCleanAudio = async ({
   fields,
   promptOverride,
 }: TranscriptionPayload): Promise<TranscriptionResult> => {
+  // High-level helper that records > transcribes > cleans, then returns raw + cleaned text.
   const rawText = await transcribeAudioFile(uri);
   if (!rawText) {
     return { rawText: "", cleanedText: "" };

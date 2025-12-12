@@ -61,6 +61,7 @@ export default function Profile() {
       return;
     }
 
+    // Lightweight bounce animation for the three loading dots while uploads run.
     const animateDot = (index: number) => {
       Animated.sequence([
         Animated.timing(dotOffsets[index], {
@@ -110,7 +111,7 @@ export default function Profile() {
       const file = result.assets[0];
       setIsProcessing(true);
 
-      //upload documents
+      // 1) Ask our Lambda for a presigned PUT URL
       console.log('Selected file:', file);
       const _resp = await fetch(
         'https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/',
@@ -133,7 +134,7 @@ export default function Profile() {
         throw new Error(`Invalid presigned URL.`);
       }
 
-      // upload file to S3 using the presigned PUT URL
+      // 2) PUT the file blob to S3 with that URL
       const fileUri = file.uri ?? file.uri;
 
       const resp = await fetch(fileUri);
@@ -155,7 +156,7 @@ export default function Profile() {
         throw new Error(`Failed to upload the file to S3.`);
       }
 
-      //training documents
+      // 3) Trigger training so the doc is indexed before extraction
       const _resp_train = await fetch(
         'https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/',
         {
@@ -183,7 +184,7 @@ export default function Profile() {
         throw new Error(`Training failed.`);
       }
 
-      //prompting documents
+      // 4) Prompt the trained doc to pull structured profile fields back into state
       const _prompt = await fetch(
         'https://m3rcwp4vofeta3kqelrykbgosi0rswzn.lambda-url.ca-central-1.on.aws/',
         {
@@ -395,8 +396,6 @@ export default function Profile() {
           updateProfileData(updates);
         }
       }
-
-      // You can now handle the file (upload, display name, etc.)
     } catch (error) {
       console.error('Error picking document:', error);
       Alert.alert(

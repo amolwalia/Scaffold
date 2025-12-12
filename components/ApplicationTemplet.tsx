@@ -120,6 +120,7 @@ export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
   });
 
   const autoFilledValues = useMemo(() => {
+    // Pull whatever we can from ProfileContext and fall back to template defaults.
     const { first: nameFirst, last: nameLast } = buildName(
       profileData.name || ""
     );
@@ -223,6 +224,7 @@ export default function ApplicationTemplet({ grant }: ApplicationTempletProps) {
       );
       return;
     }
+    // Inline spinner per field keeps UI responsive if both prompts are used back-to-back.
     setIsGenerating((prev) => ({ ...prev, [field]: true }));
     try {
       const response = await fetch("https://api.openai.com/v1/chat/completions", {

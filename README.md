@@ -1,54 +1,63 @@
 # Scaffold
 
-Scaffold is a networking app for tradespeople and apprentices to connect and find community.  
-The app provides a safe, supportive space where users can join groups, share experiences, and access opportunities within the trades industry.
+![Scaffold logo](assets/images/scaffold%20logo.svg)
 
-## Project Status
+Grant and scholarship companion for tradespeople, apprentices, and students. Scaffold auto-fills your profile into applications, drafts answers with AI, and keeps documents and deadlines in one calm flow.
 
-🚧 **Early Development**  
-This project is in its initial stages. We are currently setting up the foundation and haven’t built out core features yet.
+## Why Scaffold
 
-## Tech Stack
+- Auto-filled applications: pull contact, education, and apprenticeship details straight from your profile.
+- AI-written drafts: per-question generation with sensible defaults and smooth input resizing.
+- Document checklist: see what’s required and upload from the flow.
+- Direct apply: tap through to the grant portal without losing context.
+- Built with Expo Router, NativeWind styling, and a trades-focused theme.
 
-- [Expo](https://expo.dev/) — for building and testing our React Native app
-- React Native — mobile app framework
-- Planned: Backend and database (to be decided in future phases)
+## Quickstart
 
-## Supabase Auth Setup
+Prerequisites: Node 18+, npm, and Expo tooling (`npm i -g expo-cli` if you like the global helper).
 
-1. Create a Supabase project and copy your `Project URL` and `anon` key.
-2. Duplicate `.env.example` to `.env` (or your preferred env file) and fill in:
-   - `EXPO_PUBLIC_SUPABASE_URL`
-   - `EXPO_PUBLIC_SUPABASE_ANON_KEY`
-   - Optional: `EXPO_PUBLIC_SUPABASE_RESET_REDIRECT_URL` for password reset links.
-3. Start the app (`npm start` / `expo start`). You’ll see the new Supabase-backed sign up and log in screens before reaching the tabs.
+```bash
+git clone https://github.com/amolwalia/Scaffold.git
+cd Scaffold
+npm install
+npm run start   # opens Expo Dev Tools; press i for iOS, a for Android, or scan the QR
+```
 
-## Goals (Initial Phase)
+## Configuration
 
-- Set up the project environment using Expo
-- Define the app’s core flows and navigation structure
-- Build a simple prototype for testing basic interactions
+Create a `.env` (or `.env.local`) with:
 
-## How to Run (once setup is ready)
+- `EXPO_PUBLIC_SUPABASE_URL`
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+- `EXPO_PUBLIC_SUPABASE_RESET_REDIRECT_URL` (optional)
+- `EXPO_PUBLIC_OPENAI_API_KEY` (required for AI answers)
 
-1. Clone the repository:
+## Scripts
 
-   git clone https://github.com/amolwalia/Scaffold.git
+- `npm run start` — Expo dev server
+- `npm run ios` / `npm run android` — run on simulator/device
+- `npm run web` — web dev build
+- `npm run build` — export web build
+- `npm run lint` — lint via Expo
+- `npm run reset-project` — reset project state
 
-2. Navigate into the project folder:
+## Product Tour
 
-   cd scaffold
+- **Grant Details & Apply**: “You’re almost done!” hero with portal CTA.
+- **Generated Application**: auto-filled profile sections (Basic Profile, Education, References), AI-written answers, document checklist, upload CTA.
+- **Profile**: editable sections with progress tracking and document ingest-to-profile automation.
+- **Bottom Navigation**: keeps grants, profile, and docs within reach.
 
-3. Install dependencies:
+## Structure
 
-   npm install
+- `app/` — Expo Router pages (e.g., `generated-application.tsx`)
+- `components/` — shared UI (BottomNavigation, icons, cards)
+- `constants/` — theme tokens, grant data
+- `contexts/` — app-wide providers (ProfileContext)
+- `hooks/` and `utilities/` — reusable logic and helpers
+- `assets/` — logos, illustrations
 
-4. Start the Expo development server:
+## Links
 
-   npx expo start
-
-This will launch Expo Dev Tools in your browser, where you can run the app in an iOS/Android simulator or on your own device with the Expo Go app.
-
-Contributing
-
-Since this is an early-stage project, contributions right now focus on planning, documentation, and setting up the development environment. As the app structure grows, we’ll add contribution guidelines.
+- Website: https://www.tryscaffold.ca/
+- Instagram: https://www.instagram.com/tryscaffold/?hl=en

@@ -74,6 +74,7 @@ export default function GeneratedApplicationScreen() {
 
   const autoFilledProfile = useMemo(
     () => ({
+      // Mirror the profile into the printable template; show prompts when missing.
       fullName: profileData.name || "Add your name",
       streetAddress: profileData.address || "Add your address",
       city:

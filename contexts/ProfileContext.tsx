@@ -89,6 +89,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       const storedData = await AsyncStorage.getItem(STORAGE_KEY);
       if (storedData) {
         const parsedData = JSON.parse(storedData);
+        // Keep the default shape but hydrate with anything we previously saved.
         setProfileData({ ...defaultProfileData, ...parsedData });
       }
     } catch (error) {
@@ -109,7 +110,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const updateProfileData = (data: Partial<ProfileData>) => {
     setProfileData((prev) => {
       const updated = { ...prev, ...data };
-      // Save to storage asynchronously
+      // Persist on every change so the UI stays in sync with storage.
       saveProfileData(updated);
       return updated;
     });
